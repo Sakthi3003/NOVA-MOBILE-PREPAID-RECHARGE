@@ -1,0 +1,74 @@
+{
+    "users": [
+      {
+        "id": 1,
+        "simHolderName": "John Doe",
+        "number": "+91 9876543210",
+        "dateOfActivation": "2024-02-12",
+        "address": "Mumbai, India",
+        "dateOfBirth": "1995-01-01",
+        "username": "JohnDoe123",
+        "email": "johndoe@example.com",
+        "password": "Sowmi@3012",
+        "role": "admin",
+        "status": "active",
+        "placeOfSupply": "TamilNadu"
+      },
+      {
+        "id": 2,
+        "simHolderName": "Jane Smith",
+        "number": "+91 8765432109",
+        "dateOfActivation": "2023-03-15",
+        "address": "Delhi, India",
+        "dateOfBirth": "1992-02-10",
+        "username": "abs",
+        "email": "dfdf",
+        "password": "eref",
+        "role": "user",
+        "status": "active",
+        "placeOfSupply": "TamilNadu"
+      },
+      {
+        "id": 3,
+        "simHolderName": "Rahul Kumar",
+        "number": "+91 7654321098",
+        "dateOfActivation": "2022-04-20",
+        "address": "Bangalore, India",
+        "dateOfBirth": "1990-12-25",
+        "username": "rahulkumar123",
+        "email": "rahul@gmail.com",
+        "password": "1234",
+        "role": "user",
+        "status": "active",
+        "placeOfSupply": "TamilNadu"
+      },
+      {
+        "id": 4,
+        "simHolderName": "Sakthisowmya T",
+        "number": "+91 9342593511",
+        "dateOfActivation": "2022-04-20",
+        "address": "Bangalore, India",
+        "dateOfBirth": "1990-12-30",
+        "username": "sowmya123",
+        "email": "sowmya@example.com",
+        "password": "sowmya@123",
+        "role": "user",
+        "status": "active",
+        "placeOfSupply": "TamilNadu"
+      },
+      {
+        "id": 5,
+        "simHolderName": "Sakthisowmya T",
+        "number": "+91 9342593512",
+        "dateOfActivation": "2022-04-30",
+        "address": "Bangalore, India",
+        "dateOfBirth": "1990-12-30",
+        "username": "sowmya456",
+        "email": "sowmya456@example.com",
+        "password": "sowmya@456",
+        "role": "user",
+        "status": "active",
+        "placeOfSupply": "TamilNadu"
+      }
+    ]
+  }

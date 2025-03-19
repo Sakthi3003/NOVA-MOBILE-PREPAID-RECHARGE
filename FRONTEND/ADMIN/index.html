@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include jQuery Validate Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <!-- css -->
+    <link rel="stylesheet" href="./assets/css/login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="logo-container">
+                <div class="logo1"><img src="./assets/images/logo.webp" alt="" height="75" width="180"></div>
+            </div>
+            
+            <!-- Login Form -->
+            <div class="card-body" id="loginForm">
+                <h2 class="form-title">Admin Login</h2>
+                <form id="adminLoginForm">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username">
+                        <label for="username" class="error"></label>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password">
+                        <label for="password" class="error"></label>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                    <div class="form-footer">
+                        <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Forgot Password Form -->
+            <div class="card-body hidden" id="forgotPasswordForm">
+                <h2 class="form-title">Reset Password</h2>
+                <p style="text-align: center; margin-bottom: 20px; font-size: 14px;">Enter your email address to receive a password reset link.</p>
+                <form id="requestResetForm">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email">
+                        <label for="email" class="error"></label>
+                    </div>
+                    <button type="submit" class="btn">Send Reset Link</button>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <a href="#" class="back-btn" id="backToLoginLink">Back to Login</a>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Reset Password Confirmation -->
+            <div class="card-body hidden" id="resetConfirmation">
+                <div class="alert alert-success">
+                    Password reset link has been sent to your email!
+                </div>
+                <h2 class="form-title">Check Your Email</h2>
+                <p style="text-align: center; margin-bottom: 20px; font-size: 14px;">We've sent a password reset link to your email address. Please check your inbox and follow the instructions.</p>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="#" class="back-btn" id="backToLoginFromConfirm">Back to Login</a>
+                </div>
+            </div>
+            
+            <!-- New Password Form -->
+            <div class="card-body hidden" id="newPasswordForm">
+                <h2 class="form-title">Create New Password</h2>
+                <form id="resetPasswordForm">
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="Enter new password">
+                        <label for="newPassword" class="error"></label>
+                        <div class="password-requirements">
+                            <div class="requirement invalid" id="length">
+                                <div class="requirement-icon"></div>
+                                <span>At least 8 characters</span>
+                            </div>
+                            <div class="requirement invalid" id="uppercase">
+                                <div class="requirement-icon"></div>
+                                <span>At least one uppercase letter</span>
+                            </div>
+                            <div class="requirement invalid" id="lowercase">
+                                <div class="requirement-icon"></div>
+                                <span>At least one lowercase letter</span>
+                            </div>
+                            <div class="requirement invalid" id="number">
+                                <div class="requirement-icon"></div>
+                                <span>At least one number</span>
+                            </div>
+                            <div class="requirement invalid" id="special">
+                                <div class="requirement-icon"></div>
+                                <span>At least one special character</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm new password">
+                        <label for="confirmPassword" class="error"></label>
+                    </div>
+                    <button type="submit" class="btn">Reset Password</button>
+                </form>
+            </div>
+            
+            <!-- Password Reset Success -->
+            <div class="card-body hidden" id="resetSuccess">
+                <div class="alert alert-success">
+                    Your password has been reset successfully!
+                </div>
+                <h2 class="form-title">Password Reset Complete</h2>
+                <p style="text-align: center; margin-bottom: 20px; font-size: 14px;">Your password has been changed successfully. You can now login with your new password.</p>
+                <button class="btn" id="goToLoginBtn">Go to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="path/to/jquery-3.6.0.min.js"></script>
+<script src="path/to/jquery.validate.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Ensure jQuery and jQuery Validate are loaded
+            if (typeof $.fn.validate === 'undefined') {
+                console.error("jQuery Validate plugin is not loaded");
+                return;
+            }
+
+            // Define admin credentials
+            const ADMIN_USERNAME = "admin";
+            const ADMIN_PASSWORD = "Sowmi@3012";
+
+            // Function to show toast notification
+            function showToast(message, type = 'error') {
+                const toastId = 'toast-' + new Date().getTime();
+                const toastHtml = `
+                    <div id="${toastId}" class="toast ${type}">
+                        <span class="toast-message">${message}</span>
+                        <span class="close-toast">×</span>
+                    </div>
+                `;
+                $('#toastContainer').append(toastHtml);
+
+                const $toast = $(`#${toastId}`);
+                $toast.addClass('show');
+
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    $toast.removeClass('show');
+                    setTimeout(() => $toast.remove(), 500); // Wait for animation to finish
+                }, 5000);
+
+                // Close on click
+                $toast.find('.close-toast').click(() => {
+                    $toast.removeClass('show');
+                    setTimeout(() => $toast.remove(), 500);
+                });
+            }
+
+            // Login Form Validation
+            $("#adminLoginForm").validate({
+                rules: {
+                    username: {
+                        required: true,
+                        minlength: 4
+                    },
+                    password: {
+                        required: true,
+                        minlength: 6
+                    }
+                },
+                messages: {
+                    username: {
+                        required: "Username is required",
+                        minlength: "Username must be at least 4 characters long"
+                    },
+                    password: {
+                        required: "Password is required",
+                        minlength: "Password must be at least 6 characters long"
+                    }
+                },
+                submitHandler: function(form) {
+                    const username = $("#username").val();
+                    const password = $("#password").val();
+
+                    console.log("Username entered:", username);
+                    console.log("Password entered:", password);
+
+                    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                        console.log("Credentials match! Showing loading spinner...");
+                        $("#loadingOverlay").css("display", "flex");
+                        
+                        setTimeout(function() {
+                            console.log("Redirecting to admin-dashboard.html");
+                            window.location.href = "./analytics.html";
+                        }, 2000);
+                    } else {
+                        console.log("Invalid credentials");
+                        showToast("Invalid username or password", "error");
+                    }
+                }
+            });
+
+            // Forgot Password Form Validation
+            $("#requestResetForm").validate({
+                rules: {
+                    email: {
+                        required: true,
+                        email: true
+                    }
+                },
+                messages: {
+                    email: {
+                        required: "Email is required",
+                        email: "Please enter a valid email address"
+                    }
+                },
+                submitHandler: function(form) {
+                    $("#forgotPasswordForm").addClass("hidden");
+                    $("#resetConfirmation").removeClass("hidden");
+                    showToast("Password reset link sent to your email!", "success");
+                }
+            });
+
+            // Reset Password Form Validation
+            $("#resetPasswordForm").validate({
+                rules: {
+                    newPassword: {
+                        required: true,
+                        minlength: 8,
+                        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+                    },
+                    confirmPassword: {
+                        required: true,
+                        equalTo: "#newPassword"
+                    }
+                },
+                messages: {
+                    newPassword: {
+                        required: "New password is required",
+                        minlength: "Password must be at least 8 characters",
+                        pattern: "Password must contain uppercase, lowercase, number, and special character"
+                    },
+                    confirmPassword: {
+                        required: "Please confirm your password",
+                        equalTo: "Passwords do not match"
+                    }
+                },
+                submitHandler: function(form) {
+                    $("#newPasswordForm").addClass("hidden");
+                    $("#resetSuccess").removeClass("hidden");
+                    showToast("Password reset successful!", "success");
+                }
+            });
+
+            // Password validation on input (for visual feedback in reset password form)
+            $("#newPassword").on('input', function() {
+                const password = $(this).val();
+                const lengthValid = password.length >= 8;
+                const uppercaseValid = /[A-Z]/.test(password);
+                const lowercaseValid = /[a-z]/.test(password);
+                const numberValid = /[0-9]/.test(password);
+                const specialValid = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+                
+                $('#length').toggleClass('valid', lengthValid).toggleClass('invalid', !lengthValid);
+                $('#uppercase').toggleClass('valid', uppercaseValid).toggleClass('invalid', !uppercaseValid);
+                $('#lowercase').toggleClass('valid', lowercaseValid).toggleClass('invalid', !lowercaseValid);
+                $('#number').toggleClass('valid', numberValid).toggleClass('invalid', !numberValid);
+                $('#special').toggleClass('valid', specialValid).toggleClass('invalid', !specialValid);
+            });
+
+            // Form navigation
+            $("#forgotPasswordLink").click(function(e) {
+                e.preventDefault();
+                $("#loginForm").addClass("hidden");
+                $("#forgotPasswordForm").removeClass("hidden");
+            });
+
+            $("#backToLoginLink").click(function(e) {
+                e.preventDefault();
+                $("#forgotPasswordForm").addClass("hidden");
+                $("#loginForm").removeClass("hidden");
+            });
+
+            $("#backToLoginFromConfirm").click(function(e) {
+                e.preventDefault();
+                $("#resetConfirmation").addClass("hidden");
+                $("#loginForm").removeClass("hidden");
+            });
+
+            $("#goToLoginBtn").click(function() {
+                $("#resetSuccess").addClass("hidden");
+                $("#loginForm").removeClass("hidden");
+                showToast("You can now login with your new password", "success");
+            });
+
+            // For demo purposes: show new password form (double click logo)
+            $(".logo").dblclick(function() {
+                $("#loginForm").addClass("hidden");
+                $("#forgotPasswordForm").addClass("hidden");
+                $("#resetConfirmation").addClass("hidden");
+                $("#resetSuccess").addClass("hidden");
+                $("#newPasswordForm").removeClass("hidden");
+            });
+        });
+    </script>
+</body>
+</html>

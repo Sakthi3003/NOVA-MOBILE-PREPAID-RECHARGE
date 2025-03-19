@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIM Card Ordering</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: #2c2e3a;
+            min-height: 100vh;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        html, body {
+            font-family: 'Poppins', sans-serif;
+            height: 100%;
+        }
+
+        .custom-navbar {
+            background-color: #141619;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .navbar-nav .nav-link {
+            color: white;
+            font-size: 16px;
+            margin: 0 15px;
+            position: relative;
+            transition: all 0.3s ease-in-out;
+        }
+        .navbar-nav .nav-link:hover {
+            color: white;
+        }
+        .navbar-nav .nav-link::after {
+            content: '';
+            width: 0;
+            height: 2px;
+            background: #0a21c0;
+            transition: width 0.3s ease-in-out;
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+        }
+        .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }
+        .btn-login {
+            color: white;
+            background: transparent;
+            border: 1px solid white;
+            padding: 8px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-login:hover {
+            background: #0a21c0 !important;
+            border-color: #0a21c0 !important;
+            color: white;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background-color: #0a21c0;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(10, 33, 192, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            text-align: center;
+            color: #fff;
+        }
+        
+        .page {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: none;
+            border-top: 4px solid #0a21c0;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e1e4ed;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: #fafafa;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #0a21c0;
+            box-shadow: 0 0 0 2px rgba(10, 33, 192, 0.1);
+            background-color: white;
+        }
+        
+        button {
+            background-color: #0a21c0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background-color: #0818a0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(10, 33, 192, 0.2);
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .btn-back {
+            background-color: #ffffff;
+            border: 1px solid #0a21c0;
+            color: #0a21c0;
+        }
+        
+        .btn-back:hover {
+            background-color: #f0f3ff;
+        }
+        
+        .btn-home {
+            background-color: #2e8540;
+        }
+        
+        .btn-home:hover {
+            background-color: #246c34;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #e4e8f7;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #0a21c0;
+            transition: width 0.3s ease;
+        }
+        
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .otp-inputs input {
+            width: 55px;
+            height: 55px;
+            text-align: center;
+            font-size: 24px;
+            border-radius: 10px;
+            border: 2px solid #e1e4ed;
+            background-color: #fafafa;
+        }
+        
+        .otp-inputs input:focus {
+            border-color: #0a21c0;
+            box-shadow: 0 0 5px rgba(10, 33, 192, 0.3);
+        }
+        
+        .input-with-validation {
+            position: relative;
+        }
+        
+        .validation-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            font-size: 12px;
+        }
+        
+        .validation-indicator.valid {
+            color: #28a745;
+            display: block;
+        }
+        
+        .validation-indicator.invalid {
+            color: #dc3545;
+            display: block;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            background-color: #fff2f2;
+            border-left: 2px solid #dc3545;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-3px); }
+            40%, 80% { transform: translateX(3px); }
+        }
+        
+        .error-message:before {
+            content: "⚠️ ";
+        }
+        
+        input.error {
+            border-color: #dc3545;
+            background-color: #fff2f2;
+        }
+        
+        .validation-message {
+            margin-top: 6px;
+            font-size: 11px;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <div class="container sim">
+            <a class="navbar-brand text-white" href="#"><img src="./assets/images/logo.webp" alt="NOVA" height="30" width="70"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="./plans.html">Plans</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="./support.html">Support</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="./sim.html">Get Sim</a></li>
+                    <li class="nav-item" id="loginButtonContainer">
+                        <a class="btn btn-light btn-login" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>SIM Card Ordering</h1>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress-bar" style="width: 33%;"></div>
+        </div>
+        
+        <div class="page active" id="page-1">
+            <h2>Prepaid SIM Information</h2>
+            <p style="margin-top: 10px; margin-bottom: 20px;">Our standard prepaid SIM card includes everything you need.</p>
+            <div class="sim-info">
+                <div class="sim-icon">📱</div>
+                <div class="sim-title">Standard Prepaid SIM</div>
+                <div class="sim-description">Includes 5GB Data</div>
+                <div class="sim-description">Unlimited Voice Minutes</div>
+                <div class="sim-description">Valid for 28 days</div>
+                <div class="sim-description" style="font-weight: bold; margin-top: 10px; color: #0a21c0;">$20/month</div>
+            </div>
+            <div class="btn-container">
+                <button class="btn-back" onclick="goToHome()">Back to Home</button>
+                <button onclick="nextPage(1, 2)">Continue</button>
+            </div>
+        </div>
+        
+        <div class="page" id="page-2">
+            <h2>Contact Information</h2>
+            <p style="margin-top: 10px; margin-bottom: 20px;">Enter your mobile number to receive an OTP verification code.</p>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <div class="input-with-validation">
+                    <input type="tel" id="phone" placeholder="9876543210" maxlength="10" required>
+                    <span class="validation-indicator valid">✓</span>
+                    <span class="validation-indicator invalid">✗</span>
+                </div>
+                <div class="validation-message" id="phone-validation-msg">Enter a 10-digit mobile number</div>
+                <div id="phone-error" class="error-message">Please enter a valid 10-digit phone number</div>
+            </div>
+            
+            <div id="otp-section" style="display: none;">
+                <div class="form-group">
+                    <label>Enter OTP sent to your phone:</label>
+                    <div class="otp-inputs">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                    </div>
+                    <div id="otp-error" class="error-message">Please enter a valid 4-digit OTP</div>
+                    <div id="otp-attempts-error" class="error-message">Maximum 3 attempts reached. Please try again later.</div>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn-back" onclick="nextPage(2, 1)">Back</button>
+                <button id="verify-btn" onclick="verifyPhone()">Get OTP</button>
+                <button id="submit-otp-btn" style="display: none;" onclick="verifyOTP()">Verify OTP</button>
+            </div>
+        </div>
+        
+        <div class="page" id="page-3">
+            <h2>Delivery Details</h2>
+            <p style="margin-top: 10px; margin-bottom: 20px;">Provide your address and choose a delivery date.</p>
+            
+            <div class="form-group">
+                <label for="pincode">PIN Code:</label>
+                <div class="input-with-validation">
+                    <input type="text" id="pincode" placeholder="400001" maxlength="6" required>
+                    <span class="validation-indicator valid">✓</span>
+                    <span class="validation-indicator invalid">✗</span>
+                </div>
+                <div class="validation-message" id="pincode-validation-msg">Enter a 6-digit PIN code</div>
+                <div id="pincode-error" class="error-message">Please enter a valid 6-digit PIN code</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Complete Address:</label>
+                <div class="input-with-validation">
+                    <input type="text" id="address" placeholder="123 Main St, Mumbai" required>
+                    <span class="validation-indicator valid">✓</span>
+                    <span class="validation-indicator invalid">✗</span>
+                </div>
+                <div class="validation-message" id="address-validation-msg">Enter at least 10 characters</div>
+                <div id="address-error" class="error-message">Please enter your complete address (min 10 characters)</div>
+            </div>
+            
+            <div class="form-group">
+                <label>Select Delivery Date:</label>
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <span>March 2025</span>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="weekday">Sun</div>
+                        <div class="weekday">Mon</div>
+                        <div class="weekday">Tue</div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday">Thu</div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday">Sat</div>
+                        <div class="calendar-day disabled">2</div>
+                        <div class="calendar-day disabled">3</div>
+                        <div class="calendar-day disabled">4</div>
+                        <div class="calendar-day">5</div>
+                        <div class="calendar-day">6</div>
+                        <div class="calendar-day">7</div>
+                        <div class="calendar-day">8</div>
+                    </div>
+                </div>
+                <div id="date-error" class="error-message">Please select a delivery date</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="time-slot">Preferred Time Slot:</label>
+                <select id="time-slot">
+                    <option value="">Select a time slot</option>
+                    <option value="morning">Morning (9 AM - 12 PM)</option>
+                    <option value="afternoon">Afternoon (12 PM - 3 PM)</option>
+                    <option value="evening">Evening (3 PM - 6 PM)</option>
+                </select>
+                <div id="time-error" class="error-message">Please select a preferred time slot</div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn-back" onclick="nextPage(3, 2)">Back</button>
+                <button onclick="validateAndSubmitOrder()">Confirm Order</button>
+            </div>
+        </div>
+        
+        <div class="page" id="page-4">
+            <div class="success-icon">✓</div>
+            <h2 style="text-align: center;">Order Confirmed!</h2>
+            <p style="text-align: center; margin-top: 10px; margin-bottom: 20px;">Your SIM card order has been successfully placed.</p>
+            <div class="summary">
+                <p class="summary-title">Order Summary:</p>
+                <p><strong>Plan:</strong> <span id="summary-plan">Standard Prepaid SIM</span></p>
+                <p><strong>Phone:</strong> <span id="summary-phone">+91 98765 43210</span></p>
+                <p><strong>Address:</strong> <span id="summary-address">123 Main St, Mumbai, 400001</span></p>
+                <p><strong>Delivery:</strong> <span id="summary-delivery">March 8, 2025, Morning (9 AM - 12 PM)</span></p>
+            </div>
+            <div class="btn-container">
+                <button class="btn-back" onclick="nextPage(4, 3)">Back</button>
+                <button class="btn-home" onclick="goToHome()">Go to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let otpAttempts = 0;
+        const maxAttempts = 3;
+
+        function nextPage(current, next) {
+            document.getElementById('page-' + current).classList.remove('active');
+            document.getElementById('page-' + next).classList.add('active');
+            let progress = (next / 3) * 100;
+            if (next === 4) progress = 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+        
+        function goToHome() {
+            alert("Redirecting to Home Page...");
+            window.location.reload();
+        }
+        
+        const phoneInput = document.getElementById('phone');
+        const phoneError = document.getElementById('phone-error');
+        const phoneValidIndicator = phoneInput.parentElement.querySelector('.validation-indicator.valid');
+        const phoneInvalidIndicator = phoneInput.parentElement.querySelector('.validation-indicator.invalid');
+        const phoneValidationMsg = document.getElementById('phone-validation-msg');
+
+        function validatePhone() {
+            const phoneRegex = /^\d{10}$/;
+            const isValid = phoneRegex.test(phoneInput.value.trim());
+            if (!isValid) {
+                phoneInput.classList.add('error');
+                phoneError.style.display = 'block';
+                phoneValidIndicator.style.display = 'none';
+                phoneInvalidIndicator.style.display = 'block';
+                return false;
+            } else {
+                phoneInput.classList.remove('error');
+                phoneError.style.display = 'none';
+                phoneValidIndicator.style.display = 'block';
+                phoneInvalidIndicator.style.display = 'none';
+                return true;
+            }
+        }
+
+        phoneInput.addEventListener('input', function() {
+            const value = this.value.replace(/\D/g, '');
+            this.value = value;
+            if (value.length > 0) {
+                if (value.length === 10) {
+                    phoneValidationMsg.style.color = '#28a745';
+                    phoneValidationMsg.textContent = 'Valid mobile number';
+                    validatePhone();
+                } else {
+                    phoneValidationMsg.style.color = '#666';
+                    phoneValidationMsg.textContent = 'Enter a 10-digit mobile number';
+                    phoneInput.classList.add('error');
+                    phoneValidIndicator.style.display = 'none';
+                    phoneInvalidIndicator.style.display = 'block';
+                }
+            } else {
+                phoneValidIndicator.style.display = 'none';
+                phoneInvalidIndicator.style.display = 'none';
+                phoneValidationMsg.style.color = '#666';
+                phoneValidationMsg.textContent = 'Enter a 10-digit mobile number';
+            }
+        });
+
+        function verifyPhone() {
+            if (validatePhone()) {
+                document.getElementById('otp-section').style.display = 'block';
+                document.getElementById('verify-btn').style.display = 'none';
+                document.getElementById('submit-otp-btn').style.display = 'block';
+                setupOTPInputs();
+                // No OTP sending logic here; will be added via API later
+            }
+        }
+
+        function setupOTPInputs() {
+            const inputs = document.querySelectorAll('.otp-input');
+            inputs.forEach((input, index) => {
+                input.value = '';
+                input.addEventListener('keyup', function(e) {
+                    const isNumber = /^[0-9]$/;
+                    if (isNumber.test(e.key)) {
+                        this.value = e.key;
+                        if (index < inputs.length - 1) inputs[index + 1].focus();
+                    } else if (e.key === 'Backspace') {
+                        this.value = '';
+                        if (index > 0) inputs[index - 1].focus();
+                    }
+                });
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+            });
+            inputs[0].focus();
+        }
+
+        function verifyOTP() {
+            let otp = '';
+            let isComplete = true;
+            document.querySelectorAll('.otp-input').forEach(input => {
+                otp += input.value;
+                if (!input.value) isComplete = false;
+            });
+            const otpError = document.getElementById('otp-error');
+            const otpAttemptsError = document.getElementById('otp-attempts-error');
+            const submitOtpBtn = document.getElementById('submit-otp-btn');
+
+            if (!isComplete) {
+                otpError.style.display = 'block';
+                return;
+            }
+
+            otpAttempts++;
+            if (otpAttempts >= maxAttempts) {
+                otpAttemptsError.style.display = 'block';
+                otpError.style.display = 'none';
+                submitOtpBtn.disabled = true;
+                submitOtpBtn.textContent = 'Attempts Exhausted';
+                return;
+            }
+
+            // For now, accept any 4-digit OTP since no API is connected
+            otpError.style.display = 'none';
+            otpAttemptsError.style.display = 'none';
+            nextPage(2, 3);
+        }
+
+        const pincodeInput = document.getElementById('pincode');
+        const addressInput = document.getElementById('address');
+        const pincodeError = document.getElementById('pincode-error');
+        const addressError = document.getElementById('address-error');
+        const pincodeValidIndicator = pincodeInput.parentElement.querySelector('.validation-indicator.valid');
+        const pincodeInvalidIndicator = pincodeInput.parentElement.querySelector('.validation-indicator.invalid');
+        const addressValidIndicator = addressInput.parentElement.querySelector('.validation-indicator.valid');
+        const addressInvalidIndicator = addressInput.parentElement.querySelector('.validation-indicator.invalid');
+        const pincodeValidationMsg = document.getElementById('pincode-validation-msg');
+        const addressValidationMsg = document.getElementById('address-validation-msg');
+
+        function validatePincode() {
+            const pincodeRegex = /^\d{6}$/;
+            const isValid = pincodeRegex.test(pincodeInput.value.trim());
+            if (!isValid) {
+                pincodeInput.classList.add('error');
+                pincodeError.style.display = 'block';
+                pincodeValidIndicator.style.display = 'none';
+                pincodeInvalidIndicator.style.display = 'block';
+                return false;
+            } else {
+                pincodeInput.classList.remove('error');
+                pincodeError.style.display = 'none';
+                pincodeValidIndicator.style.display = 'block';
+                pincodeInvalidIndicator.style.display = 'none';
+                return true;
+            }
+        }
+
+        function validateAddress() {
+            const isValid = addressInput.value.trim().length >= 10;
+            if (!isValid) {
+                addressInput.classList.add('error');
+                addressError.style.display = 'block';
+                addressValidIndicator.style.display = 'none';
+                addressInvalidIndicator.style.display = 'block';
+                return false;
+            } else {
+                addressInput.classList.remove('error');
+                addressError.style.display = 'none';
+                addressValidIndicator.style.display = 'block';
+                addressInvalidIndicator.style.display = 'none';
+                return true;
+            }
+        }
+
+        pincodeInput.addEventListener('input', function() {
+            const value = this.value.replace(/\D/g, '');
+            this.value = value;
+            if (value.length > 0) {
+                if (value.length === 6) {
+                    pincodeValidationMsg.style.color = '#28a745';
+                    pincodeValidationMsg.textContent = 'Valid PIN code';
+                    validatePincode();
+                } else {
+                    pincodeValidationMsg.style.color = '#666';
+                    pincodeValidationMsg.textContent = 'Enter a 6-digit PIN code';
+                    pincodeInput.classList.add('error');
+                    pincodeValidIndicator.style.display = 'none';
+                    pincodeInvalidIndicator.style.display = 'block';
+                }
+            } else {
+                pincodeValidIndicator.style.display = 'none';
+                pincodeInvalidIndicator.style.display = 'none';
+                pincodeValidationMsg.style.color = '#666';
+                pincodeValidationMsg.textContent = 'Enter a 6-digit PIN code';
+            }
+        });
+
+        addressInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            if (value.length > 0) {
+                if (value.length >= 10) {
+                    addressValidationMsg.style.color = '#28a745';
+                    addressValidationMsg.textContent = 'Valid address';
+                    validateAddress();
+                } else {
+                    addressValidationMsg.style.color = '#666';
+                    addressValidationMsg.textContent = `Enter at least ${10 - value.length} more characters`;
+                    addressInput.classList.add('error');
+                    addressValidIndicator.style.display = 'none';
+                    addressInvalidIndicator.style.display = 'block';
+                }
+            } else {
+                addressValidIndicator.style.display = 'none';
+                addressInvalidIndicator.style.display = 'none';
+                addressValidationMsg.style.color = '#666';
+                addressValidationMsg.textContent = 'Enter at least 10 characters';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const days = document.querySelectorAll('.calendar-day:not(.disabled)');
+            days.forEach(day => {
+                day.addEventListener('click', function() {
+                    days.forEach(d => d.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('date-error').style.display = 'none';
+                });
+            });
+        });
+
+        function validateAndSubmitOrder() {
+            const timeSlot = document.getElementById('time-slot').value;
+            const selectedDay = document.querySelector('.calendar-day.selected');
+            let isValid = true;
+
+            if (!validatePincode()) isValid = false;
+            if (!validateAddress()) isValid = false;
+
+            if (!selectedDay) {
+                document.getElementById('date-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('date-error').style.display = 'none';
+            }
+
+            if (!timeSlot) {
+                document.getElementById('time-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('time-error').style.display = 'none';
+            }
+
+            if (!isValid) return;
+
+            let date = selectedDay ? "March " + selectedDay.textContent + ", 2025" : "Not selected";
+            let timeSlotText = "";
+            if (timeSlot === "morning") timeSlotText = "Morning (9 AM - 12 PM)";
+            if (timeSlot === "afternoon") timeSlotText = "Afternoon (12 PM - 3 PM)";
+            if (timeSlot === "evening") timeSlotText = "Evening (3 PM - 6 PM)";
+
+            document.getElementById('summary-phone').textContent = formatPhoneNumber(phoneInput.value);
+            document.getElementById('summary-address').textContent = addressInput.value + ", " + pincodeInput.value;
+            document.getElementById('summary-delivery').textContent = date + ", " + timeSlotText;
+
+            nextPage(3, 4);
+        }
+
+        function formatPhoneNumber(phoneNumber) {
+            if (phoneNumber.length === 10) {
+                return phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, '+91 $1-$2-$3');
+            }
+            return phoneNumber;
+        }
+    </script>
+</body>
+</html>

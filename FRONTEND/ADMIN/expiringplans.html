@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova - Expiring Plans</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
+    <link rel="stylesheet" href="./assets/css/expiringplans.css">
+</head>
+<body>
+    <!-- Header with Menu Toggler (Keeping Logo and Title on Left) -->
+    <header class="header">
+        <div class="logo-container">
+            <img src="./assets/images/logo.webp" alt="" height="40px" width="70px">
+            <!-- <div class="header-title">Admin Dashboard</div> -->
+        </div>
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="header-actions">
+            <div class="nav-menu" id="navMenu">
+                <a href="./analytics.html" class="nav-item">Analytics</a>
+                <a href="./expiringplans.html" class="nav-item active">Expiring Plans</a>
+                <a href="./manageplans.html" class="nav-item">Manage Plans</a>
+                <a href="./subscriberManagement.html" class="nav-item">Manage Users</a>
+                <a href="./profile.html" class="nav-item">Profile</a>
+                <a href="./index.html" class="nav-item logout-btn">Logout</a>
+                <i class="fas fa-user-circle admin-icon"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container dashboard-container">
+        <!-- Filters and Table -->
+        <div class="card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="fw-bold mb-0">Plans Expiring in 3 Days</h3>
+                <div class="d-flex gap-1"> <!-- Reduced gap for compactness -->
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control search-input" id="searchInput" placeholder="Search customers...">
+                    </div>
+                    <button id="bulkNotifyBtn" class="btn btn-primary">
+                        <i class="fas fa-bell me-1"></i>Bulk Notify
+                    </button>
+                    <button id="automateCallsBtn" class="btn btn-primary">
+                        <i class="fas fa-phone-alt me-1"></i>Automate Calls
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table align-middle" id="expiringTable">
+                        <thead>
+                            <tr>
+                                <th>Customer Name</th>
+                                <th>Expiry Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expiringList"></tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-end p-2"> <!-- Reduced padding for compactness -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination mb-0" id="pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Improved Profile & Transaction Modal (Matching Image) -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">Customer Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Profile</h6>
+                    <div class="profile-info">
+                        <p><strong>Name:</strong> <span id="custName"></span></p>
+                        <p><strong>Email:</strong> <span id="custEmail"></span></p>
+                        <p><strong>Phone:</strong> <span id="custPhone"></span></p>
+                        <p><strong>Plan:</strong> <span id="custPlan"></span></p>
+                        <p><strong>Expiry Date:</strong> <span id="custExpiry"></span></p>
+                        <p><strong>Amount:</strong> <span id="custAmount"></span></p>
+                    </div>
+                    <div class="transaction-history">
+                        <h6>Transaction History</h6>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Plan</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- Loading Overlay (Added for Logout) -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script src="./assets/js/expiringplans.js"></script>
+</body>
+</html>

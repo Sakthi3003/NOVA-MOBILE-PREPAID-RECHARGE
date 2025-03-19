@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA - Support</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="icon" type="image/png" href="./assets/images/android-chrome-192x192.png">
+    <link rel="stylesheet" href="../assets/css/support-g.css">
+    <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
+    <!-- Inline CSS for Validation Changes Only -->
+    <style>
+        /* Validation Styles (Added Only) */
+        .form-control.error {
+            border-color: #dc3545;
+            background-color: #fff2f2;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            background-color: #fff2f2;
+            border-left: 2px solid #dc3545;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error-message:before {
+            content: "⚠️ ";
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-3px); }
+            40%, 80% { transform: translateX(3px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="index.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40" width="100"></a>
+        <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+        <div class="nav-links" id="nav-links">
+            <a href="../index.html" class="nav-link">Home</a>
+            <a href="plans.html" class="nav-link">Plans</a>
+            <a href="support.html" class="nav-link active">Support</a>
+            <a href="about.html" class="nav-link">About us</a>
+            <a href="./login.html" class="btn login-btn">Login</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Support & Help Center</h2>
+
+        <!-- Support Options -->
+        <section class="support-options">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h4>Email Support</h4>
+                        <p>Send us your questions or concerns and we'll respond within 24 hours.</p>
+                        <a href="mailto:support@nova.com" class="btn btn-sm btn-outline-primary mt-3">Email Us</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h4>Documentation</h4>
+                        <p>Find detailed guides and tutorials in our knowledge base.</p>
+                        <a href="#faq-section" class="btn btn-sm btn-outline-primary mt-3">Browse FAQs</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h4>Request a Feature</h4>
+                        <p>Have an idea to improve our platform? Share your suggestions with us to help shape future updates.</p>
+                        <a href="#contact-section" class="btn btn-sm btn-outline-primary mt-3">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="contact-info">
+                <h3 class="section-heading">Get in Touch</h3>
+                <p>Have a question or need assistance? Fill out this form and our support team will get back to you as soon as possible.</p>
+                
+                <div class="contact-channels">
+                    <div class="contact-channel">
+                        <div class="channel-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="channel-details">
+                            <h5>Email</h5>
+                            <p>support@nova.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-channel">
+                        <div class="channel-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="channel-details">
+                            <h5>Response Time</h5>
+                            <p>Within 24 hours</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="contact-form">
+                <form id="supportForm" onsubmit="handleFormSubmit(event); return false;">
+                    <div class="form-group">
+                        <label for="name" class="form-label">Your Name</label>
+                        <input type="text" class="form-control" id="name" name="name" aria-describedby="name-error" placeholder="John Doe">
+                        <div class="error-message" id="name-error">Please enter your name (at least 2 characters).</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="text" class="form-control" id="email" name="email" aria-describedby="email-error" placeholder="john.doe@example.com">
+                        <div class="error-message" id="email-error">Please enter a valid email address.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject" class="form-label">Subject</label>
+                        <select class="form-control" id="subject" name="subject" aria-describedby="subject-error">
+                            <option value="" selected disabled>Select an issue type</option>
+                            <option value="billing">Billing Issue</option>
+                            <option value="technical">Technical Support</option>
+                            <option value="account">Account Management</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="error-message" id="subject-error">Please select an issue type.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="message" class="form-label">Your Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" aria-describedby="message-error" placeholder="Describe your issue..."></textarea>
+                        <div class="error-message" id="message-error">Please enter your message (at least 10 characters).</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Submit Request</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-container" id="faq-section">
+            <h3 class="section-heading">Frequently Asked Questions</h3>
+            
+            <div class="faq-search">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0" id="faqSearch" placeholder="Search FAQs...">
+                </div>
+            </div>
+            
+            <div class="faq-categories">
+                <div class="faq-category active" data-category="all">All</div>
+                <div class="faq-category" data-category="plans">Plans & Pricing</div>
+                <div class="faq-category" data-category="billing">Billing & Payment</div>
+                <div class="faq-category" data-category="technical">Technical Issues</div>
+                <div class="faq-category" data-category="sim">SIM & Devices</div>
+                <div class="faq-category" data-category="account">Account & Services</div>
+            </div>
+            
+            <div class="faq-list">
+                <!-- Plans & Pricing FAQs -->
+                <div class="faq-item" data-category="plans">
+                    <div class="faq-question">
+                        <span>Can I pause my plan temporarily?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Currently, we do not offer a feature to pause plans. However, you can switch to a lower plan if needed. Visit the Plans section to view available options or contact our customer support for assistance.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="plans">
+                    <div class="faq-question">
+                        <span>How do I upgrade my current plan?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can upgrade your plan at any time through your account dashboard. Simply log in, go to the Plans section, and select "Upgrade Plan". The new plan will be activated immediately and you'll be charged the difference between your current plan and the new one.</p>
+                    </div>
+                </div>
+                
+                <!-- Billing & Payment FAQs -->
+                <div class="faq-item" data-category="billing">
+                    <div class="faq-question">
+                        <span>What payment methods are supported?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept multiple payment methods including credit/debit cards, UPI, net banking. For recurring payments, you can set up auto-debit from your preferred payment method.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="billing">
+                    <div class="faq-question">
+                        <span>How do I recharge my number?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                
+                <!-- Technical Issues FAQs -->
+                <div class="faq-item" data-category="technical">
+                    <div class="faq-question">
+                        <span>Why am I experiencing poor network connectivity?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Poor network connectivity can be caused by several factors:</p>
+                        <ul>
+                            <li>Location - You might be in an area with weak signal coverage</li>
+                            <li>Network congestion - During peak hours, many users might be connected</li>
+                            <li>Device issues - Your phone's antenna might be damaged or obstructed</li>
+                            <li>SIM card issues - Your SIM card might be damaged or incorrectly inserted</li>
+                        </ul>
+                        <p>Try restarting your phone, checking if your SIM is properly inserted, or moving to a different location.</p>
+                    </div>
+                </div>
+                
+                <!-- SIM & Devices FAQs -->
+                <div class="faq-item" data-category="sim">
+                    <div class="faq-question">
+                        <span>Is my phone compatible with your network?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Most unlocked phones sold in the last 5 years are compatible with our network. Your phone should support GSM technology and the frequency bands we use. You can check compatibility by:</p>
+                        <ul>
+                            <li>Entering your device IMEI in our compatibility checker tool</li>
+                            <li>Checking if your phone supports GSM and our frequency bands</li>
+                            <li>Contacting our support team with your device model information</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Account & Services FAQs -->
+                <div class="faq-item" data-category="account">
+                    <div class="faq-question">
+                        <span>How do I change my account information?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can update most of your account information through your account profile page after logging in. This includes:</p>
+                        <ul>
+                            <li>Contact information (username, email)</li>
+                            <li>Password and security settings</li>
+                            <li>Payment methods</li>
+                            <li>Communication preferences</li>
+                        </ul>
+                        <p>For changes to your name or primary phone number, please contact our support team with appropriate identification documents.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Explore</h4>
+                <a href="../index.html">Home</a><br>
+                <a href=".plans.html">Plans</a><br>
+                <a href=".supportg.html">Support</a><br>
+                <a href=".about.html">About Us</a><br>
+                <a href=".login.html">Login</a>
+            </div>
+            <div class="footer-section">
+                <h4>Get Started</h4>
+                <a href=".buy-sim.html">Get sim</a><br>
+                <a href=".port.html">Switch to NOVA</a><br>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Us</h4>
+                <p>Email: support@nova.com</p>
+                <p>Phone: +91 9876543210</p>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Mobi Comm Service Limited. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- SweetAlert2 Script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Inline JavaScript with Validation Changes Only -->
+    <script>
+        // Navbar toggle function (Original)
+        function toggleMenu() {
+            const navLinks = document.getElementById("nav-links");
+            navLinks.classList.toggle("active");
+        }
+
+        // Debounce function for real-time validation
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Validation Functions
+        function validateName(input) {
+            const value = input.value.trim();
+            const errorElement = document.getElementById('name-error');
+
+            if (!value || value.length < 2 || !/^[a-zA-Z\s]+$/.test(value)) {
+                input.classList.add('error');
+                errorElement.style.display = 'block';
+                input.setAttribute('aria-invalid', 'true');
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorElement.style.display = 'none';
+                input.setAttribute('aria-invalid', 'false');
+                return true;
+            }
+        }
+
+        function validateEmail(input) {
+            const value = input.value.trim();
+            const errorElement = document.getElementById('email-error');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!value || !emailRegex.test(value)) {
+                input.classList.add('error');
+                errorElement.style.display = 'block';
+                input.setAttribute('aria-invalid', 'true');
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorElement.style.display = 'none';
+                input.setAttribute('aria-invalid', 'false');
+                return true;
+            }
+        }
+
+        function validateSubject(input) {
+            const value = input.value;
+            const errorElement = document.getElementById('subject-error');
+
+            if (!value) {
+                input.classList.add('error');
+                errorElement.style.display = 'block';
+                input.setAttribute('aria-invalid', 'true');
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorElement.style.display = 'none';
+                input.setAttribute('aria-invalid', 'false');
+                return true;
+            }
+        }
+
+        function validateMessage(input) {
+            const value = input.value.trim();
+            const errorElement = document.getElementById('message-error');
+
+            if (!value || value.length < 10) {
+                input.classList.add('error');
+                errorElement.style.display = 'block';
+                input.setAttribute('aria-invalid', 'true');
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorElement.style.display = 'none';
+                input.setAttribute('aria-invalid', 'false');
+                return true;
+            }
+        }
+
+        // Real-time Validation with Debounce
+        const inputs = document.querySelectorAll('#supportForm input, #supportForm select, #supportForm textarea');
+        inputs.forEach(input => {
+            const debouncedValidation = debounce(() => {
+                if (input.id === 'name') validateName(input);
+                else if (input.id === 'email') validateEmail(input);
+                else if (input.id === 'subject') validateSubject(input);
+                else if (input.id === 'message') validateMessage(input);
+            }, 300);
+
+            input.addEventListener('input', debouncedValidation);
+            input.addEventListener('change', () => {
+                if (input.id === 'name') validateName(input);
+                else if (input.id === 'email') validateEmail(input);
+                else if (input.id === 'subject') validateSubject(input);
+                else if (input.id === 'message') validateMessage(input);
+            });
+        });
+
+        // Handle Form Submission
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const subjectInput = document.getElementById('subject');
+            const messageInput = document.getElementById('message');
+
+            const isNameValid = validateName(nameInput);
+            const isEmailValid = validateEmail(emailInput);
+            const isSubjectValid = validateSubject(subjectInput);
+            const isMessageValid = validateMessage(messageInput);
+
+            if (isNameValid && isEmailValid && isSubjectValid && isMessageValid) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Thank you! Our support team will contact you soon.',
+                    confirmButtonColor: '#0a21c0'
+                }).then(() => {
+                    document.getElementById('supportForm').reset();
+                    inputs.forEach(input => {
+                        input.classList.remove('error');
+                        const errorElement = document.getElementById(`${input.id}-error`);
+                        errorElement.style.display = 'none';
+                        input.setAttribute('aria-invalid', 'false');
+                    });
+                    submitBtn.disabled = false;
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please fill out all fields correctly before submitting.',
+                    confirmButtonColor: '#0a21c0'
+                });
+                submitBtn.disabled = false;
+            }
+        }
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const answer = this.querySelector('.faq-answer');
+                const icon = this.querySelector('.fa-chevron-down');
+                answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+                icon.style.transform = answer.style.display === 'block' ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+        });
+
+        // Filter FAQs by Category
+        document.querySelectorAll('.faq-category').forEach(category => {
+            category.addEventListener('click', function() {
+                document.querySelectorAll('.faq-category').forEach(cat => cat.classList.remove('active'));
+                this.classList.add('active');
+                const selectedCategory = this.getAttribute('data-category');
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.style.display = (selectedCategory === 'all' || item.getAttribute('data-category') === selectedCategory) ? 'block' : 'none';
+                });
+            });
+        });
+
+        // Search FAQs
+        document.getElementById('faqSearch').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const question = item.querySelector('.faq-question span').textContent.toLowerCase();
+                const answer = item.querySelector('.faq-answer') ? item.querySelector('.faq-answer').textContent.toLowerCase() : '';
+                item.style.display = (question.includes(searchTerm) || answer.includes(searchTerm)) ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

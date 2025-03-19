@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova - Subscriber Management</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Font Awesome for the hamburger menu -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
+  <link rel="stylesheet" href="./assets/css/sm.css">
+
+</head>
+<body>
+  <div class="d-flex flex-column vh-100">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-container">
+        <img src="./assets/images/logo.webp" alt="" height="40px" width="70px">
+        <!-- <div class="header-title">Admin Dashboard</div> -->
+      </div>
+      <button class="menu-toggle" id="mainMenuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="header-actions">
+        <div class="nav-menu" id="navMenu">
+          <a href="./analytics.html" class="nav-item">Analytics</a>
+          <a href="./expiringplans.html" class="nav-item">Expiring Plans</a>
+          <a href="./manageplans.html" class="nav-item">Manage Plans</a>
+          <a href="./subscriberManagement.html" class="nav-item active" id="manageUsersLink">Manage Users</a>
+          <a href="./profile.html" class="nav-item">Profile</a>
+          <a href="./index.html" class="nav-item logout-btn">Logout</a>
+          <i class="fas fa-user-circle admin-icon"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- Subscriber Management Main Content (Under Manage Users) -->
+    <main class="main-content overflow-auto" id="subscriberMainContent">
+      <div class="subscriber-header">
+        <h1 class="subscriber-h1">Subscriber Management</h1>
+      </div>
+      
+      <div class="subscriber-container">
+        <div class="subscriber-search-bar">
+          <input type="text" id="subscriberSearchInput" class="form-control" placeholder="Search by name, email, address, or phone...">
+        </div>
+        
+        <div class="subscriber-filter-container">
+          <span class="subscriber-filter-label">Filter by Status:</span>
+          <div class="subscriber-filter-options">
+            <button class="subscriber-filter-btn active" data-filter="all">All Subscribers</button>
+            <button class="subscriber-filter-btn" data-filter="active">Active Subscribers</button>
+            <button class="subscriber-filter-btn" data-filter="inactive">Inactive Subscribers</button>
+            <button class="subscriber-filter-btn" data-filter="ported">Ported Numbers</button>
+          </div>
+        </div>
+        
+        <div class="subscriber-table-container">
+          <table class="subscriber-table" id="subscribers-table">
+            <thead>
+              <tr>
+                <th>SIM Holder Name</th>
+                <th>Activate Date</th>
+                <th>Username</th>
+                <th>Email Address</th>
+                <th>Address</th>
+                <th>DOB</th>
+                <th>Status</th>
+                <th>Porting Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-status="active" data-porting="not-ported">
+                <td>Sakthi</td>
+                <td>2024-03-15</td>
+                <td>sakthi123</td>
+                <td><a href="mailto:john.smith@example.com">sowmi@gmail.com</a></td>
+                <td>123 Main St, TamilNadu, India</td>
+                <td>2003-30-12</td>
+                <td><span class="subscriber-status subscriber-active">Active</span></td>
+                <td><span class="subscriber-status">Not Ported</span></td>
+                <td>
+                  <button class="subscriber-action-btn subscriber-deactivate-btn">Deactivate</button>
+                </td>
+              </tr>
+              <tr data-status="inactive" data-porting="ported">
+                <td>Jane Doe</td>
+                <td>2024-03-15</td>
+                <td>jane.doe</td>
+                <td><a href="mailto:jane.doe@example.com">jane.doe@example.com</a></td>
+                <td>456 Oak Ave, TamilNadu, India</td>
+                <td>2003-30-12</td>
+                <td><span class="subscriber-status subscriber-inactive">Inactive</span></td>
+                <td><span class="subscriber-status subscriber-ported">Ported</span></td>
+                <td>
+                  <button class="subscriber-action-btn subscriber-activate-btn">Activate</button>
+                </td>
+              </tr>
+              <tr data-status="active" data-porting="ported">
+                <td>Michael Johnson</td>
+                <td>2024-03-15</td>
+                <td>michael.j</td>
+                <td><a href="mailto:michael.j@example.com">michael.j@example.com</a></td>
+                <td>789 Pine Dr, TamilNadu, India</td>
+                <td>2003-30-12</td>
+                <td><span class="subscriber-status subscriber-active">Active</span></td>
+                <td><span class="subscriber-status subscriber-ported">Ported</span></td>
+                <td>
+                  <button class="subscriber-action-btn subscriber-deactivate-btn">Deactivate</button>
+                </td>
+              </tr>
+              <tr data-status="inactive" data-porting="not-ported">
+                <td>Sarah Williams</td>
+                <td>2024-03-15</td>
+                <td>sarah.w</td>
+                <td><a href="mailto:sarah.w@example.com">sarah.w@example.com</a></td>
+                <td>101 Cedar Ln, TamilNadu, India</td>
+                <td>2003-30-12</td>
+                <td><span class="subscriber-status subscriber-inactive">Inactive</span></td>
+                <td><span class="subscriber-status">Not Ported</span></td>
+                <td>
+                  <button class="subscriber-action-btn subscriber-activate-btn">Activate</button>
+                </td>
+              </tr>
+              <tr data-status="active" data-porting="not-ported">
+                <td>Robert Brown</td>
+                <td>2003-30-12</td>
+                <td>robert.b</td>
+                <td><a href="mailto:robert.b@example.com">robert.b@example.com</a></td>
+                <td>202 Maple Way, Delhi, India</td>
+                <td>2003-30-12</td>
+                <td><span class="subscriber-status subscriber-active">Active</span></td>
+                <td><span class="subscriber-status">Not Ported</span></td>
+                <td>
+                  <button class="subscriber-action-btn subscriber-deactivate-btn">Deactivate</button>
+                </td>
+              </tr>
+              <tr data-status="active" data-porting="ported">
+                <td>Emily Davis</td>
+                <td>2003-30-12</td>
+                <td>emily.d</td>
+                <td><a href="mailto:emily.d@example.com">emily.d@example.com</a></td>
+                <td>303 Elm Blvd, TamilNadu, India</td>
+                <td>2003-30-12</td>
+                <td><span class="subscriber-status subscriber-active">Active</span></td>
+                <td><span class="subscriber-status subscriber-ported">Ported</span></td>
+                <td>
+                  <button class="subscriber-action-btn subscriber-deactivate-btn">Deactivate</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="subscriber-pagination">
+          <button id="subscriberPrevPage">Previous</button>
+          <button class="active">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button id="subscriberNextPage">Next</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container toast-notification" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050;">
+    <div id="toastNotification" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="bi bi-check-circle me-2"></i>
+          <span id="toastMessage"></span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Required JS Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+  <script src="./assets/js/sm.js"></script>
+</body>
+</html>

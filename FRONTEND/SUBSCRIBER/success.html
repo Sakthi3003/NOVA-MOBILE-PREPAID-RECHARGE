@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success - Nova SIM</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Google Fonts: Poppins and Dancing Script -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4ff, #e6e9ff);
+            color: #333;
+            min-height: 100vh;
+            padding: 0;
+            position: relative;
+        }
+
+        .navbar {
+            background-color: #000;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .success-container {
+            max-width: 550px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .success-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #28a745;
+            margin-bottom: 12px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #0a21c0;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .success-message {
+            color: #555;
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        .transaction-card {
+            background: #fafbff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e6e9ff;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .transaction-card:hover {
+            box-shadow: 0 4px 15px rgba(10, 33, 192, 0.08);
+        }
+
+        .transaction-card p {
+            margin: 6px 0;
+            font-size: 13px;
+            color: #444;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .transaction-card strong {
+            color: #0a21c0;
+            font-weight: 600;
+            flex: 0 0 40%;
+        }
+
+        .transaction-card span {
+            flex: 0 0 60%;
+            text-align: right;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0a21c0, #081899);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #081899, #0a21c0);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(10, 33, 192, 0.2);
+        }
+
+        .btn-secondary {
+            background: #0a21c0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #0a21c0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+        }
+
+        footer {
+            background: linear-gradient(135deg, #141619, #000000);
+            color: white;
+            padding: 30px 20px;
+            margin-top: 40px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .footer-section h4 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #0a21c0;
+            text-transform: uppercase;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            font-size: 13px;
+            color: #b3b4bd;
+            text-decoration: none;
+            margin-bottom: 8px;
+        }
+
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            font-size: 13px;
+        }
+
+        .feedback-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .feedback-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2001;
+        }
+
+        .feedback-modal-content h3 {
+            font-size: 20px;
+            color: #0a21c0;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .rating {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .rating i {
+            font-size: 30px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .rating i:hover,
+        .rating i.active {
+            color: #f1c40f;
+        }
+
+        .feedback-modal-content textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            resize: none;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .feedback-modal-content textarea:focus {
+            border-color: #0a21c0;
+            outline: none;
+        }
+
+        .feedback-modal-content .btn {
+            background: #0a21c0;
+            color: white;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-modal-content .btn:hover {
+            background: linear-gradient(90deg, #08189b, #3a78c2);
+        }
+
+        .close-feedback-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            z-index: 2002;
+        }
+
+        .close-feedback-btn:hover {
+            color: #ff3b30;
+        }
+
+        .swal2-container {
+            z-index: 3000;
+        }
+
+        @media (max-width: 600px) {
+            .success-container {
+                margin: 20px 10px;
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .success-icon {
+                font-size: 50px;
+            }
+
+            .transaction-card p {
+                font-size: 12px;
+                flex-direction: column;
+                text-align: left;
+            }
+
+            .transaction-card strong,
+            .transaction-card span {
+                flex: none;
+                text-align: left;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .feedback-modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .rating i {
+                font-size: 25px;
+            }
+        }
+
+        #invoice {
+            display: none;
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        .invoice-header {
+            background: white;
+            color: #0a21c0;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .invoice-logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .invoice-logo img {
+            width: 100px;
+            height: 70px;
+            margin-right: 15px;
+        }
+        
+        .invoice-logo h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .invoice-title {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .invoice-body {
+            padding: 20px;
+        }
+        
+        .invoice-section {
+            margin-bottom: 25px;
+        }
+        
+        .invoice-section-title {
+            background: #E3F2FD;
+            color: #1E3A8A;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-left: 4px solid #1E3A8A;
+            margin-bottom: 10px;
+        }
+        
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .invoice-table th {
+            background: #F3F4F6;
+            color: #1E3A8A;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .invoice-table td {
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .invoice-table tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        
+        .total-row {
+            background-color: #E3F2FD !important;
+            font-weight: 600;
+        }
+        
+        .invoice-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .invoice-meta-item {
+            flex: 1;
+        }
+        
+        .invoice-meta-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .invoice-meta-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .invoice-footer {
+            border-top: 1px dashed #e0e0e0;
+            padding-top: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .signature-container {
+            margin-top: 10px; /* Reduced margin for compactness */
+            padding-top: 5px; /* Reduced padding for compactness */
+            border-top: 1px dashed #000; /* Maintain dashed line as in your screenshot */
+        }
+
+        .signature-box {
+            display: flex;
+            justify-content: flex-end; /* Aligns the entire box to the right of the invoice */
+            align-items: center;
+            gap: 5px; /* Very small gap for tight layout */
+            border: 1px solid #000; /* Thin border to match your screenshot */
+            padding: 5px; /* Very small padding for a tiny box */
+            background: #fff; /* White background for contrast */
+            max-width: 200px; /* Reduced width for a very small box */
+            margin-left: auto; /* Pushes the box to the right edge of its container */
+        }
+
+        .signature-text {
+            font-size: 8px; /* Very small font size for compactness */
+            color: #333;
+            text-align: left; /* Align text left within the box for readability */
+            margin: 0; /* Remove default margins */
+            line-height: 1; /* Tightest line spacing for minimal height */
+        }
+
+        .dynamic-time {
+            margin-left: auto; /* Pushes the time to the right within the box */
+            text-align: right; /* Aligns time to the right */
+        }
+        
+        .invoice-notice {
+            background: #F3F4F6;
+            padding: 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            color: #444;
+        }
+        
+        .invoice-qr {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .invoice-qr img {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Success Content -->
+    <div class="success-container">
+        <a href="javascript:history.back()" class="logo" style="color: blue; padding: 20px;"><i class="fas fa-arrow-left"></i></a>
+        <div class="success-header">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h1>Payment Successful!</h1>
+            <p class="success-message">Your recharge has been processed successfully!</p>
+        </div>
+
+        <div class="transaction-card">
+            <p><strong>Name:</strong> <span id="customerName"></span></p>
+            <p><strong>Mobile Number:</strong> <span id="mobileNumber"></span></p>
+            <p><strong>Amount:</strong> <span id="amount"></span></p>
+            <p><strong>Reference No:</strong> <span id="refNo"></span></p>
+            <p><strong>Transaction ID:</strong> <span id="txnId"></span></p>
+            <p><strong>Date:</strong> <span id="date"></span></p>
+            <p><strong>Time:</strong> <span id="time"></span></p>
+            <p><strong>Payment Method:</strong> <span id="paymentMethod"></span></p>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-secondary" id="downloadInvoiceBtn">Download Invoice</button>
+            <button class="btn btn-secondary" id="shareEmailBtn"><i class="fas fa-envelope"></i> Share via Email</button>
+            <button class="btn btn-primary" id="goToHomeBtn">Go to Home</button>
+        </div>
+    </div>
+
+    <!-- Feedback Popup -->
+    <div class="feedback-modal" id="feedbackModal">
+        <div class="feedback-modal-content">
+            <button class="close-feedback-btn" onclick="closeFeedbackModal()">✖</button>
+            <h3>We Value Your Feedback!</h3>
+            <div class="rating" id="ratingStars">
+                <i class="fas fa-star" data-value="1"></i>
+                <i class="fas fa-star" data-value="2"></i>
+                <i class="fas fa-star" data-value="3"></i>
+                <i class="fas fa-star" data-value="4"></i>
+                <i class="fas fa-star" data-value="5"></i>
+            </div>
+            <textarea id="feedbackText" placeholder="Please share your feedback (optional)"></textarea>
+            <button class="btn" id="submitFeedbackBtn">Submit Feedback</button>
+        </div>
+    </div>
+
+    <div id="invoice">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="invoice-logo">
+                <img src="./assets/images/logo.webp" alt="Nova SIM Logo" width="190" height="60">
+            </div>
+            <div class="invoice-title">PAYMENT RECEIPT</div>
+        </div>
+        
+        <!-- Invoice Body -->
+        <div class="invoice-body">
+            <!-- Invoice Meta Information -->
+            <div class="invoice-meta">
+                <div class="invoice-meta-item">
+                    <div class="invoice-meta-label">Receipt No.</div>
+                    <div class="invoice-meta-value" id="invoiceRefNo"></div>
+                </div>
+                <div class="invoice-meta-item">
+                    <div class="invoice-meta-label">Transaction Date</div>
+                    <div class="invoice-meta-value" id="invoiceDateTime"></div>
+                </div>
+                <div class="invoice-meta-item">
+                    <div class="invoice-meta-label">Payment Mode</div>
+                    <div class="invoice-meta-value" id="invoicePaymentMethod"></div>
+                </div>
+            </div>
+            
+            <!-- Customer Details Section -->
+            <div class="invoice-section">
+                <div class="invoice-section-title">CUSTOMER DETAILS</div>
+                <table class="invoice-table">
+                    <tr>
+                        <td width="30%"><strong>Customer Name</strong></td>
+                        <td width="70%" id="invoiceCustomerName"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mobile Number</strong></td>
+                        <td id="invoiceMobileNumber"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transaction ID</strong></td>
+                        <td id="invoiceTxnId"></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Plan Details Section -->
+            <div class="invoice-section">
+                <div class="invoice-section-title">PLAN DETAILS</div>
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Pack Description</th>
+                            <th>Data</th>
+                            <th>Validity</th>
+                            <th>Voice</th>
+                            <th>SMS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="invoicePlanName"></td>
+                            <td id="invoiceData"></td>
+                            <td id="invoiceValidity"></td>
+                            <td id="invoiceCalls"></td>
+                            <td id="invoiceSMS"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Payment Details Section -->
+            <div class="invoice-section">
+                <div class="invoice-section-title">PAYMENT DETAILS</div>
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Base Pack Amount</td>
+                            <td id="invoiceBaseAmount"></td>
+                        </tr>
+                        <tr>
+                            <td>GST (18%)</td>
+                            <td id="invoiceGST"></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>Total Amount</strong></td>
+                            <td id="invoiceTotalAmount"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Footer with Signature -->
+            <div class="invoice-footer">
+                <div class="signature-container">
+                    <div class="signature-box">
+                        <div class="signature-text">
+                            <p>Digitally signed by Mobi Comm Service Limited</p>
+                            <p>Date: 2025.02.27</p>
+                            <p>Reason: Invoice</p>
+                            <p class="dynamic-time"></p> <!-- Placeholder for dynamic time -->
+                        </div>
+                    </div>
+                </div>
+                <p>Thank you for choosing Nova. For any assistance, please contact our customer support.</p>
+                <p>Email: support@nova.com | Helpline: +91 987654321</p>
+                <p>© 2025 Mobi Comm Service Limited. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // For testing when session storage is empty
+            if (!sessionStorage.getItem('transactionDetails')) {
+                const sampleTransactionDetails = {
+                    customerName: "John Doe",
+                    mobileNumber: "9876543210",
+                    amount: "₹599",
+                    refNo: "REF12345678",
+                    txnId: "TXN987654321",
+                    date: "02-03-2025",
+                    time: "15:30:45",
+                    paymentMode: "UPI"
+                };
+                
+                const sampleUserDetails = {
+                    simHolderName: "John Doe",
+                    number: "9876543210"
+                };
+                
+                const samplePlan = {
+                    name: "Monthly Unlimited Plan",
+                    data: "2GB/day",
+                    validity: "28 days",
+                    calls: "Unlimited",
+                    sms: "100/day",
+                    price: "599"
+                };
+                
+                sessionStorage.setItem('transactionDetails', JSON.stringify(sampleTransactionDetails));
+                sessionStorage.setItem('userDetails', JSON.stringify(sampleUserDetails));
+                sessionStorage.setItem('selectedPlan', JSON.stringify(samplePlan));
+            }
+    
+            // Retrieve transaction details from sessionStorage
+            const transactionDetails = JSON.parse(sessionStorage.getItem('transactionDetails'));
+            const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+            const selectedPlan = JSON.parse(sessionStorage.getItem('selectedPlan'));
+    
+            if (!transactionDetails || !userDetails || !selectedPlan) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Transaction details not found. Please try again.',
+                    confirmButtonColor: '#0a21c0',
+                    position: 'center',
+                    zIndex: 3001
+                }).then(() => {
+                    window.location.href = 'plans.html';
+                });
+                return;
+            }
+    
+            // Display transaction details on the success page
+            $('#customerName').text(transactionDetails.customerName);
+            $('#mobileNumber').text(transactionDetails.mobileNumber);
+            $('#amount').text(transactionDetails.amount);
+            $('#refNo').text(transactionDetails.refNo);
+            $('#txnId').text(transactionDetails.txnId);
+            $('#date').text(transactionDetails.date);
+            $('#time').text(transactionDetails.time);
+            $('#paymentMethod').text(transactionDetails.paymentMode);
+    
+            // Populate invoice template
+            $('#invoiceCustomerName').text(userDetails.simHolderName);
+            $('#invoiceMobileNumber').text(userDetails.number);
+            $('#invoiceRefNo').text(transactionDetails.refNo);
+            $('#invoiceTxnId').text(transactionDetails.txnId);
+            $('#invoiceDateTime').text(`${transactionDetails.date} ${transactionDetails.time}`);
+            $('#invoicePaymentMethod').text(transactionDetails.paymentMode);
+            $('#invoicePlanName').text(selectedPlan.name);
+            $('#invoiceData').text(selectedPlan.data);
+            $('#invoiceValidity').text(selectedPlan.validity);
+            $('#invoiceCalls').text(selectedPlan.calls);
+            $('#invoiceSMS').text(selectedPlan.sms);
+    
+            const planPrice = parseFloat(selectedPlan.price);
+            const gstRate = 0.18;
+            const gstAmount = planPrice * gstRate;
+            const totalAmount = planPrice + gstAmount;
+    
+            $('#invoiceBaseAmount').text(`${planPrice.toFixed(2)}`);
+            $('#invoiceGST').text(`${gstAmount.toFixed(2)}`);
+            $('#invoiceTotalAmount').text(`${totalAmount.toFixed(2)}`);
+    
+            // Go to Home button
+            $('#goToHomeBtn').on('click', function() {
+                window.location.href = '../index.html';
+            });
+    
+            // Download Invoice button
+            $('#downloadInvoiceBtn').on('click', function() {
+                generateInvoice();
+            });
+    
+            // Show feedback modal automatically after page load
+            setTimeout(function() {
+                $('#feedbackModal').css({
+                    'display': 'flex',
+                    'top': '50%',
+                    'left': '50%',
+                    'transform': 'translate(-50%, -50%)',
+                    'opacity': 0
+                }).animate({ opacity: 1 }, 300);
+            }, 500);
+    
+            // Rating star interaction
+            let ratingValue = 0;
+            $('.rating i').on('click', function() {
+                ratingValue = $(this).data('value');
+                $('.rating i').each(function() {
+                    if ($(this).data('value') <= ratingValue) {
+                        $(this).addClass('active');
+                    } else {
+                        $(this).removeClass('active');
+                    }
+                });
+            });
+    
+            // Submit feedback
+            $('#submitFeedbackBtn').on('click', function() {
+                const feedbackText = $('#feedbackText').val().trim();
+                console.log('Rating:', ratingValue || 'Not provided');
+                console.log('Feedback:', feedbackText || 'Not provided');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thank You!',
+                    text: 'Your feedback has been submitted.',
+                    confirmButtonColor: '#0a21c0',
+                    position: 'center',
+                    zIndex: 3001
+                }).then(() => {
+                    closeFeedbackModal();
+                });
+            });
+    
+            // Close feedback modal
+            function closeFeedbackModal() {
+                $('#feedbackModal').animate({ opacity: 0 }, 300, function() {
+                    $(this).css('display', 'none');
+                });
+            }
+    
+            // Invoice generation function
+            function generateInvoice() {
+                $('#invoice').css('display', 'block');
+                
+                const element = document.getElementById('invoice');
+                const opt = {
+                    margin: 10,
+                    filename: `Nova_SIM_Invoice_${transactionDetails.refNo}.pdf`,
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+    
+                html2pdf().from(element).set(opt).save()
+                    .then(() => {
+                        console.log('Invoice generated and downloaded successfully.');
+                        $('#invoice').css('display', 'none');
+                    })
+                    .catch((error) => {
+                        console.error('Error generating invoice:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: `Failed to generate invoice. Details: ${error.message}`,
+                            confirmButtonColor: '#0a21c0',
+                            position: 'center',
+                            zIndex: 3001
+                        });
+                        $('#invoice').css('display', 'none');
+                    });
+            }
+
+            // Dynamic time update
+            function updateDynamicTime() {
+                const now = new Date('2025-03-05T' + new Date().toTimeString().split(' ')[0]); // Use March 5, 2025, with current time
+                const timeString = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata' });
+                $('.dynamic-time').text(`Time: ${timeString} IST`);
+            }
+
+            // Call the function when the page loads and update every second
+            updateDynamicTime();
+            setInterval(updateDynamicTime, 1000);
+        });
+    </script>
+</body>
+</html>

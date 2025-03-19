@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA - User Transactions</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            font-size: 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Navbar Styles (Copied from indexu.html) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+        }
+        
+        .nav-link.active {
+            font-weight: bold;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: #0a21c0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .user-avatar::after {
+            content: '\f0d7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-avatar:hover::after {
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            background-color: #000;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #08189b;
+            color: white;
+        }
+
+        /* Highlight style for Transactions dropdown item */
+        .dropdown-item.transactions-highlight {
+            background-color: #0a21c0; /* Blue color for dropdown item */
+            color: white;
+        }
+
+        .dropdown-item.transactions-highlight:hover {
+            background-color: #08189b; /* Slightly darker blue for hover */
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 0.4em solid #0a21c0;
+            border-right-color: transparent;
+        }
+
+        /* Container Styles */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #0a21c0;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .tab-container {
+            margin-top: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #0a21c0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            background-color: white;
+            color: #333;
+            border: none;
+            margin-right: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 6px 6px 0 0;
+            flex-shrink: 0;
+        }
+
+        .tab:hover {
+            background-color: #e6e9ff;
+        }
+
+        .tab.active {
+            background-color: #0a21c0;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .filters {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .date-picker {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .search-input {
+            padding: 12px 20px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .button, .download-btn {
+            padding: 8px 14px;
+            background-color: #0a21c0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover, .download-btn:hover {
+            background-color: #08189b;
+        }
+
+        .bulk-download {
+            margin-bottom: 15px;
+            text-align: right;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #0a21c0;
+            color: white;
+            font-weight: 500;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f4ff;
+        }
+
+        tr:hover {
+            background-color: #e6e9ff;
+        }
+
+        .status-active, .status-paid {
+            color: #2e7d32;
+            font-weight: 500;
+        }
+
+        .status-expired {
+            color: #d32f2f;
+            font-weight: 500;
+        }
+
+        /* Responsive Styles (Copied from indexu.html) */
+        @media (max-width: 768px) {
+            .hero-section {
+                background: white;
+                color: #000;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                background-color: #000; /* Changed to black as requested */
+                padding: 1rem;
+                gap: 1rem;
+                transform: translateY(-150%);
+                transition: transform 0.3s ease-in-out;
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+            }
+
+            .user-avatar::after {
+                display: none;
+            }
+
+            .dropdown-menu {
+                width: 100%;
+                text-align: center;
+            }
+
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input, .date-picker {
+                max-width: 100%;
+            }
+
+            .bulk-download {
+                text-align: center;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+                margin: 5px;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .tab {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+
+            table {
+                border: 0;
+                width: 100%;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                display: block;
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 10px;
+                background-color: white;
+            }
+
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 10px;
+                border-bottom: 1px dashed #eee;
+                font-size: 14px;
+            }
+
+            td:last-child {
+                border-bottom: 0;
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #333;
+                flex: 1;
+                margin-right: 10px;
+            }
+
+            .download-btn {
+                width: auto;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* Fade-In Animation */
+        @keyframes fadeInSection {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar (User Version) -->
+    <nav class="navbar" id="navbar">
+        <a href="./indexu.html" class="logo"><img src="../assets/images/logo.webp" alt="Nova SIM Logo" height="40px" width="100px"></a>
+        <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="nav-links" id="nav-links">
+            <a href="./indexu.html" class="nav-link" id="home-link">Home</a>
+            <a href="plansu.html" class="nav-link" id="plans-link">Plans</a>
+            <a href="support.html" class="nav-link" id="support-link">Support</a>
+            <a href="about.html" class="nav-link" id="about-link">About Us</a>
+            <!-- Dropdown will be populated dynamically -->
+        </div>
+    </nav>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tab-container">
+            <div class="tabs">
+                <div class="tab active" onclick="openTab('transactions')">Transaction History</div>
+                <div class="tab" onclick="openTab('recharges')">Recharge History</div>
+                <div class="tab" onclick="openTab('invoices')">Invoice History</div>
+            </div>
+
+            <!-- Transaction History Tab -->
+            <div id="transactions" class="tab-content active">
+                <div class="filters">
+                    <input type="date" id="transactionDate" class="date-picker" onchange="filterByDate('transactionTable', 'transactionDate')">
+                    <input type="text" id="transactionSearch" class="search-input" placeholder="Search transactions..." onkeyup="searchTable('transactionTable', 'transactionSearch')">
+                </div>
+                <table id="transactionTable">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Transaction ID</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Recharge History Tab -->
+            <div id="recharges" class="tab-content">
+                <div class="filters">
+                    <input type="date" id="rechargeDate" class="date-picker" onchange="filterByDate('rechargeTable', 'rechargeDate')">
+                    <input type="text" id="rechargeSearch" class="search-input" placeholder="Search recharges..." onkeyup="searchTable('rechargeTable', 'rechargeSearch')">
+                </div>
+                <table id="rechargeTable">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Ref No</th>
+                            <th>Price</th>
+                            <th>Payment Mode</th>
+                            <th>Plan</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Invoice History Tab -->
+            <div id="invoices" class="tab-content">
+                <div class="filters">
+                    <input type="date" id="invoiceDate" class="date-picker" onchange="filterByDate('invoiceTable', 'invoiceDate')">
+                    <input type="text" id="invoiceSearch" class="search-input" placeholder="Search invoices..." onkeyup="searchTable('invoiceTable', 'invoiceSearch')">
+                </div>
+                <div class="bulk-download">
+                    <button class="button" onclick="bulkDownloadInvoices()">Bulk Download Invoices</button>
+                </div>
+                <table id="invoiceTable">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Ref No</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const loggedInDropdownPages = [
+            { id: "myplans", label: "My Plans", url: "myplans.html" },
+            { id: "transactions", label: "Transactions", url: "transaction.html" },
+            { id: "profile", label: "Profile", url: "profilef.html" },
+        ];
+
+        const mainPages = [
+            { id: "home", label: "Home", url: "./indexu.html" },
+            { id: "plans", label: "Plans", url: "plansu.html" },
+            { id: "support", label: "Support", url: "support.html" },
+            { id: "about", label: "About Us", url: "about.html" }
+        ];
+
+        let currentPage = "transactions";
+
+        // Generate navigation for logged-in users
+        function generateNavigation() {
+            const navLinks = document.getElementById("nav-links");
+            const homeLink = document.getElementById("home-link");
+            const plansLink = document.getElementById("plans-link");
+            const supportLink = document.getElementById("support-link");
+            const aboutLink = document.getElementById("about-link");
+
+            homeLink.className = `nav-link ${currentPage === 'home' ? 'active' : ''}`;
+            plansLink.className = `nav-link ${currentPage === 'plans' ? 'active' : ''}`;
+            supportLink.className = `nav-link ${currentPage === 'support' ? 'active' : ''}`;
+            aboutLink.className = `nav-link ${currentPage === 'about' ? 'active' : ''}`;
+
+            const existingDropdown = navLinks.querySelector('.dropdown');
+            if (existingDropdown) existingDropdown.remove();
+
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (loggedInUser) {
+                const dropdownDiv = document.createElement('div');
+                dropdownDiv.className = 'dropdown';
+
+                const avatar = document.createElement('div');
+                avatar.className = 'user-avatar dropdown-toggle';
+                avatar.id = 'profileDropdown';
+                avatar.setAttribute('data-bs-toggle', 'dropdown');
+                avatar.textContent = loggedInUser.simHolderName ? loggedInUser.simHolderName.charAt(0).toUpperCase() : 'U';
+                dropdownDiv.appendChild(avatar);
+
+                const dropdownMenu = document.createElement('div');
+                dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+
+                loggedInDropdownPages.forEach(page => {
+                    const link = document.createElement('a');
+                    link.href = page.url;
+                    link.className = `dropdown-item ${page.id === 'transactions' && currentPage === 'transactions' ? 'transactions-highlight' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = (e) => {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    dropdownMenu.appendChild(link);
+                });
+
+                const logoutLink = document.createElement('a');
+                logoutLink.href = '#';
+                logoutLink.className = 'dropdown-item';
+                logoutLink.textContent = 'Logout';
+                logoutLink.onclick = (e) => {
+                    e.preventDefault();
+                    logout();
+                };
+                dropdownMenu.appendChild(logoutLink);
+
+                dropdownDiv.appendChild(dropdownMenu);
+                navLinks.appendChild(dropdownDiv);
+            } else {
+                window.location.href = '../index.html'; // Redirect to guest page if not logged in
+            }
+        }
+
+        // Set current page and navigate
+        function setCurrentPage(pageId) {
+            currentPage = pageId;
+            const page = [...mainPages, ...loggedInDropdownPages].find(p => p.id === pageId);
+            if (page) {
+                const loadingOverlay = $('#loadingOverlay');
+                loadingOverlay.css('display', 'flex');
+                setTimeout(() => {
+                    window.location.href = page.url;
+                }, 1000);
+            }
+            generateNavigation();
+        }
+
+        // Logout function with loading overlay
+        function logout() {
+            const loadingOverlay = $('#loadingOverlay');
+            loadingOverlay.css('display', 'flex'); // Show loading overlay
+            localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('profileSetup');
+            sessionStorage.removeItem('phoneNumber');
+            setTimeout(() => {
+                window.location.href = '../index.html'; // Redirect after 1-second delay
+            }, 1000);
+        }
+
+        // Toggle mobile menu
+        function toggleMenu() {
+            const navLinks = document.getElementById("nav-links");
+            navLinks.classList.toggle("active");
+        }
+
+        const transactionData = [
+            { datetime: "2025-02-28 14:32:45", transactionId: "TXN123456", description: "Monthly Subscription", amount: "₹299", status: "Completed" },
+            { datetime: "2025-02-15 09:17:23", transactionId: "TXN123455", description: "Add-on Purchase", amount: "₹999", status: "Completed" },
+            { datetime: "2025-01-28 16:45:12", transactionId: "TXN123454", description: "Monthly Subscription", amount: "₹299", status: "Completed" },
+            { datetime: "2025-01-10 11:22:33", transactionId: "TXN123453", description: "One-time Service", amount: "₹499", status: "Completed" },
+            { datetime: "2024-12-28 08:05:19", transactionId: "TXN123452", description: "Monthly Subscription", amount: "₹299", status: "Completed" }
+        ];
+
+        const rechargeData = [
+            { datetime: "2025-02-28 14:30:22", refNo: "RCH78901", price: "₹299", paymentMode: "Card", plan: "Entertainment", startDate: "2025-02-28", endDate: "2025-03-28", status: "Active" },
+            { datetime: "2025-01-28 14:28:45", refNo: "RCH78900", price: "₹299", paymentMode: "UPI", plan: "5G", startDate: "2025-01-28", endDate: "2025-02-28", status: "Expired" },
+            { datetime: "2024-12-28 09:15:32", refNo: "RCH78899", price: "₹299", paymentMode: "Netbanking", plan: "Entertainment", startDate: "2024-12-28", endDate: "2025-01-28", status: "Expired" },
+            { datetime: "2024-11-28 11:42:18", refNo: "RCH78898", price: "₹299", paymentMode: "UPI", plan: "5G", startDate: "2024-11-28", endDate: "2024-12-28", status: "Expired" },
+            { datetime: "2024-11-10 16:33:27", refNo: "RCH78897", price: "₹799", paymentMode: "UPI", plan: "Entertainment", startDate: "2024-11-10", endDate: "2025-02-10", status: "Expired" }
+        ];
+
+        const invoiceData = [
+            { datetime: "2025-02-28 14:32:45", refNo: "INV56789", description: "Premium Monthly Subscription", price: "₹29.99", status: "Paid" },
+            { datetime: "2025-02-15 09:17:23", refNo: "INV56788", description: "Add-on Service", price: "₹9.99", status: "Paid" },
+            { datetime: "2025-01-28 16:45:12", refNo: "INV56787", description: "Premium Monthly Subscription", price: "₹29.99", status: "Paid" },
+            { datetime: "2025-01-10 11:22:33", refNo: "INV56786", description: "One-time Service Fee", price: "₹49.99", status: "Paid" },
+            { datetime: "2024-12-28 08:05:19", refNo: "INV56785", description: "Premium Monthly Subscription", price: "₹29.99", status: "Paid" }
+        ];
+
+        function populateTables() {
+            const transactionTable = document.getElementById("transactionTable").getElementsByTagName('tbody')[0];
+            transactionData.forEach(transaction => {
+                const row = transactionTable.insertRow();
+                row.innerHTML = `
+                    <td data-label="Date & Time">${transaction.datetime}</td>
+                    <td data-label="Transaction ID">${transaction.transactionId}</td>
+                    <td data-label="Description">${transaction.description}</td>
+                    <td data-label="Amount">${transaction.amount}</td>
+                    <td data-label="Status" class="status-active">${transaction.status}</td>
+                `;
+            });
+
+            const rechargeTable = document.getElementById("rechargeTable").getElementsByTagName('tbody')[0];
+            rechargeData.forEach(recharge => {
+                const row = rechargeTable.insertRow();
+                row.innerHTML = `
+                    <td data-label="Date & Time">${recharge.datetime}</td>
+                    <td data-label="Ref No">${recharge.refNo}</td>
+                    <td data-label="Price">${recharge.price}</td>
+                    <td data-label="Payment Mode">${recharge.paymentMode}</td>
+                    <td data-label="Plan">${recharge.plan}</td>
+                    <td data-label="Start Date">${recharge.startDate}</td>
+                    <td data-label="End Date">${recharge.endDate}</td>
+                    <td data-label="Status" class="${recharge.status === 'Active' ? 'status-active' : 'status-expired'}">${recharge.status}</td>
+                `;
+            });
+
+            const invoiceTable = document.getElementById("invoiceTable").getElementsByTagName('tbody')[0];
+            invoiceData.forEach(invoice => {
+                const row = invoiceTable.insertRow();
+                row.innerHTML = `
+                    <td data-label="Date & Time">${invoice.datetime}</td>
+                    <td data-label="Ref No">${invoice.refNo}</td>
+                    <td data-label="Description">${invoice.description}</td>
+                    <td data-label="Price">${invoice.price}</td>
+                    <td data-label="Status" class="status-paid">${invoice.status}</td>
+                    <td data-label="Action"><button class="download-btn" onclick="downloadInvoice('${invoice.refNo}')">Download</button></td>
+                `;
+            });
+        }
+
+        function openTab(tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            const tabs = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            event.currentTarget.classList.add("active");
+        }
+
+        function searchTable(tableId, searchInputId) {
+            const input = document.getElementById(searchInputId);
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById(tableId);
+            const tr = table.getElementsByTagName("tr");
+            for (let i = 0; i < tr.length; i++) {
+                let found = false;
+                const td = tr[i].getElementsByTagName("td");
+                for (let j = 0; j < td.length; j++) {
+                    const txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+                tr[i].style.display = found ? "" : "none";
+            }
+        }
+
+        function filterByDate(tableId, dateInputId) {
+            const input = document.getElementById(dateInputId);
+            const filterDate = input.value;
+            const table = document.getElementById(tableId);
+            const tr = table.getElementsByTagName("tr");
+            for (let i = 0; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                    const dateTime = td.textContent || td.innerText;
+                    const date = dateTime.split(" ")[0];
+                    tr[i].style.display = filterDate === "" || date === filterDate ? "" : "none";
+                }
+            }
+        }
+
+        function downloadInvoice(refNo) {
+            alert(`Downloading invoice: ${refNo}`);
+        }
+
+        function bulkDownloadInvoices() {
+            alert("Bulk downloading all invoices");
+        }
+
+        $(document).ready(function() {
+            generateNavigation();
+            populateTables();
+        });
+    </script>
+</body>
+</html>

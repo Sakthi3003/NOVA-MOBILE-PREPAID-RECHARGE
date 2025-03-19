@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova - My Plans</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/myplans.css">
+</head>
+<body>
+    <!-- Loading Overlay (Updated to match indexu.html) -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="./indexu.html" class="logo"><img src="../assets/images/logo.webp" alt="Nova SIM Logo" height="40px" width="100px"></a>
+        <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="nav-links" id="nav-links">
+            <a href="./indexu.html" class="nav-link" id="home-link">Home</a>
+            <a href="plansu.html" class="nav-link" id="plans-link">Plans</a>
+            <a href="support.html" class="nav-link" id="support-link">Support</a>
+            <a href="about.html" class="nav-link" id="about-link">About Us</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section-title">Current Plan</div>
+        <div class="current-plan-card">
+            <div class="current-plan-header">
+                <div class="plan-name">Premium Monthly</div>
+                <div class="plan-badge">Active</div>
+            </div>
+            <div class="plan-details">
+                <div class="plan-detail">
+                    <div class="detail-label">Subscription Fee</div>
+                    <div class="detail-value price-value">₹1,999/month</div>
+                </div>
+                <div class="plan-detail">
+                    <div class="detail-label">Start Date</div>
+                    <div class="detail-value">February 28, 2025</div>
+                </div>
+                <div class="plan-detail">
+                    <div class="detail-label">End Date</div>
+                    <div class="detail-value">March 28, 2025</div>
+                </div>
+                <div class="plan-detail">
+                    <div class="detail-label">Days Remaining</div>
+                    <div class="detail-value">27 days</div>
+                </div>
+            </div>
+            <div class="usage-info">
+                <div class="usage-item">
+                    <div class="usage-label">Data Balance</div>
+                    <div class="usage-value">24.5 GB remaining</div>
+                </div>
+                <div class="usage-item">
+                    <div class="usage-label">SMS Balance</div>
+                    <div class="usage-value">5 SMS remaining</div>
+                </div>
+                <div class="usage-item">
+                    <div class="usage-label">Voice Minutes</div>
+                    <div class="usage-value">380 mins remaining</div>
+                </div>
+            </div>
+            <div class="plan-actions">
+                <button class="button button-secondary">View Details</button>
+                <button class="button">Renew Plan</button>
+            </div>
+        </div>
+        
+        <div class="section-title">Previous Plans</div>
+        <div class="filters">
+            <input type="text" class="search-input" placeholder="Search plans..." id="planSearch">
+            <div class="filter-group">
+                <label class="filter-label">Category:</label>
+                <select class="filter-select" id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="5g">5G</option>
+                    <option value="data">Data</option>
+                    <option value="voice">Voice</option>
+                </select>
+            </div>
+        </div>
+        <table class="plans-table">
+            <thead>
+                <tr>
+                    <th>Plan Name</th>
+                    <th>Price</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="plansTableBody">
+                <tr>
+                    <td data-label="Plan Name">Premium Monthly</td>
+                    <td data-label="Price">₹1,999</td>
+                    <td data-label="End Date">Feb 28, 2025</td>
+                    <td data-label="Status" class="status-active">Active</td>
+                    <td data-label="Action">
+                        <button class="table-button view-details" data-plan-id="1">View</button>
+                        <button class="table-button">Recharge</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Plan Name">Premium Quarterly</td>
+                    <td data-label="Price">₹5,499</td>
+                    <td data-label="End Date">Feb 10, 2025</td>
+                    <td data-label="Status" class="status-expired">Expired</td>
+                    <td data-label="Action">
+                        <button class="table-button view-details" data-plan-id="2">View</button>
+                        <button class="table-button">Recharge</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Plan Name">Premium Monthly</td>
+                    <td data-label="Price">₹1,999</td>
+                    <td data-label="End Date">Jan 28, 2025</td>
+                    <td data-label="Status" class="status-expired">Expired</td>
+                    <td data-label="Action">
+                        <button class="table-button view-details" data-plan-id="3">View</button>
+                        <button class="table-button">Recharge</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td data-label="Plan Name">Data Booster</td>
+                    <td data-label="Price">₹299</td>
+                    <td data-label="End Date">Feb 15, 2025</td>
+                    <td data-label="Status" class="status-expired">Expired</td>
+                    <td data-label="Action">
+                        <button class="table-button view-details" data-plan-id="4">View</button>
+                        <button class="table-button">Recharge</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal" id="rechargeModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">×</button>
+            <div class="modal-header" id="modalTitle">Plan Details</div>
+            <div class="modal-body" id="modalBody">
+                <!-- Plan details will be populated dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button cancel" id="modalCancel">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/myplans.js"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
+    <link rel="stylesheet" href="./assets/css/analytics.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <img src="./assets/images/logo.webp" alt="" height="40px" width="70px">
+            <!-- <div class="header-title">Admin Dashboard</div> -->
+        </div>
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="header-actions">
+            <div class="nav-menu" id="navMenu">
+                <a href="#" class="nav-item active">Analytics</a>
+                <a href="./expiringplans.html" class="nav-item">Expiring Plans</a>
+                <a href="./manageplans.html" class="nav-item">Manage Plans</a>
+                <a href="./subscriberManagement.html" class="nav-item">Manage Users</a>
+                <a href="./profile.html" class="nav-item">Profile</a>
+                <a href="./index.html" class="nav-item logout-btn">Logout</a>
+                <i class="fas fa-user-circle admin-icon"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="analytics-cards">
+            <div class="card">
+                <i class="fas fa-cogs card-icon"></i>
+                <div class="card-content">
+                    <h3>Active Plans</h3>
+                    <p>10</p>
+                </div>
+            </div>
+            <div class="card">
+                <i class="fas fa-users card-icon"></i>
+                <div class="card-content">
+                    <h3>Subscribers</h3>
+                    <p>12</p>
+                </div>
+            </div>
+            <div class="card">
+                <i class="fas fa-hourglass-end card-icon"></i>
+                <div class="card-content">
+                    <h3>Expiring Plans</h3>
+                    <p>3</p>
+                </div>
+            </div>
+            <div class="card">
+                <i class="fas fa-inr card-icon"></i>
+                <div class="card-content">
+                    <h3>Revenue</h3>
+                    <p>10,000</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="analytics-charts">
+            <div class="chart-card">
+                <h3>Subscriber Growth</h3>
+                <div class="chart-container">
+                    <canvas id="subscriberGrowthChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Payement Method Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="planDistributionChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Revenue Trend</h3>
+                <div class="chart-container">
+                    <canvas id="revenueTrendChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Plan Renewals</h3>
+                <div class="chart-container">
+                    <canvas id="planRenewalsChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Customer Acquisition</h3>
+                <div class="chart-container">
+                    <canvas id="customerAcquisitionChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Revenue by Plan</h3>
+                <div class="chart-container">
+                    <canvas id="revenueByPlanChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="expiring-table">
+            <div class="table-header">
+                <h3>Plans Expiring in 3 Days</h3>
+                <a href="./expiringplans.html" class="view-all-btn">View All</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Plan</th>
+                        <th>Expiry Date</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John Smith</td>
+                        <td>Entertainment</td>
+                        <td>03-03-2025</td>
+                        <td>₹299</td>
+                    </tr>
+                    <tr>
+                        <td>Sarah Johnson</td>
+                        <td>Unlimited</td>
+                        <td>03-03-2025</td>
+                        <td>₹999</td>
+                    </tr>
+                    <tr>
+                        <td>Mike Wilson</td>
+                        <td>5G</td>
+                        <td>03-03-2025</td>
+                        <td>₹499</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="./assets/js/analytics.js"></script>
+</body>
+</html>

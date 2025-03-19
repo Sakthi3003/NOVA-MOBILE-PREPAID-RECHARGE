@@ -1,0 +1,557 @@
+:root {
+    --primary: #0a21c0; /* Your previous primary color */
+    --black: #000000;   /* Your previous black */
+    --white: #ffffff;   /* Your previous white */
+    --gray: #b3b4b3;    /* Your previous gray */
+    --bg-color: #f5f7fa; /* Your previous background */
+    --light: #f8fafc;
+    --shadow: 0 2px 15px rgba(0,0,0,0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--black);
+}
+
+/* Exact Navbar from Previous Design */
+.header {
+    background: var(--black);
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    box-shadow: var(--shadow);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.header-title {
+    color: var(--white);
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-item {
+    color: var(--gray);
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: var(--transition);
+    font-size: 16px;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: var(--white);
+    background: var(--primary);
+}
+
+.admin-icon {
+    color: var(--white);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Responsive Navbar Toggler (Matching Screenshot and Admin Dashboard) */
+.menu-toggle {
+    display: none; /* Hidden by default on large screens */
+    font-size: 18px; /* Reduced size for compactness, matching screenshot */
+    color: var(--white);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px; /* Reduced padding for smaller size, matching screenshot */
+    position: absolute; /* Position in top-right corner */
+    top: 20px; /* Align with header padding */
+    right: 40px; /* Align with header padding */
+}
+
+.header-actions {
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+@media (max-width: 1024px) {
+    .header {
+        padding: 15px 20px; /* Reduced padding for tablets */
+        flex-direction: row; /* Keep logo and title on the left */
+        justify-content: space-between; /* Maintain space between logo/title and toggler */
+    }
+
+    .logo-container {
+        flex-direction: row; /* Ensure logo and title stay left-aligned */
+    }
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block; /* Show toggler on mobile */
+    }
+
+    .nav-menu {
+        display: none; /* Hide menu by default on mobile */
+        flex-direction: column;
+        position: absolute;
+        top: 80px; /* Below header */
+        right: 0; /* Align to right side */
+        width: 250px; /* Compact width, matching screenshot and Admin Dashboard */
+        background: var(--black);
+        padding: 20px;
+        box-shadow: var(--shadow);
+        max-height: calc(100vh - 80px); /* Limit height to viewport minus header */
+        overflow-y: auto; /* Scroll if content overflows */
+    }
+
+    .nav-menu.active {
+        display: flex; /* Show menu when active */
+    }
+
+    .nav-item {
+        width: 100%;
+        text-align: right; /* Align items to right for consistency, matching screenshot */
+        padding: 12px 15px; /* Maintain touch-friendly padding */
+    }
+
+    .header-actions {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 15px;
+    }
+
+    .admin-icon {
+        margin-left: 0; /* Remove margin, adjust for right alignment */
+        margin-right: 15px; /* Add margin on the right for spacing */
+    }
+
+    .header {
+        padding: 15px 20px; /* Reduced padding on mobile */
+        flex-direction: row; /* Keep logo and title on the left */
+        justify-content: space-between; /* Maintain space between logo/title and toggler */
+    }
+
+    .logo-container {
+        flex-direction: row; /* Ensure logo and title stay left-aligned */
+    }
+}
+
+.dashboard-container {
+    max-width: 1400px;
+    margin-top: 80px;
+    padding: 40px;
+}
+
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.table-container {
+    background-color: var(--white);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: 0; /* Removed border-radius to allow scrolling */
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: var(--light);
+    font-weight: 600;
+    border-top: none;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.75rem; /* Reduced padding for compactness */
+    text-align: left;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover {
+    background-color: var(--light);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    border-radius: 0.375rem; /* Slightly smaller radius for compactness */
+    padding: 0.25rem 0.625rem; /* Reduced padding for smaller size, matching image */
+    font-weight: 500;
+    font-size: 0.75rem; /* Reduced font size for compactness, matching image */
+}
+
+.btn-primary:hover {
+    background-color: #2b3fd5;
+    border-color: #2b3fd5;
+}
+
+.search-container {
+    position: relative;
+    max-width: 200px; /* Reduced width for mobile fit */
+}
+
+.search-container i {
+    position: absolute;
+    left: 8px; /* Reduced left padding for compactness */
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+    font-size: 0.875rem; /* Reduced icon size for mobile */
+}
+
+.search-input {
+    padding-left: 28px; /* Reduced padding-left for compactness */
+    border-radius: 0.375rem; /* Slightly smaller radius */
+    border: 1px solid #e2e8f0;
+    font-size: 0.875rem; /* Reduced font size for mobile */
+    height: 2rem; /* Fixed height for consistency */
+}
+
+.pagination .page-link {
+    border: none;
+    color: var(--black);
+    padding: 0.25rem 0.5rem; /* Reduced padding for compactness */
+    margin: 0 0.125rem; /* Reduced margin for tighter spacing */
+    border-radius: 0.375rem; /* Slightly smaller radius */
+    font-size: 0.75rem; /* Reduced font size for mobile */
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary);
+    color: var(--white);
+}
+
+/* Improved Modal Design to Match Image */
+.modal-content {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: var(--shadow);
+    background: var(--white);
+}
+
+.modal-header {
+    background: var(--primary);
+    color: var(--white);
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.modal-title {
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-body h6 {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--primary);
+    padding-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.modal-body .profile-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two-column layout to match image */
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.modal-body .profile-info p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+}
+
+.modal-body .profile-info p strong {
+    color: var(--black);
+    font-weight: 600;
+    display: inline-block;
+    width: 120px; /* Matches image alignment */
+    margin-right: 0.5rem;
+    text-align: left; /* Left-align labels to match image */
+}
+
+.modal-body .transaction-history {
+    margin-top: 1rem;
+}
+
+.modal-body .transaction-history h6 {
+    margin-bottom: 1rem;
+}
+
+.modal-body .table {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.modal-body .table thead th {
+    background-color: var(--primary);
+    color: var(--white);
+    border-bottom: none;
+    padding: 0.75rem;
+}
+
+.modal-body .table tbody td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-body .table tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+.btn-close {
+    filter: invert(1);
+}
+
+/* Toast Notification */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+
+.toast {
+    background-color: var(--white);
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 350px;
+}
+
+.toast-header {
+    color: var(--primary);
+    font-weight: 600;
+    padding: 0;
+    margin-bottom: 0.5rem;
+}
+
+.toast-body {
+    color: var(--black);
+}
+
+/* Loading Overlay for Logout */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.spinner {
+    width: 50px; /* Reduced size for mobile compatibility */
+    height: 50px;
+    border: 5px solid var(--gray);
+    border-top: 5px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+    .dashboard-container {
+        padding: 30px; /* Slightly reduced padding for tablets */
+    }
+
+    .table thead th, .table tbody td {
+        padding: 0.75rem; /* Slightly reduced padding for tablets */
+    }
+
+    .btn-primary {
+        padding: 0.375rem 0.75rem; /* Slightly smaller buttons on tablets */
+        font-size: 0.8125rem; /* Slightly smaller font on tablets */
+    }
+
+    .search-container {
+        max-width: 250px; /* Slightly reduced width for tablets */
+    }
+
+    .search-input {
+        font-size: 0.9375rem; /* Slightly reduced font on tablets */
+    }
+
+    .pagination .page-link {
+        padding: 0.375rem 0.625rem; /* Slightly smaller pagination on tablets */
+        font-size: 0.8125rem; /* Slightly reduced font on tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 15px 20px;
+        flex-direction: row; /* Keep logo and title on the left */
+        justify-content: space-between; /* Maintain space between logo/title and toggler */
+    }
+
+    .logo-container {
+        flex-direction: row; /* Ensure logo and title stay left-aligned */
+    }
+
+    .header-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .dashboard-container {
+        padding: 15px; /* Reduced padding on mobile */
+    }
+
+    .card {
+        padding: 2rem; /* Slightly increased padding on mobile for better spacing */
+    }
+
+    .modal-body .profile-info {
+        grid-template-columns: 1fr; /* Stack on mobile */
+        gap: 0.25rem;
+    }
+
+    .modal-body .profile-info p strong {
+        width: 100%;
+        text-align: left;
+        margin-right: 0;
+    }
+
+    .modal-body {
+        padding: 1rem; /* Reduced padding on mobile */
+    }
+
+    .table-container {
+        overflow-x: auto; /* Make table horizontally scrollable on mobile */
+    }
+
+    .table {
+        min-width: 500px; /* Minimum width to ensure scrollability */
+    }
+
+    .table thead th, .table tbody td {
+        padding: 0.5rem; /* Further reduced padding on mobile */
+        font-size: 0.75rem; /* Further reduced font size on mobile */
+        white-space: nowrap; /* Prevent text wrapping for better scrolling */
+    }
+
+    .btn-primary {
+        padding: 0.25rem 0.5rem; /* Smaller buttons on mobile, matching image */
+        font-size: 0.6875rem; /* Smaller font on mobile, matching image */
+    }
+
+    .search-container {
+        max-width: 150px; /* Reduced width for mobile fit, matching image */
+    }
+
+    .search-container i {
+        left: 6px; /* Further reduced left padding for compactness */
+        font-size: 0.75rem; /* Further reduced icon size on mobile */
+    }
+
+    .search-input {
+        padding-left: 22px; /* Further reduced padding-left for compactness */
+        font-size: 0.75rem; /* Further reduced font size on mobile */
+        height: 1.75rem; /* Reduced height for compactness */
+    }
+
+    .pagination .page-link {
+        padding: 0.125rem 0.375rem; /* Smaller pagination on mobile, matching image */
+        font-size: 0.625rem; /* Further reduced font size on mobile */
+        margin: 0 0.0625rem; /* Tighter spacing on mobile */
+    }
+
+    h3.fw-bold {
+        font-size: 1rem; /* Reduced heading size on mobile */
+    }
+}
+
+@media (max-width: 480px) {
+    .table {
+        min-width: 400px; /* Reduced minimum width for very small screens */
+    }
+
+    .btn-primary {
+        padding: 0.2rem 0.375rem; /* Even smaller buttons on very small screens */
+        font-size: 0.625rem; /* Even smaller font on very small screens */
+    }
+
+    .search-container {
+        max-width: 120px; /* Further reduced width for very small screens */
+    }
+
+    .search-input {
+        height: 1.5rem; /* Further reduced height for very small screens */
+    }
+
+    .pagination .page-link {
+        padding: 0.1rem 0.25rem; /* Even smaller pagination on very small screens */
+        font-size: 0.5625rem; /* Even smaller font on very small screens */
+    }
+}

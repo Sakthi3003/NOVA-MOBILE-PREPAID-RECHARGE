@@ -1,0 +1,529 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+:root {
+    --primary-color: #0a21c0;
+    --primary-light: rgba(10, 33, 192, 0.1);
+    --text-color: #000;
+    --bg-color: #fff;
+    --error-color: #ff3b30;
+    --success-color: #34c759;
+    --light-bg: #f5f7fa;
+    --border-color: #e1e5eb;
+    --hover-color: #081b9e;
+    --black: #000000;
+    --white: #ffffff;
+    --gray: #b3b4b3;
+    --shadow: 0 2px 15px rgba(0,0,0,0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    background-color: var(--light-bg);
+    color: var(--text-color);
+}
+
+/* Header (Matching Manage Users, dashboard.html, and expiring-plans.html) */
+.header {
+    background: var(--black);
+    padding: 20px 40px; /* Matched to Manage Users and other dashboards */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    box-shadow: var(--shadow);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Matched to Manage Users and other dashboards */
+}
+
+.logo {
+    width: 40px; /* Matched to Manage Users and other dashboards */
+    height: 40px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 20px; /* Matched to Manage Users and other dashboards */
+    font-weight: bold;
+}
+
+.header-title {
+    color: var(--white);
+    font-size: 24px; /* Matched to Manage Users and other dashboards */
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Matched to Manage Users and other dashboards */
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.nav-item {
+    color: var(--gray);
+    text-decoration: none;
+    padding: 8px 15px; /* Matched to Manage Users and other dashboards */
+    border-radius: 5px; /* Matched to Manage Users and other dashboards */
+    transition: var(--transition);
+    font-size: 16px; /* Matched to Manage Users and other dashboards */
+}
+
+.nav-item:hover, .nav-item.active {
+    color: var(--white);
+    background: var(--primary-color); /* Matched to Manage Users and other dashboards */
+}
+
+.admin-icon {
+    color: var(--white);
+    font-size: 24px; /* Matched to Manage Users and other dashboards */
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.admin-icon:hover {
+    color: var(--primary-color); /* Matched to Manage Users and other dashboards */
+}
+
+/* Responsive Navbar Toggler (Matching Manage Users, dashboard.html, and expiring-plans.html) */
+.menu-toggle {
+    display: none; /* Hidden by default on large screens */
+    font-size: 18px; /* Matched to Manage Users and other dashboards */
+    color: var(--white);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px; /* Matched to Manage Users and other dashboards */
+    position: absolute; /* Position in top-right corner */
+    top: 20px; /* Matched to Manage Users and other dashboards */
+    right: 40px; /* Matched to Manage Users and other dashboards */
+    transition: var(--transition);
+}
+
+.menu-toggle:hover {
+    color: var(--primary-color); /* Matched to Manage Users and other dashboards */
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Matched to Manage Users and other dashboards */
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block; /* Show toggler on mobile */
+    }
+
+    .nav-menu {
+        display: none; /* Hide menu by default on mobile */
+        flex-direction: column;
+        position: absolute;
+        top: 80px; /* Matched to Manage Users and other dashboards */
+        right: 0; /* Align to right side */
+        width: 250px; /* Matched to Manage Users and other dashboards */
+        background: var(--black);
+        padding: 20px; /* Matched to Manage Users and other dashboards */
+        box-shadow: var(--shadow);
+        max-height: calc(100vh - 80px); /* Matched to Manage Users and other dashboards */
+        overflow-y: auto; /* Allow scrolling if content exceeds max-height */
+    }
+
+    .nav-menu.active {
+        display: flex; /* Show menu when active */
+    }
+
+    .nav-item {
+        width: 100%;
+        text-align: right; /* Align items to right for consistency */
+        padding: 12px 15px; /* Matched to Manage Users and other dashboards */
+        font-size: 16px; /* Matched to Manage Users and other dashboards */
+    }
+
+    .header-actions {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 15px; /* Matched to Manage Users and other dashboards */
+    }
+
+    .admin-icon {
+        margin-right: 15px; /* Matched to Manage Users and other dashboards */
+    }
+
+    .header {
+        padding: 15px 20px; /* Matched to Manage Users and other dashboards */
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 10px 15px; /* Further reduced for very small screens, matching Manage Users */
+    }
+
+    .logo {
+        width: 30px; /* Reduced for very small screens, matching Manage Users */
+        height: 30px;
+        font-size: 16px; /* Reduced for very small screens, matching Manage Users */
+    }
+
+    .header-title {
+        font-size: 20px; /* Reduced for very small screens, matching Manage Users */
+    }
+
+    .nav-item {
+        padding: 10px 12px; /* Reduced for very small screens, matching Manage Users */
+        font-size: 14px; /* Reduced for very small screens, matching Manage Users */
+    }
+}
+
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    margin-top: 120px; /* Adjusted to account for the header height with potential dropdown */
+}
+
+.page-title {
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    color: var(--text-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.profile-card {
+    background-color: var(--bg-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-icon {
+    color: var(--primary-color);
+    width: 20px;
+    height: 20px;
+}
+
+.settings-card {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.account-field {
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+    position: relative;
+    background-color: var(--bg-color);
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.account-field:hover {
+    background-color: var(--light-bg); /* Updated to match --light-bg for consistency */
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.field-label {
+    font-weight: 600;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.field-value {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    word-break: break-word;
+}
+
+.edit-pencil {
+    position: absolute;
+    top: 0.75rem;
+    right: 1rem;
+    color: var(--primary-color);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.3s;
+}
+
+.edit-pencil:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background-color: var(--bg-color);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.submit-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: var(--hover-color);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: none;
+    animation: fadeIn 0.3s;
+}
+
+.success-message {
+    color: var(--success-color);
+    font-size: 0.95rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background-color: rgba(52, 199, 89, 0.1);
+    display: none;
+    text-align: center;
+    animation: fadeIn 0.5s;
+}
+
+.input-invalid {
+    border-color: var(--error-color);
+}
+
+.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Toast Message Styles (Matching Manage Users and other dashboards) */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--success-color);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
+    z-index: 1002;
+    animation: slideInToast 0.5s ease-out, fadeOutToast 0.5s ease-out 2.5s forwards;
+}
+
+@keyframes slideInToast {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeOutToast {
+    to { opacity: 0; }
+}
+
+/* Loading Overlay for Logout (Matching Manage Users and other dashboards) */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--gray);
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Adjustments for Profile Content (Matching Manage Users and other dashboards) */
+@media (max-width: 600px) {
+    .settings-card {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .page-title {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .profile-card {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
+
+    .section-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .form-control {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: 0.375rem;
+    }
+
+    .submit-btn {
+        padding: 0.25rem 0.625rem;
+        font-size: 0.6875rem;
+        border-radius: 0.375rem;
+    }
+
+    .field-value, .field-label {
+        font-size: 0.75rem;
+    }
+
+    .edit-pencil {
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+
+    .error-message {
+        font-size: 0.625rem;
+        margin-top: 0.125rem;
+    }
+
+    .success-message {
+        font-size: 0.625rem;
+        margin-top: 0.75rem;
+        padding: 0.375rem;
+        border-radius: 0.375rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-card {
+        padding: 0.875rem;
+        border-radius: 10px;
+    }
+
+    .page-title {
+        font-size: 0.875rem;
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+    }
+
+    .form-control {
+        padding: 0.2rem 0.375rem;
+        font-size: 0.625rem;
+    }
+
+    .submit-btn {
+        padding: 0.1rem 0.25rem;
+        font-size: 0.5625rem;
+    }
+
+    .field-value, .field-label {
+        font-size: 0.625rem;
+    }
+
+    .edit-pencil {
+        top: 0.25rem;
+        right: 0.375rem;
+    }
+}

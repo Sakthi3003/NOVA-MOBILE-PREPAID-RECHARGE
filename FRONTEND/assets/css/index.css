@@ -1,0 +1,851 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+    color: #333; /* Uniform body text color */
+    line-height: 1.6;
+    position: relative;
+}
+
+/* Navbar Styles */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #000;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeInSection 1s ease-in-out forwards;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    position: relative;
+    padding: 0.5rem 0;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+}
+
+.nav-link.active {
+    font-weight: bold;
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+}
+
+.btn {
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.login-btn {
+    background-color: white;
+    color: black;
+}
+
+.login-btn:hover {
+    background-color: #0a21c0;
+    color: white;
+}
+
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    background: url('../images/hero_section.webp') no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 5%;
+    opacity: 0;
+    animation: fadeInSection 1s ease-in-out forwards;
+    animation-delay: 0.2s;
+}
+
+.hero-content {
+    background: transparent;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: left;
+    max-width: 600px;
+}
+
+.hero-content h2 {
+    font-weight: 600;
+    color: #2c2e3a; /* Keep white due to dark background */
+    margin-bottom: 20px;
+    font-size: 40px;
+}
+
+.hero-content h2 span {
+    color: #0a21c0;
+}
+
+/* Quick Recharge Section */
+.quick-recharge {
+    padding: 50px 0;
+    background-color: #ffffff;
+    text-align: center;
+    position: relative;
+    opacity: 0;
+    animation: fadeInSection 1s ease-in-out forwards;
+    animation-delay: 0.4s;
+}
+
+.quick-recharge h3 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 35px;
+    color: black; /* Uniform heading color */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: fadeInText 1s ease-in-out;
+}
+
+@keyframes fadeInText {
+    0% { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.quick-recharge .form-container {
+    max-width: 550px;
+    margin: 0 auto;
+    padding: 30px;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(10, 33, 192, 0.1);
+    border: 1px solid rgba(10, 33, 192, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quick-recharge .form-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(10, 33, 192, 0.15);
+}
+
+/* Input Styles */
+.form-group {
+    margin-bottom: 16px;
+    position: relative;
+    width: 100%;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #e1e4ed;
+    border-right: none;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    color: #000000;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e1e4ed;
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background-color: #FAFAFA;
+    color: #333; /* Uniform text color */
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #0a21c0;
+    box-shadow: 0 0 0 2px rgba(10, 33, 192, 0.1);
+    background-color: white;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    display: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background-color: #fff2f2;
+    border-left: 2px solid #dc3545;
+    animation: shake 0.5s ease-in-out;
+    text-align: left;
+}
+
+.error-message:before {
+    content: "⚠️ ";
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-3px); }
+    40%, 80% { transform: translateX(3px); }
+}
+
+/* Loading Spinner */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border: 0.4em solid #0a21c0;
+    border-right-color: transparent;
+}
+
+/* Popular Plans */
+.popular-plans {
+    background-color: white;
+    padding: 50px 0;
+    text-align: center;
+    color: white;
+    opacity: 0;
+    animation: fadeInSection 1s ease-in-out forwards;
+    animation-delay: 0.6s;
+}
+
+.popular-plans h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    color: #0a21c0; /* Uniform heading color */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.plans-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.plan-card {
+    background: #ffffff;
+    color: #333; /* Uniform text color */
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    position: relative;
+    overflow: visible;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    border: 1px solid #e0e0e0;
+}
+
+.plan-card:nth-child(1) { animation-delay: 0.2s; }
+.plan-card:nth-child(2) { animation-delay: 0.4s; }
+.plan-card:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.plan-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #0a21c0, #4a90e2);
+}
+
+.plan-card h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #333; /* Uniform text color */
+    padding-top: 8px;
+}
+
+.plan-card h3 i {
+    color: #0a21c0;
+    font-size: 22px;
+}
+
+.plan-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.plan-detail {
+    flex: 1 1 100%;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    color: #333; /* Uniform text color (replacing #666) */
+}
+
+.plan-detail i {
+    margin-right: 6px;
+    color: #0a21c0;
+    font-size: 14px;
+}
+
+.plan-benefits {
+    margin-bottom: 12px;
+}
+
+.plan-benefits ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plan-benefits li {
+    font-size: 15px;
+    color: #333; /* Uniform text color (replacing black) */
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.plan-benefits li::before {
+    content: '✔';
+    color: #0a21c0;
+    margin-right: 6px;
+}
+
+.plan-price {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0a21c0;
+    margin-bottom: 12px;
+    text-align: center;
+    background: #e6f0ff;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.plan-card button {
+    background-color: #0a21c0;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.plan-card button:hover {
+    background-color: #08189b;
+}
+
+/* Features Section */
+.features-section {
+    padding: 50px 0;
+    background-color: white;
+    opacity: 0;
+    animation: fadeInSection 1s ease-in-out forwards;
+    animation-delay: 0.8s;
+}
+
+.features-section h2 {
+    color: black; 
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.feature-icon-small {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a21c0;
+    border-radius: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease-in-out;
+}
+
+.feature-icon-small i {
+    color: white;
+    font-size: 24px;
+}
+
+.feature-icon-small:hover {
+    transform: scale(1.1);
+}
+
+.features-section h4 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333; /* Uniform text color */
+    margin-top: 10px;
+}
+
+.features-section p {
+    font-size: 16px;
+    color: #333; /* Uniform text color (replacing #666/.text-secondary) */
+}
+
+.btn-primary {
+    background: #0a21c0;
+    border: none;
+    padding: 12px 24px 12px 18px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-primary:hover {
+    background: #08189b;
+    transform: scale(1.05);
+}
+
+.btn-primary .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    margin-right: 15px; /* Increased separation */
+}
+
+.btn-primary .btn-icon i {
+    color: white;
+    font-size: 16px;
+}
+
+.btn-track {
+    background: #0a21c0;
+    border: none;
+    padding: 10px 20px; /* Reduced padding */
+    font-size: 18px; /* Reduced font size */
+    font-weight: 600;
+    border-radius: 8px;
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Buy SIM Section */
+.buy-sim-section {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+    text-align: center;
+    opacity: 0;
+    animation: fadeInSection 1s ease-in-out forwards;
+    animation-delay: 1s;
+}
+
+.buy-sim-section h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: black; 
+    margin-bottom: 20px;
+}
+
+.buy-sim-section .lead {
+    font-size: 18px;
+    color: #333; /* Uniform text color (replacing #666) */
+    margin-bottom: 30px;
+}
+
+.buy-sim-section .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 10px;
+    background: white;
+}
+
+.buy-sim-section .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.buy-sim-section .card i {
+    color: #0a21c0;
+    font-size: 32px;
+}
+
+.buy-sim-section .btn-link {
+    color: #0a21c0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.buy-sim-section .btn-link:hover {
+    color: #08189b;
+    text-decoration: underline;
+}
+
+/* Port to Nova Section */
+.port-to-nova-section {
+    padding: 60px 0;
+    background-color: #ffffff;
+    text-align: center;
+    opacity: 0;
+    animation: fadeInSection 1s ease-in-out forwards;
+    animation-delay: 1.2s;
+}
+
+.port-to-nova-section h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: black; /* Uniform heading color */
+    margin-bottom: 20px;
+}
+
+.port-to-nova-section .lead {
+    font-size: 18px;
+    color: #333; /* Uniform text color (replacing #666) */
+    margin-bottom: 30px;
+}
+
+.port-to-nova-section .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 10px;
+    background: white;
+}
+
+.port-to-nova-section .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.port-to-nova-section .card i {
+    color: #0a21c0;
+    font-size: 32px;
+}
+
+.port-to-nova-section .btn-link {
+    color: #0a21c0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.port-to-nova-section .btn-link:hover {
+    color: #08189b;
+    text-decoration: underline;
+}
+
+
+footer {
+    background: linear-gradient(135deg, #141619, #000000);
+    color: white;
+    padding: 40px 20px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    margin-top: auto;
+    opacity: 0;
+    animation: fadeInSection 1s ease-in-out forwards;
+    animation-delay: 1.6s;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+}
+
+.footer-section h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #0a21c0; /* Uniform heading color */
+}
+
+.footer-section p, .footer-section a {
+    font-size: 14px;
+    color: #b3b4bd;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.footer-social a {
+    font-size: 20px;
+    margin-right: 15px;
+    color: #b3b4bd;
+    transition: color 0.3s ease;
+}
+
+.footer-social a:hover {
+    color: #0a21c0;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+}
+
+.footer-bottom p {
+    font-size: 14px;
+    color: #b3b4bd;
+    margin: 0;
+}
+
+/* General Fade-In Animation for Sections */
+@keyframes fadeInSection {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .hero-section{
+        background: white;
+        color: #000;
+    }
+    .mobile-menu-btn {
+        display: block;
+    }
+    
+    .nav-links {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        flex-direction: column;
+        background-color: #000;
+        padding: 1rem;
+        gap: 1rem;
+        transform: translateY(-150%);
+        transition: transform 0.3s ease-in-out;
+    }
+    
+    .nav-links.active {
+        transform: translateY(0);
+    }
+
+    .hero-section {
+        height: auto;
+        padding: 50px 20px;
+    }
+    
+    .hero-content {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .hero-content h2 {
+        font-size: 28px;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+
+    .quick-recharge h3, .buy-sim-section h2, .port-to-nova-section h2 {
+        font-size: 26px;
+    }
+
+    .quick-recharge .form-container {
+        padding: 20px;
+    }
+
+    .plans-section {
+        grid-template-columns: 1fr;
+    }
+
+    .about-us h1 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .about-us p {
+        text-align: center;
+    }
+
+    .counter, .rating {
+        text-align: center;
+        justify-content: center;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .footer-social a {
+        margin: 0 10px;
+    }
+
+    .plan-details {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .plan-detail {
+        flex: 1 1 100%;
+    }
+
+    .features-section .row {
+        flex-direction: column;
+        margin-top: 50px;
+        text-align: center;
+    }
+
+    .features-section .col {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .features-section .d-flex.flex-column {
+        align-items: center !important;
+    }
+
+    .features-section .btn-primary {
+        margin: 0 auto;
+    }
+
+    .features-section .row.row-cols-sm-2 {
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .features-section .col.d-flex {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .features-section .feature-icon-small {
+        margin: 0 auto;
+    }
+
+    .buy-sim-section .lead, .port-to-nova-section .lead {
+        font-size: 16px;
+    }
+    .btn-primary, .btn-track {
+padding: 8px 14px;
+font-size: 14px;
+}
+
+.btn-primary .btn-icon {
+width: 25px;
+height: 25px;
+margin-right: 8px;
+}
+
+.btn-primary .btn-icon i {
+font-size: 12px;
+}
+
+/* Reduce gap between Buy SIM Now and Track Order buttons */
+.buy-sim-section .d-flex.gap-3 {
+gap: 1rem;
+}
+}
+
+@media (max-width: 480px) {
+    .hero-content h2 {
+        font-size: 24px;
+    }
+
+    .hero-section {
+        background: white;
+        color: #000;
+    }
+
+    .quick-recharge h3, .buy-sim-section h2, .port-to-nova-section h2 {
+        font-size: 22px;
+    }
+
+    .popular-plans h2 {
+        font-size: 24px;
+    }
+
+    .plan-card {
+        padding: 15px;
+    }
+}
