@@ -34,7 +34,7 @@ public class PlanController {
         return ResponseEntity.ok(planService.getPlanById(id));
     }
 
-    @PostMapping
+    @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlanDTO> createPlan(@RequestBody PlanCreateDTO planCreateDTO) {
         return ResponseEntity.ok(planService.createPlan(planCreateDTO));

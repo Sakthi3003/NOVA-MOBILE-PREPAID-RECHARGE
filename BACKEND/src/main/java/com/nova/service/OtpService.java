@@ -26,7 +26,7 @@ public class OtpService {
     public String generateOtp(String phoneNumber) {
         String formattedPhoneNumber = formatPhoneNumber(phoneNumber); 
         String otp = String.format("%06d", new Random().nextInt(999999));
-        otpStore.put(formattedPhoneNumber, otp); // Store with country code
+        otpStore.put(formattedPhoneNumber, otp);
         new Thread(() -> {
             try {
                 TimeUnit.MINUTES.sleep(5);
