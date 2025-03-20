@@ -11,46 +11,44 @@ import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
- @Autowired
- private CategoryRepository categoryRepository;
- 
- public List<CategoryDTO> getAllCategories() {
-     return categoryRepository.findAll().stream()
-             .map(this::convertToDTO)
-             .collect(Collectors.toList());
- }
- 
- public CategoryDTO getCategoryById(Long id) {
-     Category category = categoryRepository.findById(id)
-             .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
-     return convertToDTO(category);
- }
- 
- public CategoryDTO createCategory(CategoryDTO categoryDTO) {
-     Category category = new Category();
-     category.setName(categoryDTO.getName());
-     
-     Category savedCategory = categoryRepository.save(category);
-     return convertToDTO(savedCategory);
- }
- 
- public CategoryDTO updateCategory(CategoryDTO categoryDTO) {
-     Category category = categoryRepository.findById(categoryDTO.getId())
-             .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryDTO.getId()));
-     
-     category.setName(categoryDTO.getName());
-     Category updatedCategory = categoryRepository.save(category);
-     return convertToDTO(updatedCategory);
- }
- 
- public void deleteCategory(Long id) {
-     categoryRepository.deleteById(id);
- }
- 
- private CategoryDTO convertToDTO(Category category) {
-     CategoryDTO categoryDTO = new CategoryDTO();
-     categoryDTO.setId(category.getId());
-     categoryDTO.setName(category.getName());
-     return categoryDTO;
- }
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    public List<CategoryDTO> getAllCategories() {
+        return categoryRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public CategoryDTO getCategoryById(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        return convertToDTO(category);
+    }
+
+    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        category.setName(categoryDTO.getName());
+        Category savedCategory = categoryRepository.save(category);
+        return convertToDTO(savedCategory);
+    }
+
+    public CategoryDTO updateCategory(CategoryDTO categoryDTO) {
+        Category category = categoryRepository.findById(categoryDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        category.setName(categoryDTO.getName());
+        Category updatedCategory = categoryRepository.save(category);
+        return convertToDTO(updatedCategory);
+    }
+
+    public void deleteCategory(Long id) {
+        categoryRepository.deleteById(id);
+    }
+
+    private CategoryDTO convertToDTO(Category category) {
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setId(category.getId());
+        categoryDTO.setName(category.getName());
+        return categoryDTO;
+    }
 }

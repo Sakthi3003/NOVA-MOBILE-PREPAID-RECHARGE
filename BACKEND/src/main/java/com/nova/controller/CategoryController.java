@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/categories")
+
 public class CategoryController {
  @Autowired
  private CategoryService categoryService;
@@ -31,9 +33,10 @@ public class CategoryController {
      return ResponseEntity.ok(categoryService.createCategory(categoryDTO));
  }
  
- @PutMapping
+ @PutMapping("/{id}")
  @PreAuthorize("hasRole('ADMIN')")
- public ResponseEntity<CategoryDTO> updateCategory(@RequestBody CategoryDTO categoryDTO) {
+ public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
+     categoryDTO.setId(id);
      return ResponseEntity.ok(categoryService.updateCategory(categoryDTO));
  }
  
