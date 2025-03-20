@@ -51,10 +51,14 @@ public class OtpService {
 
     private void sendOtpSms(String phoneNumber, String otp) {
         Twilio.init(accountSid, authToken);
+        // Custom OTP message for Nova login
+        String customMessage = "Your Nova login OTP is: " + otp + 
+                               ". Please use this OTP to complete your login. Do not share this OTP with anyone.";
+
         Message message = Message.creator(
                 new PhoneNumber(phoneNumber),
                 new PhoneNumber(twilioPhoneNumber),
-                "Your OTP is: " + otp
+                customMessage
         ).create();
         System.out.println("SMS sent: " + message.getSid());
     }

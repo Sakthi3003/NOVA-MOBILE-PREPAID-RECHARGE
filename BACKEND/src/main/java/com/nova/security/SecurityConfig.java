@@ -38,8 +38,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  
                 .authorizeHttpRequests(auth -> auth  
                 		.requestMatchers("/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/plans", "/api/plans/**", "/api/categories", "/api/categories/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/auth/**","/api/plans","/api/categories").permitAll()
+                        .requestMatchers("/api/plans/**","/api/categories/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/plans/add", "/api/plans/edit/**", "/api/plans/delete/**", "/api/plans/**/toggle-status").hasRole("ADMIN")
                         .requestMatchers("/api/categories/add", "/api/categories/edit/**", "/api/categories/delete/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -52,7 +52,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5504"));
+        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5501"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
