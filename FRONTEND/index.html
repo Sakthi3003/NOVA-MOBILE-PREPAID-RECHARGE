@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlock Nova Prepaid - Recharge Anytime</title>
+    <title>Nova SIM - Prepaid Recharge App</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <!-- Google Font: Poppins -->
@@ -12,9 +12,960 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="./assets/css/index.css">
-    <!-- Favicon -->
-    <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn {
+            background-color: white;
+            color: black;
+        }
+
+        .login-btn:hover {
+            background-color: #0a21c0;
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: #0a21c0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .user-avatar::after {
+            content: '\f0d7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-avatar:hover::after {
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            background-color: #000;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #0a21c0;
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: url('../assets/images/hero_section.webp') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 5%;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 0.2s;
+        }
+
+        .hero-content {
+            background: transparent;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+            max-width: 600px;
+        }
+
+        .hero-content h2 {
+            font-weight: 600;
+            color: #2c2e3a;
+            margin-bottom: 20px;
+            font-size: 40px;
+        }
+
+        .hero-content h2 span {
+            color: #0a21c0;
+        }
+
+        .recharge-input {
+            width: 70%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .recharge-input:hover, .recharge-input:focus {
+            border-color: #0a21c0;
+        }
+
+        .btn-recharge {
+            width: 30%;
+            background-color: #0a21c0;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-recharge:hover {
+            background-color: #08189b;
+        }
+
+        /* Quick Recharge Section */
+        .quick-recharge {
+            padding: 50px 0;
+            background-color: #f8f9fa;
+            text-align: center;
+            position: relative;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 0.4s;
+        }
+
+        .quick-recharge h3 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 35px;
+            color: #0a21c0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: fadeInText 1s ease-in-out;
+        }
+
+        @keyframes fadeInText {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .quick-recharge .form-container {
+            max-width: 550px;
+            margin: 0 auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .quick-recharge .form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+            width: 100%;
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: 1px solid #e1e4ed;
+            border-right: none;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+            color: #000000;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e1e4ed;
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: #FAFAFA;
+            color: #333;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #0a21c0;
+            box-shadow: 0 0 0 2px rgba(10, 33, 192, 0.1);
+            background-color: white;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            background-color: #fff2f2;
+            border-left: 2px solid #dc3545;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error-message:before {
+            content: "⚠️ ";
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-3px); }
+            40%, 80% { transform: translateX(3px); }
+        }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 0.4em solid #0a21c0;
+            border-right-color: transparent;
+        }
+
+        /* Popular Plans */
+        .popular-plans {
+            background-color: white;
+            padding: 50px 0;
+            text-align: center;
+            color: white;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 0.6s;
+        }
+
+        .popular-plans h2 {
+            font-size: 32px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            color: #0a21c0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .plans-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .plan-card {
+            background: #ffffff;
+            color: #333;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            position: relative;
+            overflow: visible;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+            border: 1px solid #e0e0e0;
+        }
+
+        .plan-card:nth-child(1) { animation-delay: 0.2s; }
+        .plan-card:nth-child(2) { animation-delay: 0.4s; }
+        .plan-card:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .plan-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #0a21c0, #4a90e2);
+        }
+
+        .plan-card h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #333;
+            padding-top: 8px;
+        }
+
+        .plan-card h3 i {
+            color: #0a21c0;
+            font-size: 22px;
+        }
+
+        .plan-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .plan-detail {
+            flex: 1 1 100%;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .plan-detail i {
+            margin-right: 6px;
+            color: #0a21c0;
+            font-size: 14px;
+        }
+
+        .plan-benefits {
+            margin-bottom: 12px;
+        }
+
+        .plan-benefits ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .plan-benefits li {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .plan-benefits li::before {
+            content: '✔';
+            color: #0a21c0;
+            margin-right: 6px;
+        }
+
+        .plan-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0a21c0;
+            margin-bottom: 12px;
+            text-align: center;
+            background: #e6f0ff;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .plan-card button {
+            background-color: #0a21c0;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .plan-card button:hover {
+            background-color: #08189b;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 50px 0;
+            background-color: white;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 0.8s;
+        }
+
+        .features-section h2 {
+            color: black;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .feature-icon-small {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a21c0;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.3);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .feature-icon-small i {
+            color: white;
+            font-size: 24px;
+        }
+
+        .feature-icon-small:hover {
+            transform: scale(1.1);
+        }
+
+        .features-section h4 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .features-section p {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .btn-primary {
+            background: #0a21c0;
+            border: none;
+            padding: 12px 24px 12px 18px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-primary:hover {
+            background: #08189b;
+            transform: scale(1.05);
+        }
+
+        .btn-primary .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+
+        .btn-primary .btn-icon i {
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn-track {
+            background: #0a21c0;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            color: white;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Buy SIM Section */
+        .buy-sim-section {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 1s;
+        }
+
+        .buy-sim-section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        .buy-sim-section .lead {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .buy-sim-section .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .buy-sim-section .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .buy-sim-section .card i {
+            color: #0a21c0;
+            font-size: 32px;
+        }
+
+        .buy-sim-section .btn-link {
+            color: #0a21c0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .buy-sim-section .btn-link:hover {
+            color: #08189b;
+            text-decoration: underline;
+        }
+
+        /* Port to Nova Section */
+        .port-to-nova-section {
+            padding: 60px 0;
+            background-color: #ffffff;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 1.2s;
+        }
+
+        .port-to-nova-section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        .port-to-nova-section .lead {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .port-to-nova-section .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .port-to-nova-section .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .port-to-nova-section .card i {
+            color: #0a21c0;
+            font-size: 32px;
+        }
+
+        .port-to-nova-section .btn-link {
+            color: #0a21c0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .port-to-nova-section .btn-link:hover {
+            color: #08189b;
+            text-decoration: underline;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #141619, #000000);
+            color: white;
+            padding: 40px 20px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: auto;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 1.6s;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #0a21c0;
+        }
+
+        .footer-section p, .footer-section a {
+            font-size: 14px;
+            color: #b3b4bd;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer-social a {
+            font-size: 20px;
+            margin-right: 15px;
+            color: #b3b4bd;
+            transition: color 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            color: #0a21c0;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        .footer-bottom p {
+            font-size: 14px;
+            color: #b3b4bd;
+            margin: 0;
+        }
+
+        @keyframes fadeInSection {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .hero-section {
+                background: white;
+                color: #000;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                background-color: #000;
+                padding: 1rem;
+                gap: 1rem;
+                transform: translateY(-150%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+            }
+
+            .user-avatar::after {
+                display: none;
+            }
+
+            .dropdown-menu {
+                width: 100%;
+                text-align: center;
+            }
+
+            .hero-section {
+                height: auto;
+                padding: 50px 20px;
+            }
+
+            .hero-content {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .hero-content h2 {
+                font-size: 28px;
+            }
+
+            .form-group, .recharge-input, .btn-recharge {
+                width: 100%;
+            }
+
+            .quick-recharge h3, .buy-sim-section h2, .port-to-nova-section h2 {
+                font-size: 26px;
+            }
+
+            .quick-recharge .form-container {
+                padding: 20px;
+            }
+
+            .plans-section {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-social a {
+                margin: 0 10px;
+            }
+
+            .plan-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .plan-detail {
+                flex: 1 1 100%;
+            }
+
+            .features-section .row {
+                flex-direction: column;
+                margin-top: 50px;
+                text-align: center;
+            }
+
+            .features-section .col {
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            .features-section .d-flex.flex-column {
+                align-items: center !important;
+            }
+
+            .features-section .btn-primary {
+                margin: 0 auto;
+            }
+
+            .features-section .row.row-cols-sm-2 {
+                justify-content: center;
+                gap: 20px;
+            }
+
+            .features-section .col.d-flex {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .features-section .feature-icon-small {
+                margin: 0 auto;
+            }
+
+            .buy-sim-section .lead, .port-to-nova-section .lead {
+                font-size: 16px;
+            }
+
+            /* Button size fixes for tablet */
+            .btn-recharge, .btn-primary, .btn-track, .plan-card button {
+                padding: 8px 12px;
+                font-size: 12px;
+                width: auto;
+                min-width: 120px;
+            }
+
+            .hero-content .btn-recharge {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .buy-sim-section .btn-primary,
+            .buy-sim-section .btn-track,
+            .port-to-nova-section .btn-primary {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h2 {
+                font-size: 24px;
+            }
+
+            .hero-section {
+                background: white;
+                color: #000;
+            }
+
+            .quick-recharge h3, .buy-sim-section h2, .port-to-nova-section h2 {
+                font-size: 22px;
+            }
+
+            .popular-plans h2 {
+                font-size: 24px;
+            }
+
+            .plan-card {
+                padding: 15px;
+            }
+
+            /* Button size fixes for mobile */
+            .btn-recharge, .btn-primary, .btn-track, .plan-card button {
+                padding: 6px 10px;
+                font-size: 11px;
+                min-width: 100px;
+            }
+
+            .hero-content .btn-recharge {
+                max-width: 180px;
+            }
+
+            .buy-sim-section .btn-primary,
+            .buy-sim-section .btn-track,
+            .port-to-nova-section .btn-primary {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Loading Spinner -->
@@ -26,14 +977,10 @@
 
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
-        <a href="index.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40px" width="100px"></a>
+        <a href="index.html" class="logo"><img src="./assets/images/logo.webp" alt="" height="40px" width="100px"></a>
         <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
         <div class="nav-links" id="nav-links">
-            <a href="index.html" class="nav-link active">Home</a>
-            <a href="./SUBSCRIBER/plans.html" class="nav-link">Plans</a>
-            <a href="./SUBSCRIBER/support.html" class="nav-link">Support</a>
-            <a href="./SUBSCRIBER/about.html" class="nav-link">About us</a>
-            <a href="./SUBSCRIBER/login.html" class="btn login-btn">Login</a>
+            <!-- Navigation links will be dynamically generated -->
         </div>
     </nav>
 
@@ -41,6 +988,7 @@
     <div class="hero-section">
         <div class="hero-content">
             <h2>POWER UP YOUR CONNECTION <span>ANYTIME, ANYWHERE</span></h2>
+            <a href="./subscriber/plans.html"><button class="btn-recharge" id="rechargeButton">Recharge Now</button></a>
         </div>
     </div>
 
@@ -130,9 +1078,7 @@
                 <div class="col d-flex flex-column align-items-start gap-3">
                     <h2 class="fw-bold">The Ultimate SIM & Recharge Experience</h2>
                     <p>NOVA delivers a seamless mobile recharge and SIM management experience, providing ultra-fast network connectivity and flexible data plans to suit your needs. Log in to track your transactions and stay connected effortlessly.</p>
-                    <a href="./SUBSCRIBER/login.html" class="btn btn-primary btn-lg">
-                        <span class="btn-icon"><i class="fas fa-signal"></i></span> Get Started
-                    </a>
+                    <a href="./login.html" class="btn btn-primary btn-lg">Get Started</a>
                 </div>
                 <div class="col">
                     <div class="row row-cols-1 row-cols-sm-2 g-4">
@@ -173,12 +1119,12 @@
     <!-- Buy SIM Section -->
     <section class="buy-sim-section">
         <div class="container">
-            <h2>Get Your Nova SIM Today</h2>
-            <p class="lead">Stay connected with Nova’s high-speed prepaid SIM cards. Order now, activate easily, and enjoy seamless connectivity!</p>
+            <h2>Your Perfect SIM, Ready in a Flash!</h2>
+            <p class="lead">We gather your details upfront, so when your SIM lands in your hands, it’s already primed for action. Just pop it in, power up, and dive into seamless connectivity</p>
             <div class="row justify-content-center mb-4">
                 <div class="col-md-8 d-flex justify-content-center gap-3">
-                    <a href="./SUBSCRIBER/buy-sim.html" class="btn btn-primary">Buy SIM Now</a>
-                    <a href="./SUBSCRIBER/track-order.html" class="btn btn-track">Track Order</a>
+                    <a href="buy-sim.html" class="btn btn-primary">Buy SIM Now</a>
+
                 </div>
             </div>
             <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -195,9 +1141,9 @@
                     <div class="card h-100 text-center shadow-sm">
                         <div class="card-body">
                             <i class="fas fa-check-circle fa-2x mb-3"></i>
-                            <h5 class="card-title">Easy Activation</h5>
-                            <p class="card-text">Activate your SIM online in minutes with our simple process.</p>
-                            <a href="activate-sim.html" class="btn btn-link">Activate Now</a>
+                            <h5 class="card-title">Instant Activation</h5>
+                            <p class="card-text">No setup required—just insert the SIM and start using it immediately.</p>
+
                         </div>
                     </div>
                 </div>
@@ -207,7 +1153,7 @@
                             <i class="fas fa-question-circle fa-2x mb-3"></i>
                             <h5 class="card-title">Have Queries?</h5>
                             <p class="card-text">Check our FAQ or reach out for support.</p>
-                            <a href="supportg.html#faq" class="btn btn-link">View FAQs</a>
+                            <a href="support.html#faq" class="btn btn-link">View FAQs</a>
                         </div>
                     </div>
                 </div>
@@ -262,17 +1208,12 @@
     <footer>
         <div class="footer-container">
             <div class="footer-section">
-                <h4>Explore</h4>
+                <h4>Quick Links</h4>
                 <a href="index.html">Home</a><br>
-                <a href="./SUBSCRIBER/plans.html">Plans</a><br>
-                <a href="./SUBSCRIBER/supportg.html">Support</a><br>
-                <a href="./SUBSCRIBER/about.html">About Us</a><br>
-                <a href="./SUBSCRIBER/login.html">Login</a>
-            </div>
-            <div class="footer-section">
-                <h4>Get Started</h4>
-                <a href="./SUBSCRIBER/buy-sim.html">Get sim</a><br>
-                <a href="./SUBSCRIBER/port.html">Switch to NOVA</a><br>
+                <a href="./subscriber/plans.html">Plans</a><br>
+                <a href="./subscriber/support.html">Support</a><br>
+                <a href="./subscriber/about.html">About</a><br>
+                <a href="./login.html">Login</a>
             </div>
             <div class="footer-section">
                 <h4>Contact Us</h4>
@@ -294,12 +1235,232 @@
         </div>
     </footer>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery Validate -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-    <script src="./assets/js/index.js"></script>
+    <script>
+    const guestPages = [
+        { id: "admin", label: "Admin", url: "./ADMIN/login.html" },
+        { id: "home", label: "Home", url: "index.html" },
+        { id: "plans", label: "Plans", url: "./subscriber/plans.html" },
+        { id: "support", label: "Support", url: "./subscriber/support.html" },
+        { id: "About", label: "About Us", url: "./subscriber/about.html" }
+    ];
+
+    const loggedInDropdownPages = [
+        { id: "myplans", label: "My Plans", url: "./subscriber/myplans.html" },
+        { id: "transactions", label: "Transactions", url: "./subscriber/transaction.html" },
+        { id: "profile", label: "Profile", url: "./subscriber/profilef.html" },
+    ];
+
+    let currentPage = "home";
+    let isLoggedIn = false;
+    let userInitials = "U";
+
+    // Generate navigation
+    function generateNavigation() {
+        const navLinks = document.getElementById("nav-links");
+        navLinks.innerHTML = "";
+
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        isLoggedIn = !!loggedInUser;
+
+        if (isLoggedIn) {
+            userInitials = loggedInUser?.simHolderName?.charAt(0).toUpperCase() || 'U';
+            guestPages.forEach(page => {
+                const link = document.createElement("a");
+                link.href = page.url;
+                link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                link.textContent = page.label;
+                link.onclick = function(e) {
+                    e.preventDefault();
+                    setCurrentPage(page.id);
+                };
+                navLinks.appendChild(link);
+            });
+
+            const dropdownDiv = document.createElement('div');
+            dropdownDiv.className = 'dropdown';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'user-avatar dropdown-toggle';
+            avatar.id = 'profileDropdown';
+            avatar.setAttribute('data-bs-toggle', 'dropdown');
+            avatar.textContent = userInitials;
+            dropdownDiv.appendChild(avatar);
+
+            const dropdownMenu = document.createElement('div');
+            dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+
+            loggedInDropdownPages.forEach(page => {
+                const link = document.createElement('a');
+                link.href = page.url;
+                link.className = 'dropdown-item';
+                link.textContent = page.label;
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    setCurrentPage(page.id);
+                };
+                dropdownMenu.appendChild(link);
+            });
+
+            const logoutLink = document.createElement('a');
+            logoutLink.href = '#';
+            logoutLink.className = 'dropdown-item';
+            logoutLink.textContent = 'Logout';
+            logoutLink.onclick = (e) => {
+                e.preventDefault();
+                logout();
+            };
+            dropdownMenu.appendChild(logoutLink);
+
+            dropdownDiv.appendChild(dropdownMenu);
+            navLinks.appendChild(dropdownDiv);
+        } else {
+            guestPages.forEach(page => {
+                const link = document.createElement("a");
+                link.href = page.url;
+                link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                link.textContent = page.label;
+                link.onclick = function(e) {
+                    e.preventDefault();
+                    setCurrentPage(page.id);
+                };
+                navLinks.appendChild(link);
+            });
+
+            const loginBtn = document.createElement("a");
+            loginBtn.href = "./SUBSCRIBER/login.html";
+            loginBtn.className = "btn login-btn";
+            loginBtn.textContent = "Login";
+            navLinks.appendChild(loginBtn);
+        }
+    }
+
+    // Set current page and navigate
+    function setCurrentPage(pageId) {
+        currentPage = pageId;
+        const guestPage = guestPages.find(p => p.id === pageId);
+        const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
+        if (guestPage) {
+            window.location.href = guestPage.url;
+        } else if (loggedInPage) {
+            window.location.href = loggedInPage.url;
+        }
+        generateNavigation();
+    }
+
+    // Logout function
+    function logout() {
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('profileSetup');
+        sessionStorage.removeItem('phoneNumber');
+        sessionStorage.removeItem('userDetails');
+        isLoggedIn = false;
+        currentPage = 'home';
+        generateNavigation();
+        window.location.href = 'index.html';
+    }
+
+    // Toggle mobile menu
+    function toggleMenu() {
+        const navLinks = document.getElementById("nav-links");
+        navLinks.classList.toggle("active");
+    }
+
+    // Phone number validation
+    function validatePhoneNumber(value) {
+        const phoneError = document.getElementById('phoneError');
+
+        if (!value) {
+            phoneError.textContent = 'Phone number is required';
+            phoneError.style.display = 'block';
+            return false;
+        }
+
+        if (!/^\d{10}$/.test(value)) {
+            phoneError.textContent = 'Enter a valid 10-digit number';
+            phoneError.style.display = 'block';
+            return false;
+        }
+
+        if (/^[0-5]/.test(value)) {
+            phoneError.textContent = 'Number cannot start with 0, 1, 2, 3, 4, or 5';
+            phoneError.style.display = 'block';
+            return false;
+        }
+
+        phoneError.style.display = 'none';
+        return true;
+    }
+
+    // Fetch user details from backend API
+    async function fetchUserDetails(phoneNumber) {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const phoneError = document.getElementById('phoneError');
+
+        try {
+            loadingOverlay.style.display = 'flex';
+            const response = await fetch(`http://localhost:8080/api/subscriber/check-number?number=${phoneNumber}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch user details');
+            }
+
+            const userData = await response.json();
+            sessionStorage.setItem('userDetails', JSON.stringify(userData));
+            sessionStorage.setItem('phoneNumber', phoneNumber);
+            sessionStorage.setItem('fromQuickRecharge', 'true');
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+                setCurrentPage('plans');
+            }, 500); // Small delay to show loading spinner
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+            phoneError.textContent = error.message || 'This number is not registered';
+            phoneError.style.display = 'block';
+            loadingOverlay.style.display = 'none';
+        }
+    }
+
+    // Initialize and set up event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        generateNavigation();
+
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const phoneInput = document.getElementById('phoneNumber');
+
+        // Phone number input validation and API call
+        phoneInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = value.slice(0, 10);
+
+            if (value.length === 10) {
+                if (validatePhoneNumber(value)) {
+                    fetchUserDetails(value);
+                }
+            } else {
+                document.getElementById('phoneError').style.display = 'none';
+            }
+        });
+
+        // Handle Buy SIM and Track Order buttons
+        document.querySelectorAll('.btn-primary, .btn-track').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                loadingOverlay.style.display = 'flex';
+                const url = button.getAttribute('href');
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 1000);
+            });
+        });
+    });
+</script>
 </body>
 </html>

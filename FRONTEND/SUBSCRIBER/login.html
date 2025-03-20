@@ -11,8 +11,6 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         :root {
             --primary: #0a21c0;
@@ -255,8 +253,6 @@
                 padding: 2rem;
             }
 
-            
-
             .btn-primary, .btn-back {
                 width: 48%;
                 padding: 10px 20px;
@@ -276,20 +272,20 @@
             }
 
             .btn-container {
-                flex-direction: row;
+                flex-direction: column;
                 gap: 15px;
             }
 
             .btn-primary, .btn-back {
                 width: 100%;
                 padding: 12px;
-                font-size: 12px;
+                font-size: 16px;
             }
 
             .otp-input {
                 width: 40px;
                 height: 40px;
-                font-size: 16px;
+                font-size: 18px;
             }
 
             h3 {
@@ -364,38 +360,34 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            const phoneStep = $('#phoneStep');
-            const otpStep = $('#otpStep');
-            const phoneNumber = $('#phoneNumber');
-            const sendOtpBtn = $('#sendOtpBtn');
-            const phoneError = $('#phoneError');
-            const displayPhoneNumber = $('#displayPhoneNumber');
-            const otpInputs = $('.otp-input');
-            const otpError = $('#otpError');
-            const timerDisplay = $('#timer');
-            const resendBtn = $('#resendBtn');
-            const backToHomeBtn = $('#backToHomeBtn');
-            const backToPhoneBtn = $('#backToPhoneBtn');
-            const loadingOverlay = $('#loadingOverlay');
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneStep = document.getElementById('phoneStep');
+            const otpStep = document.getElementById('otpStep');
+            const phoneNumber = document.getElementById('phoneNumber');
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+            const phoneError = document.getElementById('phoneError');
+            const displayPhoneNumber = document.getElementById('displayPhoneNumber');
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const otpError = document.getElementById('otpError');
+            const timerDisplay = document.getElementById('timer');
+            const resendBtn = document.getElementById('resendBtn');
+            const backToHomeBtn = document.getElementById('backToHomeBtn');
+            const backToPhoneBtn = document.getElementById('backToPhoneBtn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
 
-            let timerInterval, countdown = 60, users = [];
+            let timerInterval, countdown = 60;
             let attemptCount = parseInt(sessionStorage.getItem('otpAttempts')) || 0;
             let lockoutTime = sessionStorage.getItem('lockoutTime');
-
-            // Fetch user.json
-            $.getJSON('user.json')
-                .done(data => users = data.users)
-                .fail(() => console.error('Failed to load user.json'));
+            const apiBaseUrl = 'http://localhost:8080/api/auth';
 
             // Check for lockout
             if (lockoutTime) {
                 const now = Date.now();
                 const timeLeft = (parseInt(lockoutTime) + 15 * 60 * 1000) - now;
                 if (timeLeft > 0) {
-                    loadingOverlay.css('display', 'flex');
+                    loadingOverlay.style.display = 'flex';
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = '../index.html';
                     }, 2000);
                     return;
                 } else {
@@ -407,8 +399,8 @@
 
             // Navigation
             function nextStep(current, next) {
-                $(`#${current}`).removeClass('active');
-                $(`#${next}`).addClass('active');
+                document.getElementById(current).classList.remove('active');
+                document.getElementById(next).classList.add('active');
             }
 
             function goToHome() {
@@ -416,137 +408,204 @@
             }
 
             // Back Button Handlers
-            backToHomeBtn.on('click', function() {
-                goToHome();
-            });
-
-            backToPhoneBtn.on('click', function() {
+            backToHomeBtn.addEventListener('click', goToHome);
+            backToPhoneBtn.addEventListener('click', () => {
                 nextStep('otpStep', 'phoneStep');
+                clearOtpInputs();
             });
 
-            // Phone Number Validation (Exact match with index.html Quick Recharge)
-            phoneNumber.on('input', function() {
+            // Clear OTP inputs
+            function clearOtpInputs() {
+                otpInputs.forEach(input => input.value = '');
+                otpError.style.display = 'none';
+            }
+
+            // Phone Number Validation
+            phoneNumber.addEventListener('input', function() {
                 const value = this.value.replace(/[^0-9]/g, '');
                 this.value = value.slice(0, 10);
-                sendOtpBtn.prop('disabled', true);
+                sendOtpBtn.disabled = true;
 
                 if (value.length > 0) {
                     if (/^[0-5]/.test(value)) {
-                        phoneError.text('Number cannot start with 0, 1, 2, 3, 4, or 5').show();
+                        phoneError.textContent = 'Number cannot start with 0, 1, 2, 3, 4, or 5';
+                        phoneError.style.display = 'block';
                     } else if (value.length < 10) {
-                        phoneError.text('Please enter a 10-digit number').show();
+                        phoneError.textContent = 'Please enter a 10-digit number';
+                        phoneError.style.display = 'block';
                     } else if (!/^\d{10}$/.test(value)) {
-                        phoneError.text('Enter a valid 10-digit number').show();
+                        phoneError.textContent = 'Enter a valid 10-digit number';
+                        phoneError.style.display = 'block';
                     } else {
-                        const fullNumber = '+91 ' + value;
-                        if (!users.some(user => user.number === fullNumber)) {
-                            phoneError.text('This number is not registered').show();
-                        } else {
-                            phoneError.hide();
-                            sendOtpBtn.prop('disabled', false);
-                        }
+                        phoneError.style.display = 'none';
+                        sendOtpBtn.disabled = false;
                     }
                 } else {
-                    phoneError.text('Please enter a 10-digit number').show();
+                    phoneError.textContent = 'Please enter a 10-digit number';
+                    phoneError.style.display = 'block';
                 }
             });
 
-            // Phone Form Submission with Required Check
-            $('#phoneForm').on('submit', function(e) {
+            // Phone Form Submission - Send OTP Request
+            document.getElementById('phoneForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const value = phoneNumber.val().trim();
+                const value = phoneNumber.value.trim();
                 if (value.length === 0) {
-                    phoneError.text('Phone number is required').show();
+                    phoneError.textContent = 'Phone number is required';
+                    phoneError.style.display = 'block';
                     return;
                 }
-                if (!phoneError.is(':visible')) {
-                    displayPhoneNumber.text('+91 ' + value);
-                    // Placeholder for future mobile OTP sending
-                    nextStep('phoneStep', 'otpStep');
-                    otpInputs.first().focus();
-                    startTimer();
+                if (phoneError.style.display === 'none') {
+                    loadingOverlay.style.display = 'flex';
+                    try {
+                        const response = await fetch(`${apiBaseUrl}/otp/request`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phoneNumber: value })
+                        });
+                        const data = await response.json();
+                        if (!response.ok) {
+                            throw new Error(data || 'Failed to send OTP');
+                        }
+                        loadingOverlay.style.display = 'none';
+                        displayPhoneNumber.textContent = '+91 ' + value;
+                        nextStep('phoneStep', 'otpStep');
+                        otpInputs[0].focus();
+                        startTimer();
+                    } catch (error) {
+                        loadingOverlay.style.display = 'none';
+                        phoneError.textContent = error.message.includes('Phone number not registered') 
+                            ? 'Phone number not registered. Please sign up.' 
+                            : 'Failed to send OTP. Please try again.';
+                        phoneError.style.display = 'block';
+                    }
                 }
             });
 
             // OTP Input Handling
-            otpInputs.on('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, '');
-                if (this.value && $(this).index() < otpInputs.length - 1) {
-                    otpInputs.eq($(this).index() + 1).focus();
-                }
-            }).on('keydown', function(e) {
-                if (e.key === 'Backspace' && !this.value && $(this).index() > 0) {
-                    otpInputs.eq($(this).index() - 1).focus();
-                }
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    if (this.value && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                });
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !this.value && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
             });
 
-            // OTP Form Submission
-            $('#otpForm').on('submit', function(e) {
+            // OTP Form Submission - Verify OTP
+            document.getElementById('otpForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 let otpValue = '';
-                otpInputs.each(function() { otpValue += $(this).val(); });
+                otpInputs.forEach(input => otpValue += input.value);
                 if (otpValue.length !== 6) {
-                    otpError.text('Enter a valid 6-digit OTP').show();
+                    otpError.textContent = 'Enter a valid 6-digit OTP';
+                    otpError.style.display = 'block';
                     return;
                 }
-                // Placeholder for future OTP verification
-                const user = users.find(u => u.number === '+91 ' + phoneNumber.val());
-                localStorage.setItem('loggedInUser', JSON.stringify(user));
-                setTimeout(() => window.location.href = 'profilef.html', 1000);
+                loadingOverlay.style.display = 'flex';
+                try {
+                    const response = await fetch(`${apiBaseUrl}/otp/verify`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phoneNumber: phoneNumber.value, otp: otpValue })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data || 'Invalid OTP');
+                    }
+                    loadingOverlay.style.display = 'none';
+                    // Store tokens and role in localStorage
+                    localStorage.setItem('accessToken', data.accessToken);
+                    localStorage.setItem('refreshToken', data.refreshToken);
+                    localStorage.setItem('role', data.role);
+                    localStorage.setItem('loggedInUser', JSON.stringify({ phoneNumber: '+91 ' + phoneNumber.value }));
+                    setTimeout(() => window.location.href = '../index.html', 1000);
+                } catch (error) {
+                    loadingOverlay.style.display = 'none';
+                    otpError.textContent = error.message.includes('Invalid OTP') 
+                        ? 'Invalid OTP. Please try again.' 
+                        : 'Failed to verify OTP. Please try again.';
+                    otpError.style.display = 'block';
+                }
             });
 
             // Timer and Resend with Attempt Limit
             function startTimer() {
                 countdown = 60;
-                timerDisplay.text(countdown);
-                resendBtn.prop('disabled', true);
+                timerDisplay.textContent = countdown;
+                resendBtn.disabled = true;
                 clearInterval(timerInterval);
                 timerInterval = setInterval(() => {
                     countdown--;
-                    timerDisplay.text(countdown);
+                    timerDisplay.textContent = countdown;
                     if (countdown <= 0) {
                         clearInterval(timerInterval);
-                        resendBtn.prop('disabled', attemptCount >= 3);
+                        resendBtn.disabled = attemptCount >= 3;
                         if (attemptCount >= 3) {
-                            otpError.text('Max attempts reached. Try again in 15 minutes.').show();
-                            resendBtn.hide();
+                            otpError.textContent = 'Max attempts reached. Try again in 15 minutes.';
+                            otpError.style.display = 'block';
+                            resendBtn.style.display = 'none';
                         }
                     }
                 }, 1000);
             }
 
-            resendBtn.on('click', function() {
+            resendBtn.addEventListener('click', async function() {
                 if (attemptCount < 3) {
                     attemptCount++;
                     sessionStorage.setItem('otpAttempts', attemptCount);
-                    // Placeholder for future mobile OTP resend
-                    window.location.reload(); // Refresh page
+                    loadingOverlay.style.display = 'flex';
+                    try {
+                        const response = await fetch(`${apiBaseUrl}/otp/request`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phoneNumber: phoneNumber.value })
+                        });
+                        const data = await response.json();
+                        if (!response.ok) {
+                            throw new Error(data || 'Failed to resend OTP');
+                        }
+                        loadingOverlay.style.display = 'none';
+                        startTimer();
+                    } catch (error) {
+                        loadingOverlay.style.display = 'none';
+                        otpError.textContent = error.message.includes('Phone number not registered') 
+                            ? 'Phone number not registered. Please sign up.' 
+                            : 'Failed to resend OTP. Please try again.';
+                        otpError.style.display = 'block';
+                    }
                 }
                 if (attemptCount >= 3) {
                     sessionStorage.setItem('lockoutTime', Date.now());
-                    loadingOverlay.css('display', 'flex');
+                    loadingOverlay.style.display = 'flex';
                     setTimeout(() => {
                         window.location.href = '../index.html';
-                    }, 800);
+                    }, 2000);
                 }
             });
 
             // Initialize timer if on OTP step after refresh
             if (sessionStorage.getItem('otpStep') === 'true') {
                 nextStep('phoneStep', 'otpStep');
-                displayPhoneNumber.text(sessionStorage.getItem('phoneNumber'));
+                displayPhoneNumber.textContent = sessionStorage.getItem('phoneNumber');
                 startTimer();
             }
 
             // Store OTP step state
-            $('#phoneForm').on('submit', function() {
+            document.getElementById('phoneForm').addEventListener('submit', function() {
                 sessionStorage.setItem('otpStep', 'true');
-                sessionStorage.setItem('phoneNumber', '+91 ' + phoneNumber.val());
+                sessionStorage.setItem('phoneNumber', '+91 ' + phoneNumber.value);
             });
 
-            $('#otpForm').on('submit', function() {
+            document.getElementById('otpForm').addEventListener('submit', function() {
                 sessionStorage.removeItem('otpStep');
                 sessionStorage.removeItem('phoneNumber');
+                sessionStorage.removeItem('otpAttempts');
             });
         });
     </script>
