@@ -39,14 +39,13 @@ public class UserController {
 	
 	@GetMapping("/check-number")
 	public ResponseEntity<?> checkBNumber(@RequestParam String number) {
-		String formattedPhoneNumber = formatPhoneNumber(number);
-	    User user = repo.findByPhoneNumber(formattedPhoneNumber).get();
+	    User user = repo.findByPhoneNumber(number).get();
 	    
 	    if (user != null) {
 	        return ResponseEntity.ok(user); // Return user details if found
 	    } else {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-	                             .body("User not found with phone number: " + formattedPhoneNumber);
+	                             .body("User not found with phone number: " + number);
 	    }
 	}
 	

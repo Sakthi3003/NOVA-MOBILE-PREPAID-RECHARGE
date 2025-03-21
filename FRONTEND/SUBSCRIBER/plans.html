@@ -12,6 +12,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         * {
             margin: 0;
@@ -26,6 +28,27 @@
             line-height: 1.6;
         }
 
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 0.4em solid #0a21c0;
+            border-right-color: transparent;
+        }
+
         /* Navbar Styles */
         .navbar {
             display: flex;
@@ -36,6 +59,8 @@
             position: sticky;
             top: 0;
             z-index: 1000;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
         }
 
         .logo {
@@ -56,6 +81,7 @@
             text-decoration: none;
             position: relative;
             padding: 0.5rem 0;
+            transition: color 0.3s ease;
         }
 
         .nav-link:hover::after {
@@ -96,6 +122,11 @@
             color: black;
         }
 
+        .login-btn:hover {
+            background-color: #0a21c0;
+            color: white;
+        }
+
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -103,6 +134,64 @@
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: #0a21c0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .user-avatar::after {
+            content: '\f0d7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-avatar:hover::after {
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            background-color: #000;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #0a21c0;
+            color: white;
         }
 
         /* Plans Page Styles */
@@ -550,6 +639,9 @@
             bottom: 0;
             width: 100%;
             margin-top: auto;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 1.6s;
         }
 
         .footer-container {
@@ -572,6 +664,7 @@
             color: #b3b4bd;
             text-decoration: none;
             margin-bottom: 10px;
+            transition: color 0.3s ease;
         }
 
         .footer-section a:hover {
@@ -603,6 +696,11 @@
             margin: 0;
         }
 
+        @keyframes fadeInSection {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         /* Responsive Styles */
         @media (max-width: 1024px) {
             .plans-grid {
@@ -630,6 +728,15 @@
 
             .nav-links.active {
                 transform: translateY(0);
+            }
+
+            .user-avatar::after {
+                display: none;
+            }
+
+            .dropdown-menu {
+                width: 100%;
+                text-align: center;
             }
 
             .plans-header {
@@ -720,16 +827,19 @@
     </style>
 </head>
 <body>
+    <!-- Loading Spinner -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
-        <a href="plans.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40px" width="100px"></a>
+        <a href="../index.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40px" width="100px"></a>
         <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
         <div class="nav-links" id="nav-links">
-            <a href="../index.html" class="nav-link">Home</a>
-            <a href="./plans.html" class="nav-link active">Plans</a>
-            <a href="./supportg.html" class="nav-link">Support</a>
-            <a href="./about.html" class="nav-link">About Us</a>
-            <a href="./login.html" class="btn login-btn">Login</a>
+            <!-- Navigation links will be dynamically generated -->
         </div>
     </nav>
 
@@ -779,20 +889,13 @@
         <!-- Tabs for Categories -->
         <div class="tabs-container">
             <div class="tabs" id="tabs">
-                <div class="tab active" data-category="popular">Popular Plans</div>
-                <div class="tab" data-category="data-top-up">Data Top-Up</div>
-                <div class="tab" data-category="5g-plans">5G Plans</div>
-                <div class="tab" data-category="entertainment">Entertainment Plans</div>
-                <div class="tab" data-category="ott">OTT Plans</div>
-                <div class="tab" data-category="validity">Validity Plans</div>
-                <div class="tab" data-category="family">Family</div>
-                <div class="tab" data-category="voice">Voice Plans</div>
+                <!-- Tabs will be populated dynamically -->
             </div>
         </div>
 
         <!-- Plans Categories -->
         <div id="plansList">
-            <!-- Categories will be populated dynamically -->
+            <!-- Categories and plans will be populated dynamically -->
         </div>
     </div>
 
@@ -803,7 +906,7 @@
                 <h4>Explore</h4>
                 <a href="../index.html">Home</a><br>
                 <a href="./plans.html">Plans</a><br>
-                <a href="./supportg.html">Support</a><br>
+                <a href="./support.html">Support</a><br>
                 <a href="./about.html">About Us</a><br>
                 <a href="./login.html">Login</a>
             </div>
@@ -838,446 +941,524 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery Validate -->
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-    <script>
-        // Pages configuration (consistent with index.html)
-        const guestPages = [
-            { id: "home", label: "Home", url: "../index.html" },
-            { id: "plans", label: "Plans", url: "plans.html" },
-            { id: "support", label: "Support", url: "support.html" },
-            { id: "about", label: "About Us", url: "about.html" }
-        ];
-    
-        const loggedInDropdownPages = [
-            { id: "myplans", label: "My Plans", url: "myplans.html" },
-            { id: "transactions", label: "Transactions", url: "transaction.html" },
-            { id: "profile", label: "Profile", url: "profile.html" },
-        ];
-    
-        let currentPage = "plans";
-        let userData = { users: [] };
-        let plansData = { content: [] };
-        let selectedPlan = null;
-        let isLoggedIn = false;
-        let userInitials = "U";
-    
-        // Fetch user data using Fetch API
-        async function fetchUsers() {
-            try {
-                const response = await fetch('./user.json'); // Replace with your API endpoint if needed
-                if (!response.ok) throw new Error('Failed to fetch user.json');
-                userData = await response.json();
-            } catch (error) {
-                console.error('Error fetching user.json:', error);
-                userData = { users: [] };
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+   <script>
+    // Pages configuration (consistent with index.html)
+    const guestPages = [
+        { id: "home", label: "Home", url: "../index.html" },
+        { id: "plans", label: "Plans", url: "./plans.html" },
+        { id: "support", label: "Support", url: "./support.html" },
+        { id: "about", label: "About Us", url: "./about.html" }
+    ];
+
+    const loggedInDropdownPages = [
+        { id: "myplans", label: "My Plans", url: "./myplans.html" },
+        { id: "transactions", label: "Transactions", url: "./transaction.html" },
+        { id: "profile", label: "Profile", url: "./profile.html" },
+    ];
+
+    let currentPage = "plans";
+    let selectedPlan = null;
+    let isLoggedIn = false;
+    let userInitials = "U";
+
+    // Fetch categories from the backend API
+    async function fetchCategories() {
+        try {
+            const response = await fetch('http://localhost:8080/api/categories');
+            if (!response.ok) throw new Error('Failed to fetch categories from API');
+            const categoriesData = await response.json();
+            if (!Array.isArray(categoriesData)) {
+                throw new Error('Invalid categories API response structure');
             }
+            return categoriesData;
+        } catch (error) {
+            console.error('Error fetching categories from API:', error);
+            return [];
         }
-    
-        // Fetch plans data from the backend API
-        async function fetchPlans() {
-            try {
-                const response = await fetch('http://localhost:8080/api/plans?page=0&size=50'); // Adjust size if needed
-                if (!response.ok) throw new Error('Failed to fetch plans from API');
-                plansData = await response.json();
-                if (!plansData.content || !Array.isArray(plansData.content)) {
-                    throw new Error('Invalid API response structure');
-                }
-                const mappedPlans = mapApiPlansToFrontend(plansData.content);
-                renderPlans(mappedPlans);
-            } catch (error) {
-                console.error('Error fetching plans from API:', error);
-                renderPlans([]);
+    }
+
+    // Fetch plans data from the backend API
+    async function fetchPlans() {
+        try {
+            const response = await fetch('http://localhost:8080/api/plans?page=0&size=50');
+            if (!response.ok) throw new Error('Failed to fetch plans from API');
+            const data = await response.json();
+            if (!data.content || !Array.isArray(data.content)) {
+                throw new Error('Invalid API response structure');
             }
+            return data.content;
+        } catch (error) {
+            console.error('Error fetching plans from API:', error);
+            return [];
         }
-    
-        // Map API response to the frontend expected structure
-        function mapApiPlansToFrontend(apiPlans) {
-            return apiPlans
-                .filter(plan => plan.status === "active") // Only show active plans
-                .map(plan => ({
-                    category: plan.category.name.toLowerCase().replace(/\s+/g, '-'), // Normalize category name
-                    name: plan.name,
-                    price: plan.price,
-                    validity: plan.validity,
-                    data: plan.data,
-                    sms: plan.sms,
-                    calls: plan.calls,
-                    benefits: [plan.benefit1, plan.benefit2].filter(b => b), // Filter out null/undefined benefits
-                    badge: plan.name === "Unlimited Plan" ? "Best Seller" : "", // Example logic for badge
-                    icon: getIconForCategory(plan.category.name) // Assign icon based on category
-                }));
-        }
-    
-        // Assign icons based on category
-        function getIconForCategory(categoryName) {
-            const iconMap = {
-                "popular": "fas fa-infinity",
-                "data-top-up": "fas fa-wifi",
-                "5g plans": "fas fa-signal",
-                "entertainment": "fas fa-tv",
-                "ott": "fas fa-video",
-                "validity": "fas fa-calendar-alt",
-                "family": "fas fa-users",
-                "voice": "fas fa-phone"
-            };
-            return iconMap[categoryName.toLowerCase()] || "fas fa-star";
-        }
-    
-        // Render plans dynamically
-        function renderPlans(plans) {
-            const categories = [
-                { id: "popular", name: "Popular Plans" },
-                { id: "data-top-up", name: "Data Top-Up" },
-                { id: "5g-plans", name: "5G Plans" },
-                { id: "entertainment", name: "Entertainment Plans" },
-                { id: "ott", name: "OTT Plans" },
-                { id: "validity", name: "Validity Plans" },
-                { id: "family", name: "Family" },
-                { id: "voice", name: "Voice Plans" }
-            ];
-    
-            const plansList = document.getElementById("plansList");
-            plansList.innerHTML = "";
-    
-            categories.forEach((category, index) => {
-                const categoryPlans = plans.filter(plan => plan.category === category.id);
-                const categorySection = document.createElement("div");
-                categorySection.className = "category-section";
-                categorySection.dataset.category = category.id;
-                categorySection.style.display = index === 0 ? "block" : "none";
-    
-                const plansGrid = document.createElement("div");
-                plansGrid.className = "plans-grid";
-    
-                categoryPlans.forEach(plan => {
-                    const planCard = document.createElement("div");
-                    planCard.className = "plan-card";
-    
-                    if (plan.badge) {
-                        const badge = document.createElement("span");
-                        badge.className = `badge ${plan.badge.toLowerCase() === "best seller" ? "" : "green"}`;
-                        badge.textContent = plan.badge;
-                        planCard.appendChild(badge);
-                    }
-    
-                    planCard.innerHTML += `
-                        <h3>${plan.name} <i class="${plan.icon}"></i></h3>
-                        <div class="plan-price">₹${plan.price}</div>
-                        <div class="plan-details">
-                            <div class="plan-detail"><i class="fas fa-calendar-alt"></i> Validity: ${plan.validity}</div>
-                            <div class="plan-detail"><i class="fas fa-mobile-alt"></i> Data: ${plan.data}</div>
-                            <div class="plan-detail"><i class="fas fa-sms"></i> SMS: ${plan.sms}</div>
-                            <div class="plan-detail"><i class="fas fa-phone"></i> Calls: ${plan.calls}</div>
-                        </div>
-                        <div class="plan-benefits">
-                            <ul>
-                                ${plan.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <button class="buy-now-btn" 
-                            data-plan-name="${plan.name}" 
-                            data-plan-price="${plan.price}" 
-                            data-plan-validity="${plan.validity}" 
-                            data-plan-data="${plan.data}" 
-                            data-plan-sms="${plan.sms}" 
-                            data-plan-calls="${plan.calls}" 
-                            data-plan-benefits="${encodeURIComponent(JSON.stringify(plan.benefits))}">
-                            Recharge Now
-                        </button>
-                    `;
-    
-                    plansGrid.appendChild(planCard);
-                });
-    
-                categorySection.appendChild(plansGrid);
-                plansList.appendChild(categorySection);
-            });
-        }
-    
-        // Generate navigation (consistent with index.html)
-        function generateNavigation() {
-            const navLinks = document.getElementById("nav-links");
-            navLinks.innerHTML = "";
-    
-            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-            isLoggedIn = !!loggedInUser;
-    
-            if (isLoggedIn) {
-                userInitials = loggedInUser?.simHolderName?.charAt(0).toUpperCase() || 'U';
-                guestPages.forEach(page => {
-                    const link = document.createElement("a");
-                    link.href = page.url;
-                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
-                    link.textContent = page.label;
-                    link.onclick = function(e) {
-                        e.preventDefault();
-                        setCurrentPage(page.id);
-                    };
-                    navLinks.appendChild(link);
-                });
-    
-                const dropdownDiv = document.createElement('div');
-                dropdownDiv.className = 'dropdown';
-    
-                const avatar = document.createElement('div');
-                avatar.className = 'user-avatar dropdown-toggle';
-                avatar.id = 'profileDropdown';
-                avatar.setAttribute('data-bs-toggle', 'dropdown');
-                avatar.textContent = userInitials;
-                dropdownDiv.appendChild(avatar);
-    
-                const dropdownMenu = document.createElement('div');
-                dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
-    
-                loggedInDropdownPages.forEach(page => {
-                    const link = document.createElement('a');
-                    link.href = page.url;
-                    link.className = 'dropdown-item';
-                    link.textContent = page.label;
-                    link.onclick = (e) => {
-                        e.preventDefault();
-                        setCurrentPage(page.id);
-                    };
-                    dropdownMenu.appendChild(link);
-                });
-    
-                const logoutLink = document.createElement('a');
-                logoutLink.href = '#';
-                logoutLink.className = 'dropdown-item';
-                logoutLink.textContent = 'Logout';
-                logoutLink.onclick = (e) => {
-                    e.preventDefault();
-                    logout();
-                };
-                dropdownMenu.appendChild(logoutLink);
-    
-                dropdownDiv.appendChild(dropdownMenu);
-                navLinks.appendChild(dropdownDiv);
-            } else {
-                guestPages.forEach(page => {
-                    const link = document.createElement("a");
-                    link.href = page.url;
-                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
-                    link.textContent = page.label;
-                    link.onclick = function(e) {
-                        e.preventDefault();
-                        setCurrentPage(page.id);
-                    };
-                    navLinks.appendChild(link);
-                });
-    
-                const loginBtn = document.createElement("a");
-                loginBtn.href = "./login.html";
-                loginBtn.className = "btn login-btn";
-                loginBtn.textContent = "Login";
-                navLinks.appendChild(loginBtn);
-            }
-        }
-    
-        // Set current page and navigate
-        function setCurrentPage(pageId) {
-            currentPage = pageId;
-            const guestPage = guestPages.find(p => p.id === pageId);
-            const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
-            if (guestPage) {
-                window.location.href = guestPage.url;
-            } else if (loggedInPage) {
-                window.location.href = loggedInPage.url;
-            }
-            generateNavigation();
-        }
-    
-        // Logout function
-        function logout() {
-            localStorage.removeItem('loggedInUser');
-            localStorage.removeItem('profileSetup');
-            sessionStorage.removeItem('phoneNumber');
-            isLoggedIn = false;
-            currentPage = 'home';
-            generateNavigation();
-            window.location.href = '../index.html';
-        }
-    
-        // Toggle mobile menu
-        function toggleMenu() {
-            const navLinks = document.getElementById("nav-links");
-            navLinks.classList.toggle("active");
-        }
-    
-        // Show change number modal
-        function showChangeNumberModal(isChangeNumber = false, plan = null) {
-            const modal = document.getElementById("numberModal");
-            const modalTitle = document.getElementById("modalTitle");
-            modal.style.display = "flex";
-            document.getElementById("modalNumberInput").value = sessionStorage.getItem('phoneNumber') || '';
-            document.getElementById("modalErrorMessage").style.display = "none";
-            modal.dataset.isChangeNumber = isChangeNumber ? "true" : "false";
-    
-            if (plan) {
-                selectedPlan = plan;
-                modalTitle.textContent = `Recharge ${plan.name}`;
-            } else {
-                modalTitle.textContent = "Enter Your Mobile Number";
-            }
-        }
-    
-        // Show confirmation modal
-        function showConfirmModal(plan) {
-            const modal = document.getElementById("confirmModal");
-            selectedPlan = plan;
-            modal.style.display = "flex";
-        }
-    
-        // Handle Yes button in confirmation modal
-        function confirmYes() {
-            const modal = document.getElementById("confirmModal");
-            modal.style.display = "none";
-            const phoneNumber = sessionStorage.getItem('phoneNumber');
-            if (phoneNumber && selectedPlan) {
-                proceedToPayment(selectedPlan);
-            } else {
-                showChangeNumberModal(false, selectedPlan);
-            }
-        }
-    
-        // Handle No button in confirmation modal
-        function confirmNo() {
-            const modal = document.getElementById("confirmModal");
-            modal.style.display = "none";
-            selectedPlan = null;
-        }
-    
-        // Validate modal number input
-        function validateModalNumber() {
-            const mobileNumber = document.getElementById("modalNumberInput").value.trim();
-            const errorMessage = document.getElementById("modalErrorMessage");
-            const modal = document.getElementById("numberModal");
-            const isChangeNumber = modal.dataset.isChangeNumber === "true";
-    
-            const mobileNumberPattern = /^[6789]\d{9}$/;
-            if (!mobileNumberPattern.test(mobileNumber)) {
-                errorMessage.textContent = 'Please enter a valid 10-digit phone number starting with 6, 7, 8, or 9.';
-                errorMessage.style.display = "block";
-                return;
-            }
-    
-            const enteredNumber = `+91${mobileNumber}`;
-            const validNumbers = userData.users.map(user => user.number.replace(/\s+/g, ''));
-            if (!validNumbers.includes(enteredNumber)) {
-                errorMessage.textContent = 'This doesn’t seem to be a NOVA number. Please check and try again.';
-                errorMessage.style.display = "block";
-            } else {
-                errorMessage.style.display = "none";
-                sessionStorage.setItem('phoneNumber', mobileNumber);
-                document.getElementById("selectedNumber").textContent = mobileNumber;
-                document.getElementById("numberModal").style.display = "none";
-                document.getElementById("numberDisplay").style.display = "flex";
-    
-                if (!isChangeNumber && selectedPlan) {
-                    proceedToPayment(selectedPlan);
-                }
-            }
-        }
-    
-        // Proceed to payment page
-        function proceedToPayment(plan) {
-            sessionStorage.setItem('selectedPlan', JSON.stringify({
+    }
+
+    // Map API response to the frontend expected structure
+    function mapApiPlansToFrontend(apiPlans) {
+        return apiPlans
+            .filter(plan => plan.status === "active") // Only show active plans
+            .map(plan => ({
+                category: plan.category.name.toLowerCase().replace(/\s+/g, '-'), // Normalize category name
                 name: plan.name,
                 price: plan.price,
                 validity: plan.validity,
                 data: plan.data,
                 sms: plan.sms,
                 calls: plan.calls,
-                benefits: plan.benefits
+                benefits: [plan.benefit1, plan.benefit2].filter(b => b), // Filter out null/undefined benefits
+                badge: plan.name === "Unlimited Plan" ? "Best Seller" : "", // Example logic for badge
+                icon: getIconForCategory(plan.category.name) // Assign icon based on category
             }));
-            sessionStorage.removeItem('fromQuickRecharge');
-            window.location.href = 'payment.html';
-        }
-    
-        // Filter plans
-        function filterPlans(searchTerm) {
-            const planCards = document.querySelectorAll('.plan-card');
-            const activeTab = document.querySelector('.tab.active').dataset.category;
-    
-            planCards.forEach(card => {
-                const planName = card.querySelector('h3').textContent.toLowerCase();
-                const benefits = card.querySelector('.plan-benefits').textContent.toLowerCase();
-                const isVisible = planName.includes(searchTerm) || benefits.includes(searchTerm);
-                const cardCategory = card.closest('.category-section').dataset.category;
-    
-                card.style.display = (isVisible && cardCategory === activeTab) ? 'block' : 'none';
-            });
-        }
-    
-        // Initialize and set up event listeners
-        document.addEventListener('DOMContentLoaded', async () => {
-            await fetchUsers();
-            await fetchPlans();
-            generateNavigation();
-    
-            const phoneNumber = sessionStorage.getItem('phoneNumber');
-            if (phoneNumber) {
-                document.getElementById("selectedNumber").textContent = phoneNumber;
-                document.getElementById("numberDisplay").style.display = "flex";
-            } else {
-                document.getElementById("numberDisplay").style.display = "none";
+    }
+
+    // Assign icons based on category
+    function getIconForCategory(categoryName) {
+        const iconMap = {
+            "popular": "fas fa-infinity",
+            "data-top-up": "fas fa-wifi",
+            "5g plans": "fas fa-signal",
+            "entertainment": "fas fa-tv",
+            "ott": "fas fa-video",
+            "validity": "fas fa-calendar-alt",
+            "family": "fas fa-users",
+            "voice": "fas fa-phone"
+        };
+        return iconMap[categoryName.toLowerCase()] || "fas fa-star";
+    }
+
+    // Render tabs dynamically
+    function renderTabs(categories, plans) {
+        const tabsContainer = document.getElementById("tabs");
+        tabsContainer.innerHTML = ""; // Clear any existing tabs
+
+        categories.forEach((category, index) => {
+            if (category.name && category.name.trim() !== "") { // Skip empty category names
+                const normalizedCategory = category.name.toLowerCase().replace(/\s+/g, '-');
+                const categoryPlans = plans.filter(plan => plan.category === normalizedCategory);
+                if (categoryPlans.length > 0) { // Only render tabs for categories with active plans
+                    const tab = document.createElement("div");
+                    tab.className = `tab ${index === 0 ? 'active' : ''}`; // Make the first tab active
+                    tab.dataset.category = normalizedCategory;
+                    tab.textContent = category.name;
+                    tabsContainer.appendChild(tab);
+                }
             }
-    
-            // Tab switching
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-    
-                    const category = tab.dataset.category;
-                    document.querySelectorAll('.category-section').forEach(section => {
-                        section.style.display = section.dataset.category === category ? 'block' : 'none';
-                    });
-    
-                    filterPlans(document.getElementById('searchInput').value.toLowerCase());
+        });
+
+        // Add event listeners to the newly created tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const category = tab.dataset.category;
+                document.querySelectorAll('.category-section').forEach(section => {
+                    section.style.display = section.dataset.category === category ? 'block' : 'none';
                 });
-            });
-    
-            // Search input
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                filterPlans(e.target.value.toLowerCase());
-            });
-    
-            // Buy now buttons
-            document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('buy-now-btn')) {
-                    const plan = {
-                        name: e.target.dataset.planName,
-                        price: e.target.dataset.planPrice,
-                        validity: e.target.dataset.planValidity,
-                        data: e.target.dataset.planData,
-                        sms: e.target.dataset.planSms,
-                        calls: e.target.dataset.planCalls,
-                        benefits: JSON.parse(decodeURIComponent(e.target.dataset.planBenefits))
-                    };
-    
-                    const fromQuickRecharge = sessionStorage.getItem('fromQuickRecharge') === 'true';
-                    if (fromQuickRecharge) {
-                        showConfirmModal(plan);
-                    } else {
-                        showChangeNumberModal(false, plan);
-                    }
-                }
-            });
-    
-            // Close modals on outside click or Esc key
-            ['numberModal', 'confirmModal'].forEach(id => {
-                document.getElementById(id).addEventListener('click', (e) => {
-                    if (e.target === e.currentTarget) e.currentTarget.style.display = "none";
-                });
-            });
-    
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.getElementById("numberModal").style.display = "none";
-                    document.getElementById("confirmModal").style.display = "none";
-                }
+
+                filterPlans(document.getElementById('searchInput').value.toLowerCase());
             });
         });
-    </script>
+    }
+
+    // Render plans dynamically
+    function renderPlans(plans, categories) {
+        const plansList = document.getElementById("plansList");
+        plansList.innerHTML = "";
+
+        categories.forEach((category, index) => {
+            if (category.name && category.name.trim() !== "") { // Skip empty category names
+                const normalizedCategory = category.name.toLowerCase().replace(/\s+/g, '-');
+                const categoryPlans = plans.filter(plan => plan.category === normalizedCategory);
+
+                if (categoryPlans.length > 0) { // Only render sections for categories with active plans
+                    const categorySection = document.createElement("div");
+                    categorySection.className = "category-section";
+                    categorySection.dataset.category = normalizedCategory;
+                    categorySection.style.display = index === 0 ? "block" : "none"; // Show the first category by default
+
+                    const plansGrid = document.createElement("div");
+                    plansGrid.className = "plans-grid";
+
+                    categoryPlans.forEach(plan => {
+                        const planCard = document.createElement("div");
+                        planCard.className = "plan-card";
+
+                        if (plan.badge) {
+                            const badge = document.createElement("span");
+                            badge.className = `badge ${plan.badge.toLowerCase() === "best seller" ? "" : "green"}`;
+                            badge.textContent = plan.badge;
+                            planCard.appendChild(badge);
+                        }
+
+                        planCard.innerHTML += `
+                            <h3>${plan.name} <i class="${plan.icon}"></i></h3>
+                            <div class="plan-price">₹${plan.price}</div>
+                            <div class="plan-details">
+                                <div class="plan-detail"><i class="fas fa-calendar-alt"></i> Validity: ${plan.validity}</div>
+                                <div class="plan-detail"><i class="fas fa-mobile-alt"></i> Data: ${plan.data}</div>
+                                <div class="plan-detail"><i class="fas fa-sms"></i> SMS: ${plan.sms}</div>
+                                <div class="plan-detail"><i class="fas fa-phone"></i> Calls: ${plan.calls}</div>
+                            </div>
+                            <div class="plan-benefits">
+                                <ul>
+                                    ${plan.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <button class="buy-now-btn" 
+                                data-plan-name="${plan.name}" 
+                                data-plan-price="${plan.price}" 
+                                data-plan-validity="${plan.validity}" 
+                                data-plan-data="${plan.data}" 
+                                data-plan-sms="${plan.sms}" 
+                                data-plan-calls="${plan.calls}" 
+                                data-plan-benefits="${encodeURIComponent(JSON.stringify(plan.benefits))}">
+                                Recharge Now
+                            </button>
+                        `;
+
+                        plansGrid.appendChild(planCard);
+                    });
+
+                    categorySection.appendChild(plansGrid);
+                    plansList.appendChild(categorySection);
+                }
+            }
+        });
+    }
+
+    // Generate navigation (consistent with index.html)
+    function generateNavigation() {
+        const navLinks = document.getElementById("nav-links");
+        navLinks.innerHTML = "";
+
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        isLoggedIn = !!loggedInUser;
+
+        if (isLoggedIn) {
+            userInitials = loggedInUser?.simHolderName?.charAt(0).toUpperCase() || 'U';
+            guestPages.forEach(page => {
+                const link = document.createElement("a");
+                link.href = page.url;
+                link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                link.textContent = page.label;
+                link.onclick = function(e) {
+                    e.preventDefault();
+                    setCurrentPage(page.id);
+                };
+                navLinks.appendChild(link);
+            });
+
+            const dropdownDiv = document.createElement('div');
+            dropdownDiv.className = 'dropdown';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'user-avatar dropdown-toggle';
+            avatar.id = 'profileDropdown';
+            avatar.setAttribute('data-bs-toggle', 'dropdown');
+            avatar.textContent = userInitials;
+            dropdownDiv.appendChild(avatar);
+
+            const dropdownMenu = document.createElement('div');
+            dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+
+            loggedInDropdownPages.forEach(page => {
+                const link = document.createElement('a');
+                link.href = page.url;
+                link.className = 'dropdown-item';
+                link.textContent = page.label;
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    setCurrentPage(page.id);
+                };
+                dropdownMenu.appendChild(link);
+            });
+
+            const logoutLink = document.createElement('a');
+            logoutLink.href = '#';
+            logoutLink.className = 'dropdown-item';
+            logoutLink.textContent = 'Logout';
+            logoutLink.onclick = (e) => {
+                e.preventDefault();
+                logout();
+            };
+            dropdownMenu.appendChild(logoutLink);
+
+            dropdownDiv.appendChild(dropdownMenu);
+            navLinks.appendChild(dropdownDiv);
+        } else {
+            guestPages.forEach(page => {
+                const link = document.createElement("a");
+                link.href = page.url;
+                link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                link.textContent = page.label;
+                link.onclick = function(e) {
+                    e.preventDefault();
+                    setCurrentPage(page.id);
+                };
+                navLinks.appendChild(link);
+            });
+
+            const loginBtn = document.createElement("a");
+            loginBtn.href = "./login.html";
+            loginBtn.className = "btn login-btn";
+            loginBtn.textContent = "Login";
+            navLinks.appendChild(loginBtn);
+        }
+    }
+
+    // Set current page and navigate
+    function setCurrentPage(pageId) {
+        currentPage = pageId;
+        const guestPage = guestPages.find(p => p.id === pageId);
+        const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
+        if (guestPage) {
+            window.location.href = guestPage.url;
+        } else if (loggedInPage) {
+            window.location.href = loggedInPage.url;
+        }
+        generateNavigation();
+    }
+
+    // Logout function with SweetAlert2 and loading overlay
+    function logout() {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        loadingOverlay.style.display = 'flex';
+
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('profileSetup');
+        sessionStorage.removeItem('phoneNumber');
+        sessionStorage.clear();
+        isLoggedIn = false;
+        currentPage = 'home';
+        generateNavigation();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Logged Out',
+            text: 'You have been logged out successfully.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#0a21c0',
+            timer: 1500,
+            timerProgressBar: true,
+            willClose: () => {
+                loadingOverlay.style.display = 'none';
+                window.location.href = '../index.html';
+            }
+        });
+    }
+
+    // Toggle mobile menu
+    function toggleMenu() {
+        const navLinks = document.getElementById("nav-links");
+        navLinks.classList.toggle("active");
+    }
+
+    // Show change number modal
+    function showChangeNumberModal(isChangeNumber = false, plan = null) {
+        const modal = document.getElementById("numberModal");
+        const modalTitle = document.getElementById("modalTitle");
+        modal.style.display = "flex";
+        document.getElementById("modalNumberInput").value = sessionStorage.getItem('phoneNumber') || '';
+        document.getElementById("modalErrorMessage").style.display = "none";
+        modal.dataset.isChangeNumber = isChangeNumber ? "true" : "false";
+
+        if (plan) {
+            selectedPlan = plan;
+            modalTitle.textContent = `Recharge ${plan.name}`;
+        } else {
+            modalTitle.textContent = "Enter Your Mobile Number";
+        }
+    }
+
+    // Show confirmation modal
+    function showConfirmModal(plan) {
+        const modal = document.getElementById("confirmModal");
+        selectedPlan = plan;
+        modal.style.display = "flex";
+    }
+
+    // Handle Yes button in confirmation modal
+    function confirmYes() {
+        const modal = document.getElementById("confirmModal");
+        modal.style.display = "none";
+        const phoneNumber = sessionStorage.getItem('phoneNumber');
+        if (phoneNumber && selectedPlan) {
+            validateModalNumber(); // Re-validate the number with the backend
+        } else {
+            showChangeNumberModal(false, selectedPlan);
+        }
+    }
+
+    // Handle No button in confirmation modal
+    function confirmNo() {
+        const modal = document.getElementById("confirmModal");
+        modal.style.display = "none";
+        selectedPlan = null;
+    }
+
+    // Validate modal number input by calling the backend API
+    async function validateModalNumber() {
+        const mobileNumber = document.getElementById("modalNumberInput").value.trim();
+        const errorMessage = document.getElementById("modalErrorMessage");
+        const modal = document.getElementById("numberModal");
+        const isChangeNumber = modal.dataset.isChangeNumber === "true";
+
+        // Client-side validation
+        const mobileNumberPattern = /^[6789]\d{9}$/;
+        if (!mobileNumber) {
+            errorMessage.textContent = 'Phone number is required';
+            errorMessage.style.display = "block";
+            return;
+        }
+        if (!mobileNumberPattern.test(mobileNumber)) {
+            errorMessage.textContent = 'Please enter a valid 10-digit phone number starting with 6, 7, 8, or 9.';
+            errorMessage.style.display = "block";
+            return;
+        }
+
+        // Call the backend API to check the number
+        try {
+            const response = await fetch(`http://localhost:8080/api/user/check-number?number=${mobileNumber}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const user = await response.json();
+                // Successfully found the user
+                errorMessage.style.display = "none";
+                sessionStorage.setItem('phoneNumber', mobileNumber);
+                sessionStorage.setItem('userDetails', JSON.stringify(user)); // Store user details
+                document.getElementById("selectedNumber").textContent = mobileNumber;
+                document.getElementById("numberModal").style.display = "none";
+                document.getElementById("numberDisplay").style.display = "flex";
+
+                if (!isChangeNumber && selectedPlan) {
+                    proceedToPayment(selectedPlan);
+                }
+            } else {
+                const errorData = await response.json();
+                errorMessage.textContent = errorData || 'This doesn’t seem to be a NOVA number. Please check and try again.';
+                errorMessage.style.display = "block";
+            }
+        } catch (error) {
+            console.error('Error validating phone number:', error);
+            errorMessage.textContent = 'An error occurred while validating the phone number. Please try again.';
+            errorMessage.style.display = "block";
+        }
+    }
+
+    // Proceed to payment page with user details and plan
+    function proceedToPayment(plan) {
+        sessionStorage.setItem('selectedPlan', JSON.stringify({
+            name: plan.name,
+            price: plan.price,
+            validity: plan.validity,
+            data: plan.data,
+            sms: plan.sms,
+            calls: plan.calls,
+            benefits: plan.benefits
+        }));
+        sessionStorage.removeItem('fromQuickRecharge');
+        window.location.href = 'payment.html';
+    }
+
+    // Filter plans
+    function filterPlans(searchTerm) {
+        const planCards = document.querySelectorAll('.plan-card');
+        const activeTab = document.querySelector('.tab.active').dataset.category;
+
+        planCards.forEach(card => {
+            const planName = card.querySelector('h3').textContent.toLowerCase();
+            const benefits = card.querySelector('.plan-benefits').textContent.toLowerCase();
+            const isVisible = planName.includes(searchTerm) || benefits.includes(searchTerm);
+            const cardCategory = card.closest('.category-section').dataset.category;
+
+            card.style.display = (isVisible && cardCategory === activeTab) ? 'block' : 'none';
+        });
+    }
+
+    // Initialize and set up event listeners
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Fetch categories and plans
+        const categories = await fetchCategories();
+        const apiPlans = await fetchPlans();
+        const mappedPlans = mapApiPlansToFrontend(apiPlans);
+
+        // Render tabs and plans
+        renderTabs(categories, mappedPlans);
+        renderPlans(mappedPlans, categories);
+
+        generateNavigation();
+
+        const phoneNumber = sessionStorage.getItem('phoneNumber');
+        if (phoneNumber) {
+            document.getElementById("selectedNumber").textContent = phoneNumber;
+            document.getElementById("numberDisplay").style.display = "flex";
+        } else {
+            document.getElementById("numberDisplay").style.display = "none";
+        }
+
+        // Search input
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            filterPlans(e.target.value.toLowerCase());
+        });
+
+        // Buy now buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('buy-now-btn')) {
+                const plan = {
+                    name: e.target.dataset.planName,
+                    price: e.target.dataset.planPrice,
+                    validity: e.target.dataset.planValidity,
+                    data: e.target.dataset.planData,
+                    sms: e.target.dataset.planSms,
+                    calls: e.target.dataset.planCalls,
+                    benefits: JSON.parse(decodeURIComponent(e.target.dataset.planBenefits))
+                };
+
+                const fromQuickRecharge = sessionStorage.getItem('fromQuickRecharge') === 'true';
+                if (fromQuickRecharge) {
+                    showConfirmModal(plan);
+                } else {
+                    showChangeNumberModal(false, plan);
+                }
+            }
+        });
+
+        // Close modals on outside click or Esc key
+        ['numberModal', 'confirmModal'].forEach(id => {
+            document.getElementById(id).addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) e.currentTarget.style.display = "none";
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById("numberModal").style.display = "none";
+                document.getElementById("confirmModal").style.display = "none";
+            }
+        });
+
+        // Dynamic phone number input validation
+        const modalNumberInput = document.getElementById('modalNumberInput');
+        modalNumberInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = value.slice(0, 10);
+
+            if (value.length > 0) {
+                validateModalNumber();
+            } else {
+                document.getElementById('modalErrorMessage').textContent = 'Phone number is required';
+                document.getElementById('modalErrorMessage').style.display = 'block';
+            }
+        });
+    });
+</script>
 </body>
 </html>

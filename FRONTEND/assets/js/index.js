@@ -26,7 +26,7 @@ function generateNavigation() {
     isLoggedIn = !!loggedInUser;
 
     if (isLoggedIn && userDetails) {
-        userInitials = userDetails.username?.charAt(0).toUpperCase() || 'U';
+        userInitials = userDetails.username?.charAt(0).toUpperCase() || '';
 
         // Add user initials display
         const initialsDisplay = document.createElement("div");
@@ -188,7 +188,7 @@ async function fetchUserDetails(phoneNumber) {
 
     try {
         loadingOverlay.style.display = 'flex';
-        const response = await fetch(`http://localhost:8080/api/subscriber/check-number?number=${phoneNumber}`, {
+        const response = await fetch(`http://localhost:8080/api/user/check-number?number=${phoneNumber}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

@@ -28,7 +28,28 @@
             line-height: 1.6;
         }
 
-        /* Navbar Styles */
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 0.4em solid #0a21c0;
+            border-right-color: transparent;
+        }
+
+        /* Navbar Styles (Copied from plans.html) */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -38,28 +59,31 @@
             position: sticky;
             top: 0;
             z-index: 1000;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
         }
-        
+
         .logo {
             font-size: 1.5rem;
             font-weight: bold;
             color: white;
             text-decoration: none;
         }
-        
+
         .nav-links {
             display: flex;
             align-items: center;
             gap: 2rem;
         }
-        
+
         .nav-link {
             color: white;
             text-decoration: none;
             position: relative;
             padding: 0.5rem 0;
+            transition: color 0.3s ease;
         }
-        
+
         .nav-link:hover::after {
             content: '';
             position: absolute;
@@ -69,11 +93,11 @@
             height: 2px;
             background-color: white;
         }
-        
+
         .nav-link.active {
             font-weight: bold;
         }
-        
+
         .nav-link.active::after {
             content: '';
             position: absolute;
@@ -83,7 +107,7 @@
             height: 2px;
             background-color: white;
         }
-        
+
         .btn {
             border: none;
             border-radius: 4px;
@@ -92,7 +116,7 @@
             font-weight: bold;
             transition: all 0.3s ease;
         }
-        
+
         .login-btn {
             background-color: white;
             color: black;
@@ -100,8 +124,9 @@
 
         .login-btn:hover {
             background-color: #0a21c0;
+            color: white;
         }
-        
+
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -109,6 +134,64 @@
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: #0a21c0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .user-avatar::after {
+            content: '\f0d7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-avatar:hover::after {
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            background-color: #000;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #0a21c0;
+            color: white;
         }
 
         /* Payment Page Styles */
@@ -563,6 +646,9 @@
             bottom: 0;
             width: 100%;
             margin-top: 40px;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 1.6s;
         }
 
         .footer-container {
@@ -671,6 +757,11 @@
             text-decoration: none;
         }
 
+        @keyframes fadeInSection {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         /* Responsive Styles */
         @media (max-width: 750px) {
             .container {
@@ -732,6 +823,15 @@
                 transform: translateY(0);
             }
 
+            .user-avatar::after {
+                display: none;
+            }
+
+            .dropdown-menu {
+                width: 100%;
+                text-align: center;
+            }
+
             .footer-container {
                 grid-template-columns: 1fr;
                 text-align: center;
@@ -766,16 +866,19 @@
     </style>
 </head>
 <body>
+    <!-- Loading Spinner -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
-        <a href="index.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40px" width="100px"></a>
+        <a href="../index.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40px" width="100px"></a>
         <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
         <div class="nav-links" id="nav-links">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="plans.html" class="nav-link">Plans</a>
-            <a href="supportg.html" class="nav-link">Support</a>
-            <a href="about.html" class="nav-link">About Us</a>
-            <a href="login.html" class="btn login-btn">Login</a>
+            <!-- Navigation links will be dynamically generated -->
         </div>
     </nav>
 
@@ -783,7 +886,6 @@
     <div class="breadcrumb">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb-list" id="breadcrumbList">
-                <!-- Dynamically populated by JavaScript -->
                 <li class="breadcrumb-item"><a href="plans.html">Plans</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Payment</li>
             </ol>
@@ -964,21 +1066,21 @@
         </div>
     </div>
 
-     <!-- Footer -->
-     <footer>
+    <!-- Footer -->
+    <footer>
         <div class="footer-container">
             <div class="footer-section">
                 <h4>Explore</h4>
-                <a href="index.html">Home</a><br>
-                <a href="plans.html">Plans</a><br>
-                <a href="supportg.html">Support</a><br>
-                <a href="about.html">About Us</a><br>
-                <a href="login.html">Login</a>
+                <a href="../index.html">Home</a><br>
+                <a href="./plans.html">Plans</a><br>
+                <a href="./support.html">Support</a><br>
+                <a href="./about.html">About Us</a><br>
+                <a href="./login.html">Login</a>
             </div>
             <div class="footer-section">
                 <h4>Get Started</h4>
-                <a href="buy-sim.html">Get sim</a><br>
-                <a href="port.html">Switch to NOVA</a><br>
+                <a href="./buy-sim.html">Get sim</a><br>
+                <a href="./port.html">Switch to NOVA</a><br>
             </div>
             <div class="footer-section">
                 <h4>Contact Us</h4>
@@ -1007,68 +1109,184 @@
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-        let userData = null;
+        // Pages configuration (consistent with plans.html)
+        const guestPages = [
+            { id: "admin", label: "Admin", url: "../ADMIN/login.html" },
+            { id: "home", label: "Home", url: "../index.html" },
+            { id: "plans", label: "Plans", url: "./plans.html" },
+            { id: "support", label: "Support", url: "./support.html" },
+            { id: "about", label: "About Us", url: "./about.html" }
+        ];
+
+        const loggedInDropdownPages = [
+            { id: "myplans", label: "My Plans", url: "./myplans.html" },
+            { id: "transactions", label: "Transactions", url: "./transaction.html" },
+            { id: "profile", label: "Profile", url: "./profile.html" },
+        ];
+
+        let currentPage = "payment";
+        let isLoggedIn = false;
+        let userInitials = "U";
         let paymentMethod = ""; // To store the selected payment method
 
-        // Fetch user.json and store data
-        async function fetchUsers() {
-            try {
-                const response = await fetch('./user.json');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch user.json');
-                }
-                userData = await response.json();
-                console.log('Users fetched:', userData.users);
-                displayUserDetails();
-                updateBreadcrumb(); // Update breadcrumb after loading user data
-            } catch (error) {
-                console.error('Error fetching user.json:', error);
-                userData = { users: [] };
-                displayUserDetails();
-                updateBreadcrumb(); // Update breadcrumb even if user data fails
+        // Check if user is logged in based on access token
+        function checkLoginStatus() {
+            const accessToken = localStorage.getItem('accessToken');
+            isLoggedIn = !!accessToken;
+            if (isLoggedIn) {
+                const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+                userInitials = loggedInUser?.simHolderName?.charAt(0).toUpperCase() || 'U';
             }
         }
 
-        // Display user details and plan details
+        // Generate navigation (consistent with plans.html)
+        function generateNavigation() {
+            const navLinks = document.getElementById("nav-links");
+            navLinks.innerHTML = "";
+
+            if (isLoggedIn) {
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
+                });
+
+                const dropdownDiv = document.createElement('div');
+                dropdownDiv.className = 'dropdown';
+
+                const avatar = document.createElement('div');
+                avatar.className = 'user-avatar dropdown-toggle';
+                avatar.id = 'profileDropdown';
+                avatar.setAttribute('data-bs-toggle', 'dropdown');
+                avatar.textContent = userInitials;
+                dropdownDiv.appendChild(avatar);
+
+                const dropdownMenu = document.createElement('div');
+                dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+
+                loggedInDropdownPages.forEach(page => {
+                    const link = document.createElement('a');
+                    link.href = page.url;
+                    link.className = 'dropdown-item';
+                    link.textContent = page.label;
+                    link.onclick = (e) => {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    dropdownMenu.appendChild(link);
+                });
+
+                const logoutLink = document.createElement('a');
+                logoutLink.href = '#';
+                logoutLink.className = 'dropdown-item';
+                logoutLink.textContent = 'Logout';
+                logoutLink.onclick = (e) => {
+                    e.preventDefault();
+                    logout();
+                };
+                dropdownMenu.appendChild(logoutLink);
+
+                dropdownDiv.appendChild(dropdownMenu);
+                navLinks.appendChild(dropdownDiv);
+            } else {
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
+                });
+
+                const loginBtn = document.createElement("a");
+                loginBtn.href = "./login.html";
+                loginBtn.className = "btn login-btn";
+                loginBtn.textContent = "Login";
+                navLinks.appendChild(loginBtn);
+            }
+        }
+
+        // Set current page and navigate
+        function setCurrentPage(pageId) {
+            currentPage = pageId;
+            const guestPage = guestPages.find(p => p.id === pageId);
+            const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
+            if (guestPage) {
+                window.location.href = guestPage.url;
+            } else if (loggedInPage) {
+                window.location.href = loggedInPage.url;
+            }
+            generateNavigation();
+        }
+
+        // Logout function with SweetAlert2 and loading overlay
+        function logout() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('profileSetup');
+            sessionStorage.removeItem('phoneNumber');
+            sessionStorage.clear();
+            isLoggedIn = false;
+            currentPage = 'home';
+            generateNavigation();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Logged Out',
+                text: 'You have been logged out successfully.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#0a21c0',
+                timer: 1500,
+                timerProgressBar: true,
+                willClose: () => {
+                    loadingOverlay.style.display = 'none';
+                    window.location.href = '../index.html';
+                }
+            });
+        }
+
+        // Toggle mobile menu
+        function toggleMenu() {
+            const navLinks = document.getElementById("nav-links");
+            navLinks.classList.toggle("active");
+        }
+
+        // Display user details and plan details using sessionStorage
         function displayUserDetails() {
             const mobileNumber = sessionStorage.getItem('phoneNumber');
             const selectedPlan = JSON.parse(sessionStorage.getItem('selectedPlan'));
+            const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
-            if (!mobileNumber || !selectedPlan) {
-                alert('Error: Plan or mobile number not found. Please select a plan again.');
-                window.location.href = 'plans.html';
+            if (!mobileNumber || !selectedPlan || !userDetails) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Plan, mobile number, or user details not found. Please select a plan again.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0a21c0'
+                }).then(() => {
+                    window.location.href = 'plans.html';
+                });
                 return;
             }
-
-            // Find user in user.json (take the first match if duplicates exist)
-            const formattedNumber = `+91${mobileNumber}`;
-            const user = userData.users.find(u => u.number.replace(/\s+/g, '') === formattedNumber);
-
-            if (!user) {
-                alert('Error: User not found. Please try again.');
-                window.location.href = 'plans.html';
-                return;
-            }
-
-            // Store user details in sessionStorage for future use (e.g., invoice)
-            sessionStorage.setItem('userDetails', JSON.stringify({
-                id: user.id,
-                simHolderName: user.simHolderName,
-                number: user.number,
-                dateOfActivation: user.dateOfActivation,
-                address: user.address,
-                dateOfBirth: user.dateOfBirth,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                status: user.status,
-                placeOfSupply: user.placeOfSupply
-            }));
 
             // Display user details
-            $('#customerName').text(user.simHolderName);
+            const fullName = `${userDetails.firstName} ${userDetails.lastName}`;
+            $('#customerName').text(fullName);
             $('#customerNumber').text(`+91 ${mobileNumber}`);
-            const initials = user.simHolderName.split(' ').map(word => word[0]).join('').toUpperCase();
+            const initials = fullName.split(' ').map(word => word[0]).join('').toUpperCase();
             $('#customerAvatar').text(initials);
 
             // Display plan details
@@ -1090,12 +1308,6 @@
             $('#payUpiAmount').text(`₹${totalAmount.toFixed(2)}`);
             $('#payCardAmount').text(`₹${totalAmount.toFixed(2)}`);
             $('#payNetbankingAmount').text(`₹${totalAmount.toFixed(2)}`);
-        }
-
-        // Toggle mobile menu
-        function toggleMenu() {
-            const navLinks = document.getElementById("nav-links");
-            navLinks.classList.toggle("active");
         }
 
         // Generate a random reference number
@@ -1134,8 +1346,8 @@
 
             // Generate transaction details
             const transactionDetails = {
-                mobileNumber: userDetails.number,
-                customerName: userDetails.simHolderName,
+                mobileNumber: `+91 ${sessionStorage.getItem('phoneNumber')}`,
+                customerName: `${userDetails.firstName} ${userDetails.lastName}`,
                 amount: `₹${totalAmount.toFixed(2)}`,
                 refNo: generateRefNo(),
                 txnId: generateTxnId(),
@@ -1151,7 +1363,7 @@
             window.location.href = 'success.html';
         }
 
-        // Update breadcrumb to show only Plans > Payment (since payment always comes from plans)
+        // Update breadcrumb to show only Plans > Payment
         function updateBreadcrumb() {
             const breadcrumbList = $('#breadcrumbList');
             breadcrumbList.empty(); // Clear existing breadcrumb items
@@ -1162,20 +1374,18 @@
             breadcrumbList.append(plansItem).append(paymentItem);
         }
 
-        // Set previous page in session storage before navigating to payment page
-        // This should be handled in plans.html
-        // Example for plans.html (you'll need to add this to plans.html):
-        /*
-        // In plans.html, before navigating to payment.html
-        function navigateToPayment() {
-            sessionStorage.setItem('previousPage', window.location.pathname);
-            window.location.href = 'payment.html';
-        }
-        */
-
         document.addEventListener('DOMContentLoaded', function() {
-            // Fetch user data and display details
-            fetchUsers();
+            // Check login status
+            checkLoginStatus();
+
+            // Generate navigation
+            generateNavigation();
+
+            // Display user and plan details
+            displayUserDetails();
+
+            // Update breadcrumb
+            updateBreadcrumb();
 
             // Tab switching with enhanced animations
             const tabs = document.querySelectorAll('.option-tab');
@@ -1420,17 +1630,6 @@
                 confirmPayment();
             });
         });
-
-        // Set previous page in session storage before navigating to payment page
-        // This should be handled in plans.html
-        // Example for plans.html (you'll need to add this to plans.html):
-        /*
-        // In plans.html, before navigating to payment.html
-        function navigateToPayment() {
-            sessionStorage.setItem('previousPage', window.location.pathname);
-            window.location.href = 'payment.html';
-        }
-        */
     </script>
 </body>
 </html>

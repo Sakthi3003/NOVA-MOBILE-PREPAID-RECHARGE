@@ -521,11 +521,11 @@
                         throw new Error(verifyData.message || 'Invalid OTP');
                     }
 
-                    // Step 2: Store tokens and role in localStorage
-                    localStorage.setItem('accessToken', verifyData.accessToken);
-                    localStorage.setItem('refreshToken', verifyData.refreshToken);
-                    localStorage.setItem('role', verifyData.role);
-                    localStorage.setItem('loggedInUser', JSON.stringify({ phoneNumber: '+91 ' + phoneNumber.value }));
+                    // Step 2: Store tokens and role in sessionStorage
+                    sessionStorage.setItem('accessToken', verifyData.accessToken);
+                    sessionStorage.setItem('refreshToken', verifyData.refreshToken);
+                    sessionStorage.setItem('role', verifyData.role);
+                    sessionStorage.setItem('loggedInUser', JSON.stringify({ phoneNumber: '+91 ' + phoneNumber.value }));
 
                     // Step 3: Store user details in sessionStorage
                     sessionStorage.setItem('userDetails', JSON.stringify(verifyData.userDetails));
