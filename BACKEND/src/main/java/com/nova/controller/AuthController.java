@@ -3,6 +3,7 @@ package com.nova.controller;
 import com.nova.DTO.AuthRequest;
 import com.nova.DTO.AuthResponse;
 import com.nova.entity.Otp;
+import com.nova.entity.Role;
 import com.nova.DTO.OtpVerify;
 import com.nova.entity.User;
 import com.nova.repository.RoleRepository;
@@ -18,7 +19,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @CrossOrigin("*")
@@ -72,15 +75,21 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken, responseRole));
     }
 
+ // 1. Send OTP (Updated to return JSON)
     @PostMapping("/otp/request")
-    public ResponseEntity<String> requestOtp(@RequestBody Otp otp) throws Exception {
+    public ResponseEntity<Map<String, Object>> requestOtp(@RequestBody Otp otp) throws Exception {
         String formattedPhoneNumber = formatPhoneNumber(otp.getPhoneNumber());
         User user = userRepository.findByPhoneNumber(otp.getPhoneNumber())
                 .orElseThrow(() -> new Exception("Phone number not registered: " + otp.getPhoneNumber()));
         otpService.generateOtp(otp.getPhoneNumber());
-        return ResponseEntity.ok("OTP sent to " + formattedPhoneNumber);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "OTP sent to " + formattedPhoneNumber);
+        return ResponseEntity.ok(response);
     }
 
+    // 2. Verify OTP (Updated to include user_id and user details)
     @PostMapping("/otp/verify")
     public ResponseEntity<?> verifyOtp(@RequestBody OtpVerify verifyRequest) throws Exception {
         if (otpService.verifyOtp(verifyRequest.getPhoneNumber(), verifyRequest.getOtp())) {
@@ -88,7 +97,7 @@ public class AuthController {
                     .orElseThrow(() -> new Exception("User not found with phone number: " + verifyRequest.getPhoneNumber()));
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
             List<String> roles = user.getRoles().stream()
-                    .map(roleObj -> roleObj.getRoleName())
+                    .map(Role::getRoleName)
                     .filter(role -> role.equals("ADMIN") || role.equals("USER"))
                     .collect(Collectors.toList());
 
@@ -99,9 +108,28 @@ public class AuthController {
             String accessToken = jwtUtil.generateToken(userDetails.getUsername(), roles);
             String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), roles);
             String responseRole = roles.contains("ADMIN") ? "ADMIN" : "USER";
-            return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken, responseRole));
+
+            // Include user details in the response
+            Map<String, Object> response = new HashMap<>();
+            response.put("accessToken", accessToken);
+            response.put("refreshToken", refreshToken);
+            response.put("role", responseRole);
+            response.put("user_id", user.getUserId());
+            response.put("userDetails", new HashMap<String, Object>() {{
+                put("activation_date", user.getActivationDate().toString());
+                put("address", user.getAddress());
+                put("email", user.getEmail());
+                put("first_name", user.getFirstName());
+                put("last_name", user.getLastName());
+                put("phone_number", formatPhoneNumber(user.getPhoneNumber()));
+                put("status", user.getStatus());
+                put("username", user.getUsername());
+     
+            }});
+
+            return ResponseEntity.ok(response);
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid OTP");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid OTP"));
     }
 
     private String formatPhoneNumber(String phoneNumber) {
