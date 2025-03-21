@@ -378,7 +378,7 @@
             let timerInterval, countdown = 60;
             let attemptCount = parseInt(sessionStorage.getItem('otpAttempts')) || 0;
             let lockoutTime = sessionStorage.getItem('lockoutTime');
-            const apiBaseUrl = 'http://localhost:8080/api/auth';
+            const apiBaseUrl = 'http://localhost:8080/api';
 
             // Check for lockout
             if (lockoutTime) {
@@ -458,25 +458,26 @@
                 if (phoneError.style.display === 'none') {
                     loadingOverlay.style.display = 'flex';
                     try {
-                        const response = await fetch(`${apiBaseUrl}/otp/request`, {
+                        const response = await fetch(`${apiBaseUrl}/auth/otp/request`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ phoneNumber: value })
                         });
                         const data = await response.json();
-                        if (!response.ok) {
-                            throw new Error(data || 'Failed to send OTP');
+                        if (response.ok && data.success) {
+                            loadingOverlay.style.display = 'none';
+                            displayPhoneNumber.textContent = '+91 ' + value;
+                            nextStep('phoneStep', 'otpStep');
+                            otpInputs[0].focus();
+                            startTimer();
+                        } else {
+                            throw new Error(data.message || 'Failed to send OTP');
                         }
-                        loadingOverlay.style.display = 'none';
-                        displayPhoneNumber.textContent = '+91 ' + value;
-                        nextStep('phoneStep', 'otpStep');
-                        otpInputs[0].focus();
-                        startTimer();
                     } catch (error) {
                         loadingOverlay.style.display = 'none';
-                        phoneError.textContent = error.message.includes('Phone number not registered') 
+                        phoneError.textContent = error.message.includes('not registered') 
                             ? 'Phone number not registered. Please sign up.' 
-                            : 'Failed to send OTP. Please try again.';
+                            : error.message || 'Failed to send OTP. Please try again.';
                         phoneError.style.display = 'block';
                     }
                 }
@@ -497,7 +498,7 @@
                 });
             });
 
-            // OTP Form Submission - Verify OTP
+            // OTP Form Submission - Verify OTP and Store User Details
             document.getElementById('otpForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 let otpValue = '';
@@ -509,21 +510,27 @@
                 }
                 loadingOverlay.style.display = 'flex';
                 try {
-                    const response = await fetch(`${apiBaseUrl}/otp/verify`, {
+                    // Step 1: Verify OTP
+                    const verifyResponse = await fetch(`${apiBaseUrl}/auth/otp/verify`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ phoneNumber: phoneNumber.value, otp: otpValue })
                     });
-                    const data = await response.json();
-                    if (!response.ok) {
-                        throw new Error(data || 'Invalid OTP');
+                    const verifyData = await verifyResponse.json();
+                    if (!verifyResponse.ok) {
+                        throw new Error(verifyData.message || 'Invalid OTP');
                     }
-                    loadingOverlay.style.display = 'none';
-                    // Store tokens and role in localStorage
-                    localStorage.setItem('accessToken', data.accessToken);
-                    localStorage.setItem('refreshToken', data.refreshToken);
-                    localStorage.setItem('role', data.role);
+
+                    // Step 2: Store tokens and role in localStorage
+                    localStorage.setItem('accessToken', verifyData.accessToken);
+                    localStorage.setItem('refreshToken', verifyData.refreshToken);
+                    localStorage.setItem('role', verifyData.role);
                     localStorage.setItem('loggedInUser', JSON.stringify({ phoneNumber: '+91 ' + phoneNumber.value }));
+
+                    // Step 3: Store user details in sessionStorage
+                    sessionStorage.setItem('userDetails', JSON.stringify(verifyData.userDetails));
+
+                    loadingOverlay.style.display = 'none';
                     setTimeout(() => window.location.href = '../index.html', 1000);
                 } catch (error) {
                     loadingOverlay.style.display = 'none';
@@ -561,20 +568,21 @@
                     sessionStorage.setItem('otpAttempts', attemptCount);
                     loadingOverlay.style.display = 'flex';
                     try {
-                        const response = await fetch(`${apiBaseUrl}/otp/request`, {
+                        const response = await fetch(`${apiBaseUrl}/auth/otp/request`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ phoneNumber: phoneNumber.value })
                         });
                         const data = await response.json();
-                        if (!response.ok) {
-                            throw new Error(data || 'Failed to resend OTP');
+                        if (response.ok && data.success) {
+                            loadingOverlay.style.display = 'none';
+                            startTimer();
+                        } else {
+                            throw new Error(data.message || 'Failed to resend OTP');
                         }
-                        loadingOverlay.style.display = 'none';
-                        startTimer();
                     } catch (error) {
                         loadingOverlay.style.display = 'none';
-                        otpError.textContent = error.message.includes('Phone number not registered') 
+                        otpError.textContent = error.message.includes('not registered') 
                             ? 'Phone number not registered. Please sign up.' 
                             : 'Failed to resend OTP. Please try again.';
                         otpError.style.display = 'block';

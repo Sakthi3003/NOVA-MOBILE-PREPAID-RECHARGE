@@ -7,7 +7,7 @@
 
 body {
     background-color: #f8f9fa;
-    color: #333; /* Uniform body text color */
+    color: #333;
     line-height: 1.6;
     position: relative;
 }
@@ -99,12 +99,83 @@ body {
     cursor: pointer;
 }
 
+.user-avatar {
+    width: 35px;
+    height: 35px;
+    background-color: #0a21c0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.user-avatar::after {
+    content: '\f0d7';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 12px;
+    color: white;
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.user-avatar:hover::after {
+    opacity: 1;
+}
+
+.dropdown-menu {
+    background-color: #000;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.dropdown-item {
+    color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #0a21c0;
+    color: white;
+}
+
+.user-initials-display {
+    width: 35px;
+    height: 35px;
+    background-color: #0a21c0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    margin-right: 1rem;
+}
+
 /* Hero Section */
 .hero-section {
     position: relative;
     width: 100%;
     height: 500px;
-    background: url('../images/hero_section.webp') no-repeat center center/cover;
+    background: url('../assets/images/hero_section.webp') no-repeat center center/cover;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -124,7 +195,7 @@ body {
 
 .hero-content h2 {
     font-weight: 600;
-    color: #2c2e3a; /* Keep white due to dark background */
+    color: #2c2e3a;
     margin-bottom: 20px;
     font-size: 40px;
 }
@@ -133,10 +204,42 @@ body {
     color: #0a21c0;
 }
 
+.recharge-input {
+    width: 70%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    outline: none;
+    font-size: 16px;
+}
+
+.recharge-input:hover, .recharge-input:focus {
+    border-color: #0a21c0;
+}
+
+.btn-recharge {
+    width: 30%;
+    background-color: #0a21c0;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-recharge:hover {
+    background-color: #08189b;
+}
+
 /* Quick Recharge Section */
 .quick-recharge {
     padding: 50px 0;
-    background-color: #ffffff;
+    background-color: #f8f9fa;
     text-align: center;
     position: relative;
     opacity: 0;
@@ -148,7 +251,7 @@ body {
     font-size: 32px;
     font-weight: 700;
     margin-bottom: 35px;
-    color: black; /* Uniform heading color */
+    color: #0a21c0;
     text-transform: uppercase;
     letter-spacing: 1px;
     animation: fadeInText 1s ease-in-out;
@@ -163,19 +266,18 @@ body {
     max-width: 550px;
     margin: 0 auto;
     padding: 30px;
-    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    background: #ffffff;
     border-radius: 15px;
-    box-shadow: 0 8px 25px rgba(10, 33, 192, 0.1);
-    border: 1px solid rgba(10, 33, 192, 0.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .quick-recharge .form-container:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 35px rgba(10, 33, 192, 0.15);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
 }
 
-/* Input Styles */
 .form-group {
     margin-bottom: 16px;
     position: relative;
@@ -204,7 +306,7 @@ body {
     font-size: 14px;
     transition: all 0.3s ease;
     background-color: #FAFAFA;
-    color: #333; /* Uniform text color */
+    color: #333;
 }
 
 .form-control:focus {
@@ -223,8 +325,8 @@ body {
     border-radius: 4px;
     background-color: #fff2f2;
     border-left: 2px solid #dc3545;
+    text-align: left; /* Align error message to the left */
     animation: shake 0.5s ease-in-out;
-    text-align: left;
 }
 
 .error-message:before {
@@ -273,7 +375,7 @@ body {
     font-size: 32px;
     margin-bottom: 40px;
     text-transform: uppercase;
-    color: #0a21c0; /* Uniform heading color */
+    color: #0a21c0;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -287,7 +389,7 @@ body {
 
 .plan-card {
     background: #ffffff;
-    color: #333; /* Uniform text color */
+    color: #333;
     padding: 15px;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
@@ -331,7 +433,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: #333; /* Uniform text color */
+    color: #333;
     padding-top: 8px;
 }
 
@@ -355,7 +457,7 @@ body {
     display: flex;
     align-items: center;
     font-size: 15px;
-    color: #333; /* Uniform text color (replacing #666) */
+    color: #333;
 }
 
 .plan-detail i {
@@ -376,7 +478,7 @@ body {
 
 .plan-benefits li {
     font-size: 15px;
-    color: #333; /* Uniform text color (replacing black) */
+    color: #333;
     margin-bottom: 4px;
     display: flex;
     align-items: center;
@@ -425,7 +527,7 @@ body {
 }
 
 .features-section h2 {
-    color: black; 
+    color: black;
     font-weight: 700;
     text-align: center;
     margin-bottom: 30px;
@@ -455,13 +557,13 @@ body {
 .features-section h4 {
     font-size: 20px;
     font-weight: 600;
-    color: #333; /* Uniform text color */
+    color: #333;
     margin-top: 10px;
 }
 
 .features-section p {
     font-size: 16px;
-    color: #333; /* Uniform text color (replacing #666/.text-secondary) */
+    color: #333;
 }
 
 .btn-primary {
@@ -489,7 +591,7 @@ body {
     height: 30px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 8px;
-    margin-right: 15px; /* Increased separation */
+    margin-right: 15px;
 }
 
 .btn-primary .btn-icon i {
@@ -500,8 +602,8 @@ body {
 .btn-track {
     background: #0a21c0;
     border: none;
-    padding: 10px 20px; /* Reduced padding */
-    font-size: 18px; /* Reduced font size */
+    padding: 10px 20px;
+    font-size: 18px;
     font-weight: 600;
     border-radius: 8px;
     color: white;
@@ -521,13 +623,13 @@ body {
 .buy-sim-section h2 {
     font-size: 32px;
     font-weight: 700;
-    color: black; 
+    color: black;
     margin-bottom: 20px;
 }
 
 .buy-sim-section .lead {
     font-size: 18px;
-    color: #333; /* Uniform text color (replacing #666) */
+    color: #333;
     margin-bottom: 30px;
 }
 
@@ -572,13 +674,13 @@ body {
 .port-to-nova-section h2 {
     font-size: 32px;
     font-weight: 700;
-    color: black; /* Uniform heading color */
+    color: black;
     margin-bottom: 20px;
 }
 
 .port-to-nova-section .lead {
     font-size: 18px;
-    color: #333; /* Uniform text color (replacing #666) */
+    color: #333;
     margin-bottom: 30px;
 }
 
@@ -610,7 +712,6 @@ body {
     text-decoration: underline;
 }
 
-
 footer {
     background: linear-gradient(135deg, #141619, #000000);
     color: white;
@@ -635,7 +736,7 @@ footer {
 .footer-section h4 {
     font-size: 18px;
     margin-bottom: 15px;
-    color: #0a21c0; /* Uniform heading color */
+    color: #0a21c0;
 }
 
 .footer-section p, .footer-section a {
@@ -675,7 +776,6 @@ footer {
     margin: 0;
 }
 
-/* General Fade-In Animation for Sections */
 @keyframes fadeInSection {
     0% { opacity: 0; transform: translateY(30px); }
     100% { opacity: 1; transform: translateY(0); }
@@ -683,14 +783,15 @@ footer {
 
 /* Responsive Styles */
 @media (max-width: 768px) {
-    .hero-section{
+    .hero-section {
         background: white;
         color: #000;
     }
+
     .mobile-menu-btn {
         display: block;
     }
-    
+
     .nav-links {
         position: fixed;
         top: 70px;
@@ -703,16 +804,25 @@ footer {
         transform: translateY(-150%);
         transition: transform 0.3s ease-in-out;
     }
-    
+
     .nav-links.active {
         transform: translateY(0);
+    }
+
+    .user-avatar::after {
+        display: none;
+    }
+
+    .dropdown-menu {
+        width: 100%;
+        text-align: center;
     }
 
     .hero-section {
         height: auto;
         padding: 50px 20px;
     }
-    
+
     .hero-content {
         width: 100%;
         padding: 15px;
@@ -722,7 +832,7 @@ footer {
         font-size: 28px;
     }
 
-    .form-group {
+    .form-group, .recharge-input, .btn-recharge {
         width: 100%;
     }
 
@@ -736,20 +846,6 @@ footer {
 
     .plans-section {
         grid-template-columns: 1fr;
-    }
-
-    .about-us h1 {
-        font-size: 1.5rem;
-        text-align: center;
-    }
-
-    .about-us p {
-        text-align: center;
-    }
-
-    .counter, .rating {
-        text-align: center;
-        justify-content: center;
     }
 
     .footer-container {
@@ -806,25 +902,30 @@ footer {
     .buy-sim-section .lead, .port-to-nova-section .lead {
         font-size: 16px;
     }
-    .btn-primary, .btn-track {
-padding: 8px 14px;
-font-size: 14px;
-}
 
-.btn-primary .btn-icon {
-width: 25px;
-height: 25px;
-margin-right: 8px;
-}
+    /* Button size fixes for tablet */
+    .btn-recharge, .btn-primary, .btn-track, .plan-card button {
+        padding: 8px 12px;
+        font-size: 12px;
+        width: auto;
+        min-width: 120px;
+    }
 
-.btn-primary .btn-icon i {
-font-size: 12px;
-}
+    .hero-content .btn-recharge {
+        width: 100%;
+        max-width: 200px;
+    }
 
-/* Reduce gap between Buy SIM Now and Track Order buttons */
-.buy-sim-section .d-flex.gap-3 {
-gap: 1rem;
-}
+    .buy-sim-section .btn-primary,
+    .buy-sim-section .btn-track,
+    .port-to-nova-section .btn-primary {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .user-initials-display {
+        margin-right: 0.5rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -847,5 +948,27 @@ gap: 1rem;
 
     .plan-card {
         padding: 15px;
+    }
+
+    /* Button size fixes for mobile */
+    .btn-recharge, .btn-primary, .btn-track, .plan-card button {
+        padding: 6px 10px;
+        font-size: 11px;
+        min-width: 100px;
+    }
+
+    .hero-content .btn-recharge {
+        max-width: 180px;
+    }
+
+    .buy-sim-section .btn-primary,
+    .buy-sim-section .btn-track,
+    .port-to-nova-section .btn-primary {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .user-initials-display {
+        margin-right: 0.3rem;
     }
 }

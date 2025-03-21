@@ -11,8 +11,567 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- Font Awesome for Dropdown Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/profile.css">
-    
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary-color: #0a21c0;
+            --primary-light: rgba(10, 33, 192, 0.1);
+            --text-color: #000;
+            --bg-color: #fff;
+            --error-color: #ff3b30;
+            --success-color: #34c759;
+            --light-bg: #f6f7f9;
+            --border-color: #e1e5eb;
+            --hover-color: #081b9e;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn {
+            background-color: #ff3b30;
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background-color: #e62e28;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .user-avatar::after {
+            content: '\f0d7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-avatar:hover::after {
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            background-color: #000;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .dropdown-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .page-title {
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .profile-card {
+            background-color: var(--bg-color);
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .section-icon {
+            color: var(--primary-color);
+            width: 18px;
+            height: 18px;
+        }
+
+        .section-content {
+            padding: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+            padding-left: 0.2rem;
+        }
+
+        .info-item:hover {
+            transform: translateX(5px);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: var(--text-color);
+            padding: 0.3rem 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: var(--text-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            background-color: var(--bg-color);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-top: 0.8rem;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(10, 33, 192, 0.2);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+            padding: 0.6rem;
+            border-radius: 8px;
+            background-color: rgba(52, 199, 89, 0.1);
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+
+        .input-invalid {
+            border-color: var(--error-color);
+        }
+
+        .settings-card {
+            margin-top: 0.8rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .account-field {
+            border-radius: 8px;
+            padding: 0.8rem;
+            transition: all 0.3s;
+            position: relative;
+            background-color: #f8f9fa;
+            margin-bottom: 0.8rem;
+        }
+
+        .account-field:hover {
+            background-color: #eef1f6;
+            transform: translateY(-2px);
+        }
+
+        .field-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+        }
+
+        .field-value {
+            font-size: 1rem;
+            color: var(--text-color);
+            word-break: break-word;
+        }
+
+        .edit-pencil {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .edit-pencil:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Toast Message Styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1002;
+            animation: slideInToast 0.5s ease-out, fadeOutToast 0.5s ease-out 2.5s forwards;
+        }
+
+        @keyframes slideInToast {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeOutToast {
+            to { opacity: 0; }
+        }
+
+        /* Loading Overlay Styles */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid var(--primary-color); /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+                flex-wrap: wrap;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                background-color: #000;
+                padding: 1rem;
+                gap: 1rem;
+                transform: translateY(-150%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+            }
+
+            .user-avatar::after {
+                display: none;
+            }
+
+            .dropdown-menu {
+                width: 100%;
+                text-align: center;
+            }
+
+            .container {
+                padding: 0.5rem;
+                margin: 1rem auto;
+            }
+
+            .page-title {
+                font-size: 1.4rem;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+
+            .settings-card {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+
+            .profile-card {
+                padding: 0.8rem;
+            }
+
+            .form-control {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .submit-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 0.6rem 0.8rem;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .nav-link {
+                padding: 0.2rem 0;
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+
+            .user-avatar {
+                width: 25px;
+                height: 25px;
+            }
+
+            .page-title {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 0.9rem;
+            }
+
+            .info-label {
+                font-size: 0.7rem;
+            }
+
+            .info-value {
+                font-size: 0.9rem;
+            }
+
+            .field-label {
+                font-size: 0.7rem;
+            }
+
+            .field-value {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -20,16 +579,25 @@
         <div class="loader"></div>
     </div>
 
-    <!-- Navigation Bar (Matches My Plans page) -->
+    <!-- Navigation Bar -->
     <nav class="navbar">
         <a href="./indexu.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40px" width="100"></a>
         <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
         <div class="nav-links" id="nav-links">
-            <a href="./indexu.html" class="nav-link" id="home-link">Home</a>
-            <a href="./plansu.html" class="nav-link" id="plans-link">Plans</a>
+            <a href="./index.html" class="nav-link" id="home-link">Home</a>
+            <a href="./plans.html" class="nav-link" id="plans-link">Plans</a>
             <a href="./support.html" class="nav-link" id="support-link">Support</a>
             <a href="./about.html" class="nav-link" id="about-link">About Us</a>
-            <!-- Dropdown will be added dynamically -->
+            <!-- Dropdown for User Actions -->
+            <div class="dropdown">
+                <button class="dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user"></i> <span id="dropdown-username">User</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="./profile.html">Profile</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
     
@@ -147,11 +715,6 @@
                 <div id="username-display" class="account-field">
                     <div class="field-label">Username</div>
                     <div id="username-value" class="field-value" style="color: #666; font-style: italic;">Not set</div>
-                    <div class="edit-pencil" onclick="toggleEdit('username')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                        </svg>
-                    </div>
                 </div>
                 
                 <div id="email-display" class="account-field">
@@ -167,12 +730,6 @@
             
             <form id="account-form" class="hidden" onsubmit="saveAccountChanges(event); return false;">
                 <div class="info-grid">
-                    <div class="form-group" id="username-edit" style="display: none;">
-                        <label for="username-input">Username</label>
-                        <input type="text" id="username-input" class="form-control" value="">
-                        <p class="error-message" id="username-error"></p>
-                    </div>
-                    
                     <div class="form-group" id="email-edit" style="display: none;">
                         <label for="email-input">Email</label>
                         <input type="text" id="email-input" class="form-control" value="">
@@ -196,6 +753,304 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap JS (required for dropdown) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/profile.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        // profile.js
+
+        // On page load, populate the profile fields with data from sessionStorage and localStorage
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get userDetails from sessionStorage
+            const userDetailsString = sessionStorage.getItem('userDetails');
+            const accessToken = localStorage.getItem('accessToken');
+
+            if (!userDetailsString || !accessToken) {
+                // If no user details or access token are found, redirect to login page
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Session Expired',
+                    text: 'Please log in to view your profile.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0a21c0'
+                }).then(() => {
+                    window.location.href = './login.html';
+                });
+                return;
+            }
+
+            let userDetails;
+            try {
+                userDetails = JSON.parse(userDetailsString);
+            } catch (error) {
+                console.error('Error parsing userDetails:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load user data. Please log in again.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0a21c0'
+                }).then(() => {
+                    window.location.href = './login.html';
+                });
+                return;
+            }
+
+            // Populate Personal Information
+            document.getElementById('name').textContent = `${userDetails.first_name} ${userDetails.last_name}` || 'Not set';
+            document.getElementById('number').textContent = userDetails.phone_number || 'Not set';
+            document.getElementById('dob').textContent = 'Not set'; // Not in response
+            document.getElementById('activation').textContent = formatDate(userDetails.activation_date) || 'Not set';
+
+            // Populate Address
+            document.getElementById('address').textContent = userDetails.address || 'Not set';
+            document.getElementById('state').textContent = 'Not set'; // Not in response
+
+            // Populate Account Settings
+            document.getElementById('username-value').textContent = userDetails.username || 'Not set';
+            if (userDetails.username) {
+                document.getElementById('username-value').style.color = 'var(--text-color)';
+                document.getElementById('username-value').style.fontStyle = 'normal';
+            }
+            document.getElementById('email-value').textContent = userDetails.email || 'Not set';
+            if (userDetails.email) {
+                document.getElementById('email-value').style.color = 'var(--text-color)';
+                document.getElementById('email-value').style.fontStyle = 'normal';
+            }
+
+            // Populate dropdown username
+            document.getElementById('dropdown-username').textContent = userDetails.username || 'User';
+
+            // Ensure .info-grid uses grid layout
+            const infoGrids = document.querySelectorAll('.info-grid');
+            infoGrids.forEach(grid => {
+                grid.style.display = 'grid';
+            });
+
+            // Hide loading overlay
+            document.getElementById('loadingOverlay').style.display = 'none';
+        });
+
+        // Format date (e.g., "2025-03-20" to "March 20, 2025")
+        function formatDate(dateString) {
+            if (!dateString) return 'Not set';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // Toggle mobile menu
+        function toggleMenu() {
+            const navLinks = document.getElementById('nav-links');
+            navLinks.classList.toggle('active');
+        }
+
+        // Toggle edit mode for email
+        function toggleEdit(field) {
+            console.log(`Toggling edit for field: ${field}`);
+            const userDetailsString = sessionStorage.getItem('userDetails');
+            let userDetails;
+            try {
+                userDetails = JSON.parse(userDetailsString);
+            } catch (error) {
+                console.error('Error parsing userDetails:', error);
+                return;
+            }
+
+            const display = document.getElementById(`${field}-display`);
+            const edit = document.getElementById(`${field}-edit`);
+            const form = document.getElementById('account-form');
+
+            if (display && edit && form) {
+                display.classList.add('hidden');
+                edit.style.display = 'block';
+                form.classList.remove('hidden');
+
+                const input = document.getElementById(`${field}-input`);
+                if (input) {
+                    const currentValue = document.getElementById(`${field}-value`).textContent;
+                    input.value = currentValue === 'Not set' ? '' : currentValue;
+                    input.focus();
+                }
+            } else {
+                console.error(`Error toggling edit for ${field}: display, edit, or form element not found`);
+            }
+        }
+
+        // Save account changes (only email) using Fetch API
+        async function saveAccountChanges(event) {
+            event.preventDefault();
+            console.log('Saving account changes');
+            showLoadingOverlay();
+
+            const userDetailsString = sessionStorage.getItem('userDetails');
+            const accessToken = localStorage.getItem('accessToken');
+
+            if (!accessToken) {
+                hideLoadingOverlay();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Session Expired',
+                    text: 'Access token is missing. Please log in again.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0a21c0'
+                }).then(() => {
+                    logout();
+                });
+                return;
+            }
+
+            let userDetails;
+            try {
+                userDetails = JSON.parse(userDetailsString);
+            } catch (error) {
+                console.error('Error parsing userDetails:', error);
+                hideLoadingOverlay();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load user data. Please log in again.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0a21c0'
+                }).then(() => {
+                    logout();
+                });
+                return;
+            }
+
+            const emailInput = document.getElementById('email-input').value.trim();
+
+            // Client-side validation for email
+            let hasError = false;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailError = document.getElementById('email-error');
+            if (!emailInput) {
+                emailError.textContent = 'Email is required';
+                emailError.style.display = 'block';
+                hasError = true;
+            } else if (!emailRegex.test(emailInput)) {
+                emailError.textContent = 'Please enter a valid email address';
+                emailError.style.display = 'block';
+                hasError = true;
+            } else {
+                emailError.textContent = '';
+                emailError.style.display = 'none';
+            }
+
+            if (hasError) {
+                hideLoadingOverlay();
+                return;
+            }
+
+            // Prepare the update payload (only email)
+            const updatedData = { email: emailInput };
+
+            try {
+                // Send PUT request to update the user profile using Fetch API
+                const response = await fetch('http://localhost:8080/api/user/update', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                }
+
+                const updatedUserDetails = await response.json();
+
+                // Update sessionStorage with the new user details
+                sessionStorage.setItem('userDetails', JSON.stringify(updatedUserDetails));
+
+                // Update the displayed email value
+                const emailValue = document.getElementById('email-value');
+                emailValue.textContent = updatedData.email;
+                emailValue.style.color = 'var(--text-color)';
+                emailValue.style.fontStyle = 'normal';
+
+                // Hide the form and show the display field
+                document.getElementById('email-display').classList.remove('hidden');
+                document.getElementById('email-edit').style.display = 'none';
+                document.getElementById('account-form').classList.add('hidden');
+
+                hideLoadingOverlay();
+
+                // Show SweetAlert2 success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Email updated successfully!',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0a21c0'
+                });
+            } catch (error) {
+                console.error('Error updating email:', error);
+                hideLoadingOverlay();
+                const errorMessage = error.message || 'Failed to update email. Please try again.';
+                if (error.message.includes('401')) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Session Expired',
+                        text: 'Your session has expired. Please log in again.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0a21c0'
+                    }).then(() => {
+                        logout();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0a21c0'
+                    });
+                }
+            }
+        }
+
+        // Logout function with loading overlay
+        function logout() {
+            console.log('Logout initiated');
+            showLoadingOverlay();
+
+            // Simulate a delay for the logout process (e.g., 1.5 seconds)
+            setTimeout(() => {
+                // Clear both sessionStorage and localStorage
+                sessionStorage.clear();
+                localStorage.clear();
+                hideLoadingOverlay();
+
+                // Show SweetAlert2 success message for logout
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Logged Out',
+                    text: 'You have been logged out successfully.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0a21c0'
+                }).then(() => {
+                    window.location.href = './login.html';
+                });
+            }, 1500);
+        }
+
+        // Show loading overlay
+        function showLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+            }
+        }
+
+        // Hide loading overlay
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
