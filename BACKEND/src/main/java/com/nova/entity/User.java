@@ -1,5 +1,7 @@
 package com.nova.entity;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +28,7 @@ public class User {
     private String email;
 
     @Column(name = "activation_date", nullable = false)
-    private java.sql.Date activationDate;
+    private Date activationDate;
 
     @Column(nullable = false, length = 20)
     private String status = "active";
@@ -54,7 +56,7 @@ public class User {
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-    public java.sql.Date getActivationDate() { return activationDate; }
+    public Date getActivationDate() { return activationDate; }
     public void setActivationDate(java.sql.Date activationDate) { this.activationDate = activationDate; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
