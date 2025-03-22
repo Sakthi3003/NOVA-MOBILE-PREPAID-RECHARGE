@@ -3,7 +3,11 @@ package com.nova.entity;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
@@ -44,6 +48,18 @@ public class User {
 
     @ManyToMany(fetch = FetchType.EAGER,cascade=CascadeType.PERSIST)
     private Set<Role> roles= new HashSet<>(); 
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Recharge> recharges;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Transaction> transactions;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Invoice> invoices;
 
     // Getters and Setters
     public Long getUserId() { return userId; }
@@ -72,6 +88,13 @@ public class User {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
+	
+	public List<Recharge> getRecharges() { return recharges; }
+    public void setRecharges(List<Recharge> recharges) { this.recharges = recharges; }
+    public List<Transaction> getTransactions() { return transactions; }
+    public void setTransactions(List<Transaction> transactions) { this.transactions = transactions; }
+    public List<Invoice> getInvoices() { return invoices; }
+    public void setInvoices(List<Invoice> invoices) { this.invoices = invoices; }
 	
   
 }

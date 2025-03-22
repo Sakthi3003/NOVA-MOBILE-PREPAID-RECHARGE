@@ -17,6 +17,19 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+    
+    public Optional<User> findById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
     public User updateUser(UpdateUserRequest updateRequest) {
         // Get the authenticated user's identifier from the SecurityContext

@@ -57,10 +57,10 @@ public class AuthController {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
         User user = userRepository.findByUsername(authRequest.getUsername())
-                .orElseThrow(() -> new Exception("admin not found with username: " + authRequest.getUsername()));
+                .orElseThrow(() -> new Exception("User not found with username: " + authRequest.getUsername()));
 
         List<String> roles = user.getRoles().stream()
-                .map(roleObj -> roleObj.getRoleName())
+                .map(Role::getRoleName)
                 .filter(role -> role.equals("ADMIN") || role.equals("USER"))
                 .collect(Collectors.toList());
 
@@ -70,9 +70,27 @@ public class AuthController {
 
         String accessToken = jwtUtil.generateToken(userDetails.getUsername(), roles);
         String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), roles);
-
         String responseRole = roles.contains("ADMIN") ? "ADMIN" : "USER";
-        return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken, responseRole));
+
+        // Include user details in the response
+        Map<String, Object> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken);
+        response.put("role", responseRole);
+        response.put("user_id", user.getUserId());
+        response.put("userDetails", new HashMap<String, Object>() {{
+            put("activation_date", user.getActivationDate().toString());
+            put("address", user.getAddress());
+            put("email", user.getEmail());
+            put("first_name", user.getFirstName());
+            put("last_name", user.getLastName());
+            put("phone_number", formatPhoneNumber(user.getPhoneNumber()));
+            put("status", user.getStatus());
+            put("username", user.getUsername());
+            put("password",user.getPassword());
+        }});
+
+        return ResponseEntity.ok(response);
     }
 
  // 1. Send OTP (Updated to return JSON)

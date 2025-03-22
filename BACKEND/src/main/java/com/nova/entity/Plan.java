@@ -1,4 +1,6 @@
 package com.nova.entity;
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -39,7 +41,9 @@ public class Plan {
     @Column(nullable = false, length = 50, columnDefinition = "varchar(50) default 'active'")
     private String status;
     
-
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Recharge> recharges;
+    
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -67,5 +71,7 @@ public class Plan {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	public List<Recharge> getRecharges() { return recharges; }
+    public void setRecharges(List<Recharge> recharges) { this.recharges = recharges; }
     
 }

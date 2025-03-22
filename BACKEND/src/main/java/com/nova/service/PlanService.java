@@ -8,6 +8,9 @@ import com.nova.entity.Category;
 import com.nova.entity.Plan;
 import com.nova.repository.CategoryRepository;
 import com.nova.repository.PlanRepository;
+
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +25,17 @@ public class PlanService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+    
+   
+
+        public Optional<Plan> findById(Long planId) {
+            return planRepository.findById(planId);
+        }
+
+        public Plan save(Plan plan) {
+            return planRepository.save(plan);
+        }
+  
 
     public Page<PlanDTO> getAllPlans(int page, int size, String search, String status, String sortBy, String sortDir) {
         Sort sort = Sort.by(sortDir.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
