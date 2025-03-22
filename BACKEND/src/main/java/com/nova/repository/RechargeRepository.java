@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +22,7 @@ public interface RechargeRepository extends JpaRepository<Recharge, Long> {
 
     @Query("SELECT r FROM Recharge r WHERE r.transactionId = :transactionId")
     Optional<Recharge> findByTransactionId(Long transactionId);
+    
+    List<Recharge> findByEndDateBetween(LocalDate start, LocalDate end);
+    List<Recharge> findByUserUserId(Long userId);
 }

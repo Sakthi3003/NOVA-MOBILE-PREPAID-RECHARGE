@@ -1,8 +1,10 @@
 package com.nova.controller;
 
+import com.nova.DTO.RechargeDTO;
 import com.nova.entity.User;
 import com.nova.repository.UserRepository;
 import com.nova.security.JwtUtil;
+import com.nova.service.AdminService;
 import com.nova.service.CustomUserDetailsService;
 import com.nova.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,9 @@ public class AdminController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private AdminService adminService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -120,6 +125,75 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "An unexpected error occurred while updating the admin profile"));
+        }
+    }
+    
+    
+    
+ // Fetch plans expiring within 3 days
+    @GetMapping("/expiring-plans")
+    public ResponseEntity<Map<String, Object>> getExpiringPlans(@RequestHeader("Authorization") String token) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (token == null || !token.startsWith("Bearer ")) {
+                throw new IllegalArgumentException("Invalid token");
+            }
+
+            List<RechargeDTO> expiringPlans = adminService.getExpiringPlans();
+            response.put("status", "SUCCESS");
+            response.put("data", expiringPlans);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", "ERROR");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // Fetch user details and transaction history
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Map<String, Object>> getUserDetailsAndTransactions(
+            @PathVariable Long userId,
+            @RequestHeader("Authorization") String token) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (token == null || !token.startsWith("Bearer ")) {
+                throw new IllegalArgumentException("Invalid token");
+            }
+
+            Map<String, Object> userData = adminService.getUserDetailsAndTransactions(userId);
+            response.put("status", "SUCCESS");
+            response.put("data", userData);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", "ERROR");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // Send notification
+    @PostMapping("/notify")
+    public ResponseEntity<Map<String, Object>> sendNotification(
+            @RequestBody Map<String, String> request,
+            @RequestHeader("Authorization") String token) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (token == null || !token.startsWith("Bearer ")) {
+                throw new IllegalArgumentException("Invalid token");
+            }
+
+            String phoneNumber = request.get("phoneNumber");
+            String message = request.get("message");
+            adminService.sendNotification(phoneNumber, message);
+
+            response.put("status", "SUCCESS");
+            response.put("message", "Notification sent successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", "ERROR");
+            response.put("message", "Failed to send notification: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

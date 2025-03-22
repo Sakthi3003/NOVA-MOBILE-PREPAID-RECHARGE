@@ -5,7 +5,9 @@ import com.nova.repository.OtpRepository;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
+import com.twilio.exception.ApiException;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -22,19 +24,43 @@ import java.util.Random;
 public class OtpService {
     private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
 
-    @Value("${twilio.account.sid}")
+    @Value("${twilio.account.sid:}")
     private String accountSid;
 
-    @Value("${twilio.auth.token}")
+    @Value("${twilio.auth.token:}")
     private String authToken;
 
-    @Value("${twilio.phone.number}")
+    @Value("${twilio.phone.number:}")
     private String twilioPhoneNumber;
 
     private final OtpRepository otpRepository;
+    private boolean isTwilioInitialized = false;
 
     public OtpService(OtpRepository otpRepository) {
         this.otpRepository = otpRepository;
+    }
+
+    @PostConstruct
+    public void initTwilio() {
+        try {
+            if (accountSid == null || accountSid.isEmpty() || authToken == null || authToken.isEmpty()) {
+                logger.error("Twilio credentials are not set. Account SID: {}, Auth Token: {}", accountSid, authToken);
+                throw new IllegalStateException("Twilio Account SID and Auth Token must be set in application.properties");
+            }
+            Twilio.init(accountSid, authToken);
+            isTwilioInitialized = true;
+            logger.info("Twilio initialized successfully with Account SID: {}", accountSid);
+        } catch (Exception e) {
+            logger.error("Failed to initialize Twilio: {}", e.getMessage(), e);
+            throw new RuntimeException("Twilio initialization failed: " + e.getMessage());
+        }
+    }
+
+    private void ensureTwilioInitialized() {
+        if (!isTwilioInitialized) {
+            logger.warn("Twilio is not initialized. Attempting to reinitialize...");
+            initTwilio();
+        }
     }
 
     public String generateOtp(String phoneNumber) {
@@ -42,14 +68,12 @@ public class OtpService {
         String formattedPhoneNumber = formatPhoneNumber(phoneNumber);
         String otp = String.format("%06d", new Random().nextInt(999999));
 
-        // Check if an OTP already exists for this phone number
         Optional<Otp> existingOtp = otpRepository.findByPhoneNumber(formattedPhoneNumber);
         if (existingOtp.isPresent()) {
             logger.debug("Deleting existing OTP for phone number: {}", formattedPhoneNumber);
             otpRepository.deleteByPhoneNumber(formattedPhoneNumber);
         }
 
-        // Store OTP in the database with a 5-minute expiration
         Otp otpEntity = new Otp();
         otpEntity.setPhoneNumber(formattedPhoneNumber);
         otpEntity.setOtp(otp);
@@ -71,14 +95,12 @@ public class OtpService {
             Otp otpEntity = otpEntityOptional.get();
             LocalDateTime now = LocalDateTime.now();
 
-            // Check if OTP is expired
             if (now.isAfter(otpEntity.getExpiresAt())) {
                 logger.debug("OTP expired for phone number: {}", formattedPhoneNumber);
                 otpRepository.deleteByPhoneNumber(formattedPhoneNumber);
                 return false;
             }
 
-            // Verify OTP
             if (otpEntity.getOtp().equals(otp)) {
                 logger.debug("OTP verified successfully for phone number: {}", formattedPhoneNumber);
                 otpRepository.deleteByPhoneNumber(formattedPhoneNumber);
@@ -92,29 +114,55 @@ public class OtpService {
 
     private void sendOtpSms(String phoneNumber, String otp) {
         try {
-            Twilio.init(accountSid, authToken);
             String customMessage = "Your Nova login OTP is: " + otp +
                                    ". Please use this OTP to complete your login. Do not share this OTP with anyone.";
-
-            Message message = Message.creator(
-                    new PhoneNumber(phoneNumber),
-                    new PhoneNumber(twilioPhoneNumber),
-                    customMessage
-            ).create();
-            logger.info("SMS sent: {}", message.getSid());
+            sendSms(phoneNumber, customMessage);
         } catch (Exception e) {
             logger.error("Failed to send OTP SMS to {}: {}", phoneNumber, e.getMessage());
-            throw new RuntimeException("Failed to send OTP. Please try again later.");
+            throw new RuntimeException("Failed to send OTP: " + e.getMessage());
+        }
+    }
+
+    public void sendSms(String phoneNumber, String message) {
+        try {
+            ensureTwilioInitialized(); // Ensure Twilio is initialized before sending SMS
+
+            if (twilioPhoneNumber == null || twilioPhoneNumber.isEmpty()) {
+                logger.error("Twilio phone number is not set.");
+                throw new IllegalStateException("Twilio phone number must be set in application.properties");
+            }
+
+            String formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+            logger.info("Sending SMS to: {}, From: {}, Message: {}", formattedPhoneNumber, twilioPhoneNumber, message);
+
+            Message msg = Message.creator(
+                    new PhoneNumber(formattedPhoneNumber),
+                    new PhoneNumber(twilioPhoneNumber),
+                    message
+            ).create();
+
+            logger.info("SMS sent successfully. SID: {}", msg.getSid());
+        } catch (ApiException e) {
+            logger.error("Twilio API error: Code: {}, Message: {}, More Info: {}", 
+                e.getCode(), e.getMessage(), e.getMoreInfo());
+            throw new RuntimeException("Failed to send SMS: " + e.getMessage() + " (Code: " + e.getCode() + ")");
+        } catch (Exception e) {
+            logger.error("Failed to send SMS to {}: {}", phoneNumber, e.getMessage(), e);
+            throw new RuntimeException("Failed to send SMS: " + e.getMessage());
         }
     }
 
     private String formatPhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.isEmpty()) {
+            logger.error("Phone number is null or empty");
             throw new IllegalArgumentException("Phone number cannot be null or empty");
         }
         if (!phoneNumber.startsWith("+")) {
-            return "+91" + phoneNumber;
+            String formatted = "+91" + phoneNumber;
+            logger.debug("Formatted phone number: {} to {}", phoneNumber, formatted);
+            return formatted;
         }
+        logger.debug("Phone number already formatted: {}", phoneNumber);
         return phoneNumber;
     }
 }
