@@ -4,127 +4,1391 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova - Expiring Plans</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
-    <link rel="stylesheet" href="./assets/css/expiringplans.css">
+    <style>
+        :root {
+            --primary: #0a21c0;
+            --secondary: #b3b4bd;
+            --dark: #000000;
+            --light: #ffffff;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --accent: #4f46e5;
+            --danger: #dc3545;
+            --success: #28a745;
+            --warning: #f59e0b;
+            --table-header-bg: #f0f2ff;
+            --table-row-bg: #ffffff;
+            --table-row-hover: #f0f4ff;
+            --table-border: #e1e4ed;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark);
+            color: var(--light);
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--light);
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--light);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--secondary);
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(179, 180, 189, 0.1);
+            color: var(--light);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--light);
+            border-left: 4px solid var(--light);
+        }
+
+        .nav-icon {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        .content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+            background-color: var(--light);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            height: 70px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-left: 10px;
+            text-transform: uppercase;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .top-action-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #4b5563;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .top-action-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger);
+            color: var(--light);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--light);
+            z-index: 1;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background-color: var(--light);
+        }
+
+        .user-profile:hover {
+            background-color: #f3f4f6;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .user-info {
+                display: block;
+            }
+            .notification-badge {
+                top: -3px;
+                right: -3px;
+                width: 16px;
+                height: 16px;
+                font-size: 0.6rem;
+            }
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1f2937;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .page-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-left {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-right {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-section input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            color: #4b5563;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .filter-section input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(10, 33, 192, 0.1);
+        }
+
+        .filter-section button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: var(--light);
+            color: #4b5563;
+        }
+
+        .filter-section button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            background-color: #e9ecef;
+        }
+
+        .filter-section button.active {
+            background-color: var(--primary);
+            color: var(--light);
+        }
+
+        .table-container {
+            background-color: var(--light);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--table-border);
+        }
+
+        .table th {
+            background-color: var(--table-header-bg);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .table td {
+            background-color: var(--table-row-bg);
+            color: #4b5563;
+        }
+
+        .table tr:hover td {
+            background-color: var(--table-row-hover);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #ef4444;
+        }
+
+        .days-to-expire {
+            font-weight: 500;
+        }
+
+        .days-to-expire.warning {
+            color: var(--warning);
+        }
+
+        .days-to-expire.danger {
+            color: var(--danger);
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            border: none;
+            margin-right: 8px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            box-shadow: 0 3px 5px rgba(10, 33, 192, 0.2);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(10, 33, 192, 0.25);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--light);
+        }
+
+        .btn-primary:hover {
+            background-color: #081899;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: var(--light);
+        }
+
+        .btn-success:hover {
+            background-color: #15803d;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 5px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .pagination .page-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .pagination .page-link {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            color: #4b5563;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #f3f4f6;
+            border-color: var(--primary);
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--light);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #9ca3af;
+            cursor: not-allowed;
+            border-color: #d1d5db;
+            background-color: #f3f4f6;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1002;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 1002;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--light);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: var(--light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--light);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 25px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 15px 25px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background-color: #f9fafb;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group p {
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin: 0;
+        }
+
+        .modal-body h6 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .modal-body table th, .modal-body table td {
+            padding: 10px;
+            border-bottom: 1px solid #e1e4ed;
+            text-align: left;
+        }
+
+        .modal-body table th {
+            background-color: #f0f2ff;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+
+            .content {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+
+            .sidebar.expanded {
+                width: var(--sidebar-width);
+                z-index: 1001;
+            }
+
+            .sidebar.expanded .nav-text {
+                opacity: 1;
+                width: auto;
+                height: auto;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-left, .filter-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 0 15px;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .top-bar-right {
+                gap: 10px;
+            }
+
+            .page-container {
+                padding: 15px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .modal-content {
+                max-width: 90%;
+            }
+
+            .modal-body {
+                max-height: 50vh;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+
+            .modal-content {
+                max-width: 95%;
+            }
+
+            .modal-header {
+                padding: 15px 20px;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-footer {
+                padding: 10px 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header with Menu Toggler (Keeping Logo and Title on Left) -->
-    <header class="header">
-        <div class="logo-container">
-            <img src="./assets/images/logo.webp" alt="" height="40px" width="70px">
-            <!-- <div class="header-title">Admin Dashboard</div> -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo"></div>
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        <button class="menu-toggle" id="menuToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="header-actions">
-            <div class="nav-menu" id="navMenu">
-                <a href="./analytics.html" class="nav-item">Analytics</a>
-                <a href="./expiringplans.html" class="nav-item active">Expiring Plans</a>
-                <a href="./manageplans.html" class="nav-item">Manage Plans</a>
-                <a href="./subscriberManagement.html" class="nav-item">Manage Users</a>
-                <a href="./profile.html" class="nav-item">Profile</a>
-                <a href="./index.html" class="nav-item logout-btn">Logout</a>
-                <i class="fas fa-user-circle admin-icon"></i>
-            </div>
-        </div>
-    </header>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="./analytics.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./expiringplans.html" class="nav-link active">
+                    <span class="nav-icon"><i class="fas fa-clock"></i></span>
+                    <span class="nav-text">Expiring Plans</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./manageplans.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                    <span class="nav-text">Manage Plans</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./subscriberManagement.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    <span class="nav-text">Manage Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./profile.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-user"></i></span>
+                    <span class="nav-text">Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../index.html" class="nav-link logout-btn">
+                    <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
 
-    <!-- Main Content -->
-    <div class="container dashboard-container">
-        <!-- Filters and Table -->
-        <div class="card p-4 mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="fw-bold mb-0">Plans Expiring in 3 Days</h3>
-                <div class="d-flex gap-1"> <!-- Reduced gap for compactness -->
-                    <div class="search-container">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="form-control search-input" id="searchInput" placeholder="Search customers...">
+    <div class="content" id="content">
+        <div class="top-bar">
+            <div class="top-logo">
+                <img src="./assets/images/logo.webp" alt="Company Logo" class="logo-img" height="40" width="100">
+                <span class="logo-text"></span>
+            </div>
+            <div class="top-bar-right">
+                <button class="top-action-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">4</span>
+                </button>
+                <div class="user-profile" id="userProfile">
+                    <div class="avatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name">Admin</div>
+                        <div class="user-role"></div>
                     </div>
-                    <button id="bulkNotifyBtn" class="btn btn-primary">
-                        <i class="fas fa-bell me-1"></i>Bulk Notify
-                    </button>
-                    <button id="automateCallsBtn" class="btn btn-primary">
-                        <i class="fas fa-phone-alt me-1"></i>Automate Calls
-                    </button>
                 </div>
             </div>
+        </div>
 
-            <div class="table-container">
-                <div class="table-responsive">
-                    <table class="table align-middle" id="expiringTable">
+        <div class="page-container">
+            <div class="section-header">
+                <h2 class="section-title">Expiring Plans</h2>
+            </div>
+
+            <div class="expiring-plans-container">
+                <div class="filter-section">
+                    <div class="filter-row">
+                        <div class="filter-left">
+                            <input type="text" id="expiringPlansSearchInput" placeholder="Search by user, plan, expiry date...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table" id="expiring-plans-table">
                         <thead>
                             <tr>
-                                <th>Customer Name</th>
-                                <th>Expiry Date</th>
-                                <th>Action</th>
+                                <th>User Name</th>
+                                <th>Phone Number</th>
+                                <th>Plan Name</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Days to Expire</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="expiringList"></tbody>
+                        <tbody id="expiring-plans-body">
+                            <!-- Data will be populated dynamically -->
+                        </tbody>
                     </table>
                 </div>
 
-                <!-- Pagination -->
-                <div class="d-flex justify-content-end p-2"> <!-- Reduced padding for compactness -->
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination mb-0" id="pagination"></ul>
-                    </nav>
+                <div class="pagination-container">
+                    <div class="pagination-info" id="pagination-info"></div>
+                    <ul class="pagination" id="pagination">
+                        <!-- Pagination will be populated dynamically -->
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Improved Profile & Transaction Modal (Matching Image) -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="profileModalLabel">Customer Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Modal for User Details and Transactions -->
+    <div class="modal" id="userDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details</h5>
+                <button class="modal-close" onclick="userDetailsModal.classList.remove('show')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Name</label>
+                    <p id="userName"></p>
                 </div>
-                <div class="modal-body">
-                    <h6>Profile</h6>
-                    <div class="profile-info">
-                        <p><strong>Name:</strong> <span id="custName"></span></p>
-                        <p><strong>Email:</strong> <span id="custEmail"></span></p>
-                        <p><strong>Phone:</strong> <span id="custPhone"></span></p>
-                        <p><strong>Plan:</strong> <span id="custPlan"></span></p>
-                        <p><strong>Expiry Date:</strong> <span id="custExpiry"></span></p>
-                        <p><strong>Amount:</strong> <span id="custAmount"></span></p>
-                    </div>
-                    <div class="transaction-history">
-                        <h6>Transaction History</h6>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Plan</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactionBody"></tbody>
-                        </table>
-                    </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <p id="userEmail"></p>
                 </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <p id="userPhone"></p>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <p id="userAddress"></p>
+                </div>
+                <div class="form-group">
+                    <label>Activation Date</label>
+                    <p id="userActivationDate"></p>
+                </div>
+                <div class="form-group">
+                    <label>Current Plan</label>
+                    <p id="userPlan"></p>
+                </div>
+                <div class="form-group">
+                    <label>Plan Price</label>
+                    <p id="userPlanPrice"></p>
+                </div>
+                <div class="form-group">
+                    <label>Validity</label>
+                    <p id="userPlanValidity"></p>
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <p id="userPlanData"></p>
+                </div>
+                <div class="form-group">
+                    <label>Calls</label>
+                    <p id="userPlanCalls"></p>
+                </div>
+                <div class="form-group">
+                    <label>SMS</label>
+                    <p id="userPlanSms"></p>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <p id="userStartDate"></p>
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <p id="userEndDate"></p>
+                </div>
+                <h6>Transaction History</h6>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Payment Mode</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionHistoryBody">
+                        <!-- Transaction data will be populated via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary action-btn" onclick="userDetailsModal.classList.remove('show')">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
-
-    <!-- Loading Overlay (Added for Logout) -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
-    <script src="./assets/js/expiringplans.js"></script>
+    <div class="toast-container"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        let token = sessionStorage.getItem('accessToken');
+        let currentPage = 0;
+        const itemsPerPage = 5;
+        let totalPages = 0;
+        let expiringPlans = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!token) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Session Expired',
+                    text: 'Please log in again.',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = 'login.html';
+                });
+                return;
+            }
+
+            setupEventListeners();
+            fetchExpiringPlans();
+        });
+
+        function setupEventListeners() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const userProfile = document.getElementById('userProfile');
+            const userDetailsModal = document.getElementById('userDetailsModal');
+            const expiringPlansSearchInput = document.getElementById('expiringPlansSearchInput');
+
+            function isMobile() {
+                return window.innerWidth <= 992;
+            }
+
+            if (isMobile()) {
+                sidebar.classList.add('collapsed');
+                content.classList.add('expanded');
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                if (isMobile()) {
+                    sidebar.classList.toggle('expanded');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    content.classList.toggle('expanded');
+                }
+            });
+
+            userProfile.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Add admin profile details here if needed
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!userProfile.contains(e.target) && !userDetailsModal.contains(e.target)) {
+                    userDetailsModal.classList.remove('show');
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                if (isMobile()) {
+                    if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
+                        sidebar.classList.add('collapsed');
+                        content.classList.add('expanded');
+                    }
+                } else {
+                    sidebar.classList.remove('expanded');
+                    if (!sidebar.classList.contains('collapsed')) {
+                        content.classList.remove('expanded');
+                    }
+                }
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    if (isMobile() && sidebar.classList.contains('expanded')) {
+                        sidebar.classList.remove('expanded');
+                    }
+                });
+            });
+
+            // Search Functionality
+            expiringPlansSearchInput.addEventListener('keyup', applyExpiringPlansFilters);
+
+            // Pagination
+            document.getElementById('pagination').addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = e.target.closest('.page-link');
+                if (!target) return;
+                const page = target.dataset.page;
+                if (page === 'prev' && currentPage > 0) {
+                    currentPage--;
+                } else if (page === 'next' && currentPage < totalPages - 1) {
+                    currentPage++;
+                } else if (!isNaN(page)) {
+                    currentPage = parseInt(page);
+                }
+                applyExpiringPlansFilters();
+                showToast('Loading page ' + (currentPage + 1));
+            });
+
+            const logoutBtn = document.querySelector('.logout-btn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                loadingOverlay.classList.add('active');
+                setTimeout(() => {
+                    sessionStorage.clear();
+                    token = null;
+                    window.location.href = 'index.html';
+                }, 1500);
+            });
+        }
+
+        async function fetchExpiringPlans() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const response = await fetch('http://localhost:8080/api/admin/expiring-plans', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch expiring plans');
+                }
+
+                const result = await response.json();
+                if (result.status !== 'SUCCESS') {
+                    throw new Error(result.message || 'Failed to fetch expiring plans');
+                }
+
+                expiringPlans = result.data;
+                populateExpiringPlansTable();
+            } catch (error) {
+                console.error('Error fetching expiring plans:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to fetch expiring plans. Please try again.',
+                    confirmButtonColor: '#0a21c0'
+                });
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        function populateExpiringPlansTable() {
+            const tbody = document.getElementById('expiring-plans-body');
+            tbody.innerHTML = '';
+
+            expiringPlans.forEach(plan => {
+                const daysToExpire = plan.daysToExpire;
+                const daysClass = daysToExpire <= 1 ? 'danger' : daysToExpire <= 2 ? 'warning' : '';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${plan.user.firstName} ${plan.user.lastName}</td>
+                    <td>${plan.phoneNumber}</td>
+                    <td>${plan.plan.name}</td>
+                    <td>${plan.startDate}</td>
+                    <td>${plan.endDate}</td>
+                    <td><span class="days-to-expire ${daysClass}">${daysToExpire} day${daysToExpire !== 1 ? 's' : ''}</span></td>
+                    <td><span class="status-badge status-${plan.status.toLowerCase()}">${plan.status}</span></td>
+                    <td>
+                        <button class="action-btn btn-primary view-btn" data-user-id="${plan.user.userId}">View</button>
+                        <button class="action-btn btn-success notify-btn" data-phone-number="${plan.phoneNumber}" data-plan-name="${plan.plan.name}" data-end-date="${plan.endDate}">Notify</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Setup action buttons
+            document.querySelectorAll('.view-btn').forEach(button => {
+                button.addEventListener('click', handleViewUserDetails);
+            });
+
+            document.querySelectorAll('.notify-btn').forEach(button => {
+                button.addEventListener('click', handleNotifyUser);
+            });
+
+            applyExpiringPlansFilters();
+        }
+
+        async function handleViewUserDetails(e) {
+            const userId = e.target.dataset.userId;
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const response = await fetch(`http://localhost:8080/api/admin/user/${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch user details');
+                }
+
+                const result = await response.json();
+                if (result.status !== 'SUCCESS') {
+                    throw new Error(result.message || 'Failed to fetch user details');
+                }
+
+                const data = result.data;
+                const user = data.user;
+                const currentRecharge = data.currentRecharge;
+                const transactions = data.transactions;
+
+                // Populate modal
+                document.getElementById('userName').textContent = `${user.firstName} ${user.lastName}`;
+                document.getElementById('userEmail').textContent = user.email || 'N/A';
+                document.getElementById('userPhone').textContent = user.phoneNumber;
+                document.getElementById('userAddress').textContent = user.address || 'N/A';
+                document.getElementById('userActivationDate').textContent = user.activationDate;
+                document.getElementById('userPlan').textContent = currentRecharge ? currentRecharge.plan.name : 'N/A';
+                document.getElementById('userPlanPrice').textContent = currentRecharge ? `₹${currentRecharge.plan.price.toFixed(2)}` : 'N/A';
+                document.getElementById('userPlanValidity').textContent = currentRecharge ? currentRecharge.plan.validity : 'N/A';
+                document.getElementById('userPlanData').textContent = currentRecharge ? currentRecharge.plan.data : 'N/A';
+                document.getElementById('userPlanCalls').textContent = currentRecharge ? currentRecharge.plan.calls : 'N/A';
+                document.getElementById('userPlanSms').textContent = currentRecharge ? currentRecharge.plan.sms : 'N/A';
+                document.getElementById('userStartDate').textContent = currentRecharge ? currentRecharge.startDate : 'N/A';
+                document.getElementById('userEndDate').textContent = currentRecharge ? currentRecharge.endDate : 'N/A';
+
+                // Populate transaction history
+                const transactionBody = document.getElementById('transactionHistoryBody');
+                transactionBody.innerHTML = '';
+                transactions.forEach(tx => {
+                    transactionBody.innerHTML += `
+                        <tr>
+                            <td>${tx.transactionDate}</td>
+                            <td>₹${tx.amount.toFixed(2)}</td>
+                            <td>${tx.paymentMode}</td>
+                            <td>${tx.status}</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('userDetailsModal').classList.add('show');
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to fetch user details. Please try again.',
+                    confirmButtonColor: '#0a21c0'
+                });
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        async function handleNotifyUser(e) {
+            const phoneNumber = e.target.dataset.phoneNumber;
+            const planName = e.target.dataset.planName;
+            const endDate = e.target.dataset.endDate;
+            const message = `Reminder: Your ${planName} plan is expiring on ${endDate}. Please recharge to continue enjoying our services. - Nova`;
+
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const response = await fetch('http://localhost:8080/api/admin/notify', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phoneNumber: phoneNumber,
+                        message: message
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to send notification');
+                }
+
+                const result = await response.json();
+                if (result.status !== 'SUCCESS') {
+                    throw new Error(result.message || 'Failed to send notification');
+                }
+
+                showToast('Notification sent successfully', 'success');
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                let errorMessage = error.message || 'Failed to send notification';
+                if (errorMessage.includes('Twilio')) {
+                    errorMessage = 'Failed to send SMS: SMS service is not properly configured. Please contact support.';
+                } else if (errorMessage.includes('phone number')) {
+                    errorMessage = 'Invalid phone number. Please check the number and try again.';
+                }
+                showToast(errorMessage, 'danger');
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        function applyExpiringPlansFilters() {
+            const searchTerm = document.getElementById('expiringPlansSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#expiring-plans-table tbody tr');
+            let filteredRows = [];
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const showRow = searchTerm ? text.includes(searchTerm) : true;
+                row.style.display = showRow ? '' : 'none';
+                if (showRow) filteredRows.push(row);
+            });
+
+            const start = currentPage * itemsPerPage;
+            const end = start + itemsPerPage;
+            filteredRows.forEach((row, index) => {
+                row.style.display = (index >= start && index < end) ? '' : 'none';
+            });
+
+            updatePagination(filteredRows, currentPage);
+        }
+
+        function updatePagination(filteredRows, page) {
+            totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 0 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" data-page="prev">Previous</a>`;
+            pagination.appendChild(prevLi);
+
+            const startPage = Math.max(0, currentPage - 2);
+            const endPage = Math.min(totalPages - 1, currentPage + 2);
+
+            if (startPage > 0) {
+                const firstPage = document.createElement('li');
+                firstPage.className = 'page-item';
+                firstPage.innerHTML = `<a class="page-link" href="#" data-page="0">1</a>`;
+                pagination.appendChild(firstPage);
+
+                if (startPage > 1) {
+                    const dots = document.createElement('li');
+                    dots.className = 'page-item disabled';
+                    dots.innerHTML = `<span class="page-link">...</span>`;
+                    pagination.appendChild(dots);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageLi = document.createElement('li');
+                pageLi.className = `page-item ${currentPage === i ? 'active' : ''}`;
+                pageLi.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i + 1}</a>`;
+                pagination.appendChild(pageLi);
+            }
+
+            if (endPage < totalPages - 1) {
+                if (endPage < totalPages - 2) {
+                    const dots = document.createElement('li');
+                    dots.className = 'page-item disabled';
+                    dots.innerHTML = `<span class="page-link">...</span>`;
+                    pagination.appendChild(dots);
+                }
+
+                const lastPage = document.createElement('li');
+                lastPage.className = 'page-item';
+                lastPage.innerHTML = `<a class="page-link" href="#" data-page="${totalPages - 1}">${totalPages}</a>`;
+                pagination.appendChild(lastPage);
+            }
+
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages - 1 ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" data-page="next">Next</a>`;
+            pagination.appendChild(nextLi);
+
+            const start = currentPage * itemsPerPage + 1;
+            const end = Math.min((currentPage + 1) * itemsPerPage, filteredRows.length);
+            document.getElementById('pagination-info').textContent = `Showing ${start} to ${end} of ${filteredRows.length} entries`;
+        }
+
+        function showToast(message, type = 'success') {
+            const toastEl = document.createElement('div');
+            toastEl.className = 'toast';
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'polite');
+            toastEl.setAttribute('aria-atomic', 'true');
+            toastEl.innerHTML = `
+                <div class="toast-header">
+                    <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            document.querySelector('.toast-container').appendChild(toastEl);
+            const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 3000 });
+            toast.show();
+        }
+    </script>
 </body>
 </html>

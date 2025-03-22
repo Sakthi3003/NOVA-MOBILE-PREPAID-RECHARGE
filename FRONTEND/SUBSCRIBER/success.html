@@ -13,519 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #f0f4ff, #e6e9ff);
-            color: #333;
-            min-height: 100vh;
-            padding: 0;
-            position: relative;
-        }
-
-        .navbar {
-            background-color: #000;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo {
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: white;
-            text-decoration: none;
-            letter-spacing: 1px;
-        }
-
-        .success-container {
-            max-width: 550px;
-            margin: 40px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-            animation: fadeIn 0.6s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .success-header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .success-icon {
-            font-size: 60px;
-            color: #28a745;
-            margin-bottom: 12px;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        h1 {
-            font-size: 24px;
-            color: #0a21c0;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .success-message {
-            color: #555;
-            font-size: 14px;
-            font-weight: 300;
-        }
-
-        .transaction-card {
-            background: #fafbff;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #e6e9ff;
-            margin-bottom: 25px;
-            transition: all 0.3s ease;
-        }
-
-        .transaction-card:hover {
-            box-shadow: 0 4px 15px rgba(10, 33, 192, 0.08);
-        }
-
-        .transaction-card p {
-            margin: 6px 0;
-            font-size: 13px;
-            color: #444;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .transaction-card strong {
-            color: #0a21c0;
-            font-weight: 600;
-            flex: 0 0 40%;
-        }
-
-        .transaction-card span {
-            flex: 0 0 60%;
-            text-align: right;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #0a21c0, #081899);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #081899, #0a21c0);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(10, 33, 192, 0.2);
-        }
-
-        .btn-secondary {
-            background: #0a21c0;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #0a21c0;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
-        }
-
-        footer {
-            background: linear-gradient(135deg, #141619, #000000);
-            color: white;
-            padding: 30px 20px;
-            margin-top: 40px;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px;
-        }
-
-        .footer-section h4 {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #0a21c0;
-            text-transform: uppercase;
-        }
-
-        .footer-section p,
-        .footer-section a {
-            font-size: 13px;
-            color: #b3b4bd;
-            text-decoration: none;
-            margin-bottom: 8px;
-        }
-
-        .footer-section a:hover {
-            color: white;
-            text-decoration: underline;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 15px;
-            font-size: 13px;
-        }
-
-        .feedback-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .feedback-modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 450px;
-            text-align: center;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            position: relative;
-            z-index: 2001;
-        }
-
-        .feedback-modal-content h3 {
-            font-size: 20px;
-            color: #0a21c0;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .rating {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .rating i {
-            font-size: 30px;
-            color: #ddd;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .rating i:hover,
-        .rating i.active {
-            color: #f1c40f;
-        }
-
-        .feedback-modal-content textarea {
-            width: 100%;
-            height: 100px;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            resize: none;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-
-        .feedback-modal-content textarea:focus {
-            border-color: #0a21c0;
-            outline: none;
-        }
-
-        .feedback-modal-content .btn {
-            background: #0a21c0;
-            color: white;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .feedback-modal-content .btn:hover {
-            background: linear-gradient(90deg, #08189b, #3a78c2);
-        }
-
-        .close-feedback-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: #666;
-            cursor: pointer;
-            transition: color 0.3s ease;
-            z-index: 2002;
-        }
-
-        .close-feedback-btn:hover {
-            color: #ff3b30;
-        }
-
-        .swal2-container {
-            z-index: 3000;
-        }
-
-        @media (max-width: 600px) {
-            .success-container {
-                margin: 20px 10px;
-                padding: 20px;
-                max-width: 100%;
-            }
-
-            h1 {
-                font-size: 20px;
-            }
-
-            .success-icon {
-                font-size: 50px;
-            }
-
-            .transaction-card p {
-                font-size: 12px;
-                flex-direction: column;
-                text-align: left;
-            }
-
-            .transaction-card strong,
-            .transaction-card span {
-                flex: none;
-                text-align: left;
-            }
-
-            .button-group {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .btn {
-                width: 100%;
-                padding: 10px;
-            }
-
-            .feedback-modal-content {
-                width: 95%;
-                padding: 15px;
-            }
-
-            .rating i {
-                font-size: 25px;
-            }
-        }
-
-        #invoice {
-            display: none;
-            font-family: 'Poppins', sans-serif;
-            background: white;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0;
-        }
-        
-        .invoice-header {
-            background: white;
-            color: #0a21c0;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .invoice-logo {
-            display: flex;
-            align-items: center;
-        }
-        
-        .invoice-logo img {
-            width: 100px;
-            height: 70px;
-            margin-right: 15px;
-        }
-        
-        .invoice-logo h2 {
-            font-size: 22px;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .invoice-title {
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-        
-        .invoice-body {
-            padding: 20px;
-        }
-        
-        .invoice-section {
-            margin-bottom: 25px;
-        }
-        
-        .invoice-section-title {
-            background: #E3F2FD;
-            color: #1E3A8A;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 8px 15px;
-            border-left: 4px solid #1E3A8A;
-            margin-bottom: 10px;
-        }
-        
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .invoice-table th {
-            background: #F3F4F6;
-            color: #1E3A8A;
-            font-weight: 600;
-            text-align: left;
-            padding: 12px;
-            font-size: 14px;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .invoice-table td {
-            padding: 12px;
-            font-size: 14px;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .invoice-table tr:nth-child(even) {
-            background-color: #fafafa;
-        }
-        
-        .total-row {
-            background-color: #E3F2FD !important;
-            font-weight: 600;
-        }
-        
-        .invoice-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        
-        .invoice-meta-item {
-            flex: 1;
-        }
-        
-        .invoice-meta-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 4px;
-        }
-        
-        .invoice-meta-value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .invoice-footer {
-            border-top: 1px dashed #e0e0e0;
-            padding-top: 15px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .signature-container {
-            margin-top: 10px; /* Reduced margin for compactness */
-            padding-top: 5px; /* Reduced padding for compactness */
-            border-top: 1px dashed #000; /* Maintain dashed line as in your screenshot */
-        }
-
-        .signature-box {
-            display: flex;
-            justify-content: flex-end; /* Aligns the entire box to the right of the invoice */
-            align-items: center;
-            gap: 5px; /* Very small gap for tight layout */
-            border: 1px solid #000; /* Thin border to match your screenshot */
-            padding: 5px; /* Very small padding for a tiny box */
-            background: #fff; /* White background for contrast */
-            max-width: 200px; /* Reduced width for a very small box */
-            margin-left: auto; /* Pushes the box to the right edge of its container */
-        }
-
-        .signature-text {
-            font-size: 8px; /* Very small font size for compactness */
-            color: #333;
-            text-align: left; /* Align text left within the box for readability */
-            margin: 0; /* Remove default margins */
-            line-height: 1; /* Tightest line spacing for minimal height */
-        }
-
-        .dynamic-time {
-            margin-left: auto; /* Pushes the time to the right within the box */
-            text-align: right; /* Aligns time to the right */
-        }
-        
-        .invoice-notice {
-            background: #F3F4F6;
-            padding: 12px;
-            font-size: 12px;
-            border-radius: 6px;
-            margin-top: 20px;
-            color: #444;
-        }
-        
-        .invoice-qr {
-            text-align: center;
-            margin: 15px 0;
-        }
-        
-        .invoice-qr img {
-            width: 100px;
-            height: 100px;
-        }
-    </style>
+    <!-- Existing CSS -->
+    <link rel="stylesheet" href="../assets/css/success.css">
 </head>
 <body>
     <!-- Success Content -->
@@ -555,28 +44,11 @@
         </div>
     </div>
 
-    <!-- Feedback Popup -->
-    <div class="feedback-modal" id="feedbackModal">
-        <div class="feedback-modal-content">
-            <button class="close-feedback-btn" onclick="closeFeedbackModal()">✖</button>
-            <h3>We Value Your Feedback!</h3>
-            <div class="rating" id="ratingStars">
-                <i class="fas fa-star" data-value="1"></i>
-                <i class="fas fa-star" data-value="2"></i>
-                <i class="fas fa-star" data-value="3"></i>
-                <i class="fas fa-star" data-value="4"></i>
-                <i class="fas fa-star" data-value="5"></i>
-            </div>
-            <textarea id="feedbackText" placeholder="Please share your feedback (optional)"></textarea>
-            <button class="btn" id="submitFeedbackBtn">Submit Feedback</button>
-        </div>
-    </div>
-
     <div id="invoice">
         <!-- Invoice Header -->
         <div class="invoice-header">
             <div class="invoice-logo">
-                <img src="./assets/images/logo.webp" alt="Nova SIM Logo" width="190" height="60">
+                <img src="../assets/images/logo.webp" alt="Nova SIM Logo" width="190" height="60">
             </div>
             <div class="invoice-title">PAYMENT RECEIPT</div>
         </div>
@@ -678,7 +150,7 @@
                             <p>Digitally signed by Mobi Comm Service Limited</p>
                             <p>Date: 2025.02.27</p>
                             <p>Reason: Invoice</p>
-                            <p class="dynamic-time"></p> <!-- Placeholder for dynamic time -->
+                            <p class="dynamic-time"></p>
                         </div>
                     </div>
                 </div>
@@ -699,43 +171,31 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
         $(document).ready(function() {
-            // For testing when session storage is empty
-            if (!sessionStorage.getItem('transactionDetails')) {
-                const sampleTransactionDetails = {
-                    customerName: "John Doe",
-                    mobileNumber: "9876543210",
-                    amount: "₹599",
-                    refNo: "REF12345678",
-                    txnId: "TXN987654321",
-                    date: "02-03-2025",
-                    time: "15:30:45",
-                    paymentMode: "UPI"
-                };
-                
-                const sampleUserDetails = {
-                    simHolderName: "John Doe",
-                    number: "9876543210"
-                };
-                
-                const samplePlan = {
-                    name: "Monthly Unlimited Plan",
-                    data: "2GB/day",
-                    validity: "28 days",
-                    calls: "Unlimited",
-                    sms: "100/day",
-                    price: "599"
-                };
-                
-                sessionStorage.setItem('transactionDetails', JSON.stringify(sampleTransactionDetails));
-                sessionStorage.setItem('userDetails', JSON.stringify(sampleUserDetails));
-                sessionStorage.setItem('selectedPlan', JSON.stringify(samplePlan));
+            // Utility function for fetching with timeout
+            async function fetchWithTimeout(url, options, timeout = 10000) {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), timeout);
+                try {
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal
+                    });
+                    clearTimeout(id);
+                    return response;
+                } catch (error) {
+                    clearTimeout(id);
+                    if (error.name === 'AbortError') {
+                        throw new Error('Request timed out. Please check your internet connection and try again.');
+                    }
+                    throw error;
+                }
             }
-    
+
             // Retrieve transaction details from sessionStorage
             const transactionDetails = JSON.parse(sessionStorage.getItem('transactionDetails'));
             const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
             const selectedPlan = JSON.parse(sessionStorage.getItem('selectedPlan'));
-    
+
             if (!transactionDetails || !userDetails || !selectedPlan) {
                 Swal.fire({
                     icon: 'error',
@@ -749,97 +209,130 @@
                 });
                 return;
             }
-    
+
             // Display transaction details on the success page
-            $('#customerName').text(transactionDetails.customerName);
-            $('#mobileNumber').text(transactionDetails.mobileNumber);
-            $('#amount').text(transactionDetails.amount);
-            $('#refNo').text(transactionDetails.refNo);
-            $('#txnId').text(transactionDetails.txnId);
-            $('#date').text(transactionDetails.date);
-            $('#time').text(transactionDetails.time);
-            $('#paymentMethod').text(transactionDetails.paymentMode);
-    
+            $('#customerName').text(transactionDetails.customerName || 'Unknown');
+            $('#mobileNumber').text(transactionDetails.mobileNumber || 'N/A');
+            $('#amount').text(transactionDetails.amount || '₹0.00');
+            $('#refNo').text(transactionDetails.refNo || 'N/A');
+            $('#txnId').text(transactionDetails.txnId || 'N/A');
+            $('#date').text(transactionDetails.date || 'N/A');
+            $('#time').text(transactionDetails.time || 'N/A');
+            $('#paymentMethod').text(transactionDetails.paymentMode || 'Unknown');
+
             // Populate invoice template
-            $('#invoiceCustomerName').text(userDetails.simHolderName);
-            $('#invoiceMobileNumber').text(userDetails.number);
-            $('#invoiceRefNo').text(transactionDetails.refNo);
-            $('#invoiceTxnId').text(transactionDetails.txnId);
-            $('#invoiceDateTime').text(`${transactionDetails.date} ${transactionDetails.time}`);
-            $('#invoicePaymentMethod').text(transactionDetails.paymentMode);
-            $('#invoicePlanName').text(selectedPlan.name);
-            $('#invoiceData').text(selectedPlan.data);
-            $('#invoiceValidity').text(selectedPlan.validity);
-            $('#invoiceCalls').text(selectedPlan.calls);
-            $('#invoiceSMS').text(selectedPlan.sms);
-    
-            const planPrice = parseFloat(selectedPlan.price);
+            $('#invoiceCustomerName').text(userDetails.simHolderName || 'Unknown');
+            $('#invoiceMobileNumber').text(userDetails.number || 'N/A');
+            $('#invoiceRefNo').text(transactionDetails.refNo || 'N/A');
+            $('#invoiceTxnId').text(transactionDetails.txnId || 'N/A');
+            $('#invoiceDateTime').text(`${transactionDetails.date} ${transactionDetails.time}` || 'N/A');
+            $('#invoicePaymentMethod').text(transactionDetails.paymentMode || 'Unknown');
+            $('#invoicePlanName').text(selectedPlan.name || 'N/A');
+            $('#invoiceData').text(selectedPlan.data || 'N/A');
+            $('#invoiceValidity').text(selectedPlan.validity || 'N/A');
+            $('#invoiceCalls').text(selectedPlan.calls || 'N/A');
+            $('#invoiceSMS').text(selectedPlan.sms || 'N/A');
+
+            const planPrice = parseFloat(selectedPlan.price || 0);
             const gstRate = 0.18;
             const gstAmount = planPrice * gstRate;
             const totalAmount = planPrice + gstAmount;
-    
+
             $('#invoiceBaseAmount').text(`${planPrice.toFixed(2)}`);
             $('#invoiceGST').text(`${gstAmount.toFixed(2)}`);
             $('#invoiceTotalAmount').text(`${totalAmount.toFixed(2)}`);
-    
+
             // Go to Home button
             $('#goToHomeBtn').on('click', function() {
+                // Clear sessionStorage to prevent stale data
+                sessionStorage.removeItem('selectedPlan');
+                sessionStorage.removeItem('userDetails');
+                sessionStorage.removeItem('phoneNumber');
+                sessionStorage.removeItem('transactionDetails');
+                sessionStorage.removeItem('fromQuickRecharge');
                 window.location.href = '../index.html';
             });
-    
+
             // Download Invoice button
             $('#downloadInvoiceBtn').on('click', function() {
                 generateInvoice();
             });
-    
-            // Show feedback modal automatically after page load
-            setTimeout(function() {
-                $('#feedbackModal').css({
-                    'display': 'flex',
-                    'top': '50%',
-                    'left': '50%',
-                    'transform': 'translate(-50%, -50%)',
-                    'opacity': 0
-                }).animate({ opacity: 1 }, 300);
-            }, 500);
-    
-            // Rating star interaction
-            let ratingValue = 0;
-            $('.rating i').on('click', function() {
-                ratingValue = $(this).data('value');
-                $('.rating i').each(function() {
-                    if ($(this).data('value') <= ratingValue) {
-                        $(this).addClass('active');
-                    } else {
-                        $(this).removeClass('active');
+
+            // Share via Email button
+            $('#shareEmailBtn').on('click', async function() {
+                const invoiceData = {
+                    transactionId: transactionDetails.txnId,
+                    email: userDetails.email || prompt('Please enter your email address:'),
+                    customerName: transactionDetails.customerName,
+                    mobileNumber: transactionDetails.mobileNumber,
+                    amount: transactionDetails.amount,
+                    refNo: transactionDetails.refNo,
+                    date: transactionDetails.date,
+                    time: transactionDetails.time,
+                    paymentMode: transactionDetails.paymentMode,
+                    planName: selectedPlan.name,
+                    data: selectedPlan.data,
+                    validity: selectedPlan.validity,
+                    calls: selectedPlan.calls,
+                    sms: selectedPlan.sms,
+                    baseAmount: planPrice.toFixed(2),
+                    gst: gstAmount.toFixed(2),
+                    totalAmount: totalAmount.toFixed(2)
+                };
+
+                if (!invoiceData.email) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Email Required',
+                        text: 'Please provide an email address to share the invoice.',
+                        confirmButtonColor: '#0a21c0',
+                        position: 'center',
+                        zIndex: 3001
+                    });
+                    return;
+                }
+
+                try {
+                    const response = await fetchWithTimeout('http://localhost:8080/api/invoice/email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        },
+                        body: JSON.stringify(invoiceData)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to send invoice via email');
                     }
-                });
+
+                    const result = await response.json();
+                    if (result.status !== 'SUCCESS') {
+                        throw new Error(result.message || 'Failed to send invoice via email');
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Invoice Sent',
+                        text: `The invoice has been sent to ${invoiceData.email}.`,
+                        confirmButtonColor: '#0a21c0',
+                        position: 'center',
+                        zIndex: 3001
+                    });
+                } catch (error) {
+                    console.error('Error sending invoice via email:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'Failed to send invoice via email. Please try again.',
+                        confirmButtonColor: '#0a21c0',
+                        position: 'center',
+                        zIndex: 3001
+                    });
+                }
             });
-    
-            // Submit feedback
-            $('#submitFeedbackBtn').on('click', function() {
-                const feedbackText = $('#feedbackText').val().trim();
-                console.log('Rating:', ratingValue || 'Not provided');
-                console.log('Feedback:', feedbackText || 'Not provided');
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Thank You!',
-                    text: 'Your feedback has been submitted.',
-                    confirmButtonColor: '#0a21c0',
-                    position: 'center',
-                    zIndex: 3001
-                }).then(() => {
-                    closeFeedbackModal();
-                });
-            });
-    
-            // Close feedback modal
-            function closeFeedbackModal() {
-                $('#feedbackModal').animate({ opacity: 0 }, 300, function() {
-                    $(this).css('display', 'none');
-                });
-            }
-    
+
             // Invoice generation function
             function generateInvoice() {
                 $('#invoice').css('display', 'block');
@@ -852,7 +345,7 @@
                     html2canvas: { scale: 2, useCORS: true },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
-    
+
                 html2pdf().from(element).set(opt).save()
                     .then(() => {
                         console.log('Invoice generated and downloaded successfully.');

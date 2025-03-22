@@ -1,190 +1,1649 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nova - Subscriber Management</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
-  <!-- Font Awesome for the hamburger menu -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
-  <link rel="stylesheet" href="./assets/css/sm.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova - Subscriber Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
+    <style>
+        :root {
+            --primary: #0a21c0;
+            --secondary: #b3b4bd;
+            --dark: #000000;
+            --light: #ffffff;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --accent: #4f46e5;
+            --danger: #dc3545;
+            --success: #28a745;
+            --warning: #f59e0b;
+            --table-header-bg: #f0f2ff;
+            --table-row-bg: #ffffff;
+            --table-row-hover: #f0f4ff;
+            --table-border: #e1e4ed;
+            --shadow: 0 2px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark);
+            color: var(--light);
+            height: 100vh;
+            position: fixed;
+            transition: var(--transition);
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--light);
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--light);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--secondary);
+            padding: 12px 20px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(179, 180, 189, 0.1);
+            color: var(--light);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--light);
+            border-left: 4px solid var(--light);
+        }
+
+        .nav-icon {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 0;
+            transition: var(--transition);
+        }
+
+        .content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+            background-color: var(--light);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            height: 70px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-left: 10px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .top-action-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #4b5563;
+            cursor: pointer;
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+  justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .top-action-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--danger);
+            color: var(--light);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--light);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 16px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .user-profile:hover {
+            background-color: #f3f4f6;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .user-info {
+                display: block;
+            }
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1f2937;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        /* Page Container */
+        .page-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            position: relative;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .filter-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        #subscriberSearchInput, #subscriber-sort, #page-size {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            color: #4b5563;
+            width: 100%;
+            max-width: 250px;
+            transition: border-color 0.3s ease;
+        }
+
+        #subscriberSearchInput:focus, #subscriber-sort:focus, #page-size:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(10, 33, 192, 0.1);
+        }
+
+        .subscriber-filter-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: var(--light);
+            color: #4b5563;
+        }
+
+        .subscriber-filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            background-color: #e9ecef;
+        }
+
+        .subscriber-filter-btn.active {
+            background-color: var(--primary);
+            color: var(--light);
+        }
+
+        /* Table Styles */
+        .subscriber-container {
+            background-color: var(--light);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            min-width: 1000px;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--table-border);
+        }
+
+        .table th {
+            background-color: var(--table-header-bg);
+            font-weight: 600;
+            color: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table td {
+            background-color: var(--table-row-bg);
+            color: #4b5563;
+        }
+
+        .table tr:hover td {
+            background-color: var(--table-row-hover);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #e0f7fa;
+            color: #00acc1;
+        }
+
+        .status-inactive {
+            background-color: #f5f5f5;
+            color: #757575;
+        }
+
+        .status-suspended {
+            background-color: #ffedd5;
+            color: #f59e0b;
+        }
+
+        .status-deactivated {
+            background-color: #d1d5db;
+            color: #4b5563;
+        }
+
+        /* Updated Action Buttons */
+        .action-btn {
+            padding: 8px;
+            border: none;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-right: 8px;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: #fff;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: #fff;
+        }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 5px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .pagination .page-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .pagination .page-link {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            color: #4b5563;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #f3f4f6;
+            border-color: var(--primary);
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--light);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #9ca3af;
+            cursor: not-allowed;
+            border-color: #d1d5db;
+            background-color: #f3f4f6;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .modal.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-group p {
+            margin: 0;
+            color: #4b5563;
+        }
+
+        .modal-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .modal-body th, .modal-body td {
+            padding: 8px;
+            border-bottom: 1px solid var(--table-border);
+            text-align: left;
+        }
+
+        .modal-body th {
+            background-color: var(--table-header-bg);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--light);
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-secondary:hover {
+            background-color: #9ea0a9;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .loading-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1500;
+        }
+
+        .toast {
+            min-width: 300px;
+            border-radius: 8px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+            
+            .sidebar .nav-text {
+                opacity: 0;
+                width: 0;
+                height: 0;
+                overflow: hidden;
+            }
+            
+            .content {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+            
+            .sidebar.expanded {
+                width: var(--sidebar-width);
+            }
+            
+            .sidebar.expanded .nav-text {
+                opacity: 1;
+                width: auto;
+                height: auto;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-left, .filter-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 0 15px;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .top-bar-right {
+                gap: 10px;
+            }
+
+            .page-container {
+                padding: 15px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .modal-content {
+                max-width: 90%;
+            }
+
+            .modal-body {
+                max-height: 50vh;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .action-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+
+            .modal-content {
+                max-width: 95%;
+            }
+
+            .modal-header {
+                padding: 15px 20px;
+            }
+
+            .modal-body {
+                padding: 15px;
+            }
+
+            .modal-footer {
+                padding: 10px 20px;
+            }
+
+            .table th, .table td {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="d-flex flex-column vh-100">
-    <!-- Header -->
-    <header class="header">
-      <div class="logo-container">
-        <img src="./assets/images/logo.webp" alt="" height="40px" width="70px">
-        <!-- <div class="header-title">Admin Dashboard</div> -->
-      </div>
-      <button class="menu-toggle" id="mainMenuToggle">
-        <i class="fas fa-bars"></i>
-      </button>
-      <div class="header-actions">
-        <div class="nav-menu" id="navMenu">
-          <a href="./analytics.html" class="nav-item">Analytics</a>
-          <a href="./expiringplans.html" class="nav-item">Expiring Plans</a>
-          <a href="./manageplans.html" class="nav-item">Manage Plans</a>
-          <a href="./subscriberManagement.html" class="nav-item active" id="manageUsersLink">Manage Users</a>
-          <a href="./profile.html" class="nav-item">Profile</a>
-          <a href="./index.html" class="nav-item logout-btn">Logout</a>
-          <i class="fas fa-user-circle admin-icon"></i>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">Nova Admin</div>
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-      </div>
-    </header>
-
-    <!-- Subscriber Management Main Content (Under Manage Users) -->
-    <main class="main-content overflow-auto" id="subscriberMainContent">
-      <div class="subscriber-header">
-        <h1 class="subscriber-h1">Subscriber Management</h1>
-      </div>
-      
-      <div class="subscriber-container">
-        <div class="subscriber-search-bar">
-          <input type="text" id="subscriberSearchInput" class="form-control" placeholder="Search by name, email, address, or phone...">
-        </div>
-        
-        <div class="subscriber-filter-container">
-          <span class="subscriber-filter-label">Filter by Status:</span>
-          <div class="subscriber-filter-options">
-            <button class="subscriber-filter-btn active" data-filter="all">All Subscribers</button>
-            <button class="subscriber-filter-btn" data-filter="active">Active Subscribers</button>
-            <button class="subscriber-filter-btn" data-filter="inactive">Inactive Subscribers</button>
-            <button class="subscriber-filter-btn" data-filter="ported">Ported Numbers</button>
-          </div>
-        </div>
-        
-        <div class="subscriber-table-container">
-          <table class="subscriber-table" id="subscribers-table">
-            <thead>
-              <tr>
-                <th>SIM Holder Name</th>
-                <th>Activate Date</th>
-                <th>Username</th>
-                <th>Email Address</th>
-                <th>Address</th>
-                <th>DOB</th>
-                <th>Status</th>
-                <th>Porting Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr data-status="active" data-porting="not-ported">
-                <td>Sakthi</td>
-                <td>2024-03-15</td>
-                <td>sakthi123</td>
-                <td><a href="mailto:john.smith@example.com">sowmi@gmail.com</a></td>
-                <td>123 Main St, TamilNadu, India</td>
-                <td>2003-30-12</td>
-                <td><span class="subscriber-status subscriber-active">Active</span></td>
-                <td><span class="subscriber-status">Not Ported</span></td>
-                <td>
-                  <button class="subscriber-action-btn subscriber-deactivate-btn">Deactivate</button>
-                </td>
-              </tr>
-              <tr data-status="inactive" data-porting="ported">
-                <td>Jane Doe</td>
-                <td>2024-03-15</td>
-                <td>jane.doe</td>
-                <td><a href="mailto:jane.doe@example.com">jane.doe@example.com</a></td>
-                <td>456 Oak Ave, TamilNadu, India</td>
-                <td>2003-30-12</td>
-                <td><span class="subscriber-status subscriber-inactive">Inactive</span></td>
-                <td><span class="subscriber-status subscriber-ported">Ported</span></td>
-                <td>
-                  <button class="subscriber-action-btn subscriber-activate-btn">Activate</button>
-                </td>
-              </tr>
-              <tr data-status="active" data-porting="ported">
-                <td>Michael Johnson</td>
-                <td>2024-03-15</td>
-                <td>michael.j</td>
-                <td><a href="mailto:michael.j@example.com">michael.j@example.com</a></td>
-                <td>789 Pine Dr, TamilNadu, India</td>
-                <td>2003-30-12</td>
-                <td><span class="subscriber-status subscriber-active">Active</span></td>
-                <td><span class="subscriber-status subscriber-ported">Ported</span></td>
-                <td>
-                  <button class="subscriber-action-btn subscriber-deactivate-btn">Deactivate</button>
-                </td>
-              </tr>
-              <tr data-status="inactive" data-porting="not-ported">
-                <td>Sarah Williams</td>
-                <td>2024-03-15</td>
-                <td>sarah.w</td>
-                <td><a href="mailto:sarah.w@example.com">sarah.w@example.com</a></td>
-                <td>101 Cedar Ln, TamilNadu, India</td>
-                <td>2003-30-12</td>
-                <td><span class="subscriber-status subscriber-inactive">Inactive</span></td>
-                <td><span class="subscriber-status">Not Ported</span></td>
-                <td>
-                  <button class="subscriber-action-btn subscriber-activate-btn">Activate</button>
-                </td>
-              </tr>
-              <tr data-status="active" data-porting="not-ported">
-                <td>Robert Brown</td>
-                <td>2003-30-12</td>
-                <td>robert.b</td>
-                <td><a href="mailto:robert.b@example.com">robert.b@example.com</a></td>
-                <td>202 Maple Way, Delhi, India</td>
-                <td>2003-30-12</td>
-                <td><span class="subscriber-status subscriber-active">Active</span></td>
-                <td><span class="subscriber-status">Not Ported</span></td>
-                <td>
-                  <button class="subscriber-action-btn subscriber-deactivate-btn">Deactivate</button>
-                </td>
-              </tr>
-              <tr data-status="active" data-porting="ported">
-                <td>Emily Davis</td>
-                <td>2003-30-12</td>
-                <td>emily.d</td>
-                <td><a href="mailto:emily.d@example.com">emily.d@example.com</a></td>
-                <td>303 Elm Blvd, TamilNadu, India</td>
-                <td>2003-30-12</td>
-                <td><span class="subscriber-status subscriber-active">Active</span></td>
-                <td><span class="subscriber-status subscriber-ported">Ported</span></td>
-                <td>
-                  <button class="subscriber-action-btn subscriber-deactivate-btn">Deactivate</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        
-        <div class="subscriber-pagination">
-          <button id="subscriberPrevPage">Previous</button>
-          <button class="active">1</button>
-          <button>2</button>
-          <button>3</button>
-          <button id="subscriberNextPage">Next</button>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <!-- Toast Notification -->
-  <div class="toast-container toast-notification" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050;">
-    <div id="toastNotification" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body">
-          <i class="bi bi-check-circle me-2"></i>
-          <span id="toastMessage"></span>
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="./analytics.html" class="nav-link">
+                <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                <span class="nav-text">Analytics</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="./expiringplans.html" class="nav-link">
+                <span class="nav-icon"><i class="fas fa-clock"></i></span>
+                <span class="nav-text">Expiring Plans</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="./manageplans.html" class="nav-link">
+                <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                <span class="nav-text">Manage Plans</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="./subscriberManagement.html" class="nav-link active">
+                <span class="nav-icon"><i class="fas fa-users"></i></span>
+                <span class="nav-text">Manage Users</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="./profile.html" class="nav-link">
+                <span class="nav-icon"><i class="fas fa-user"></i></span>
+                <span class="nav-text">Profile</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="../index.html" class="nav-link logout-btn">
+                <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                <span class="nav-text">Logout</span>
+            </a>
+        </li>
+        </ul>
     </div>
-  </div>
 
-  <!-- Required JS Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Content -->
+    <div class="content" id="content">
+        <div class="top-bar">
+            <div class="top-logo">
+                <img src="./assets/images/logo.webp" alt="Company Logo" class="logo-img">
+                <span class="logo-text">Admin Dashboard</span>
+            </div>
+            <div class="top-bar-right">
+                <button class="top-action-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">4</span>
+                </button>
+                <div class="user-profile" id="userProfile">
+                    <div class="avatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name">Admin</div>
+                        <div class="user-role"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <script src="./assets/js/sm.js"></script>
+        <div class="page-container">
+            <div class="section-header">
+                <h2 class="section-title">Subscriber Management</h2>
+            </div>
+
+            <div class="subscriber-container">
+                <div class="filter-section">
+                    <div class="filter-row">
+                        <div class="filter-left">
+                            <input type="text" id="subscriberSearchInput" placeholder="Search by name, email, phone...">
+                        </div>
+                        <div class="filter-right">
+                            <select id="subscriber-sort">
+                                <option value="userId,asc">Sort by ID (Asc)</option>
+                                <option value="userId,desc">Sort by ID (Desc)</option>
+                                <option value="firstName,asc">Sort by Name (Asc)</option>
+                                <option value="firstName,desc">Sort by Name (Desc)</option>
+                            </select>
+                            <select id="page-size">
+                                <option value="5">5 per page</option>
+                                <option value="10">10 per page</option>
+                                <option value="20">20 per page</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <div class="filter-left">
+                            <button class="subscriber-filter-btn active" data-filter="all">All Subscribers</button>
+                            <button class="subscriber-filter-btn" data-filter="active">Active Subscribers</button>
+                            <button class="subscriber-filter-btn" data-filter="inactive">Inactive Subscribers</button>
+                            <button class="subscriber-filter-btn" data-filter="suspended">Suspended Subscribers</button>
+                            <button class="subscriber-filter-btn" data-filter="deactivated">Deactivated Subscribers</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table" id="subscribers-table">
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>SIM Holder Name</th>
+                                <th>Phone Number</th>
+                                <th>Activate Date</th>
+                                <th>Username</th>
+                                <th>Email Address</th>
+                                <th>Address</th>
+                                <th>Last Recharge</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-container">
+                    <div class="pagination-info" id="pagination-info"></div>
+                    <ul class="pagination" id="pagination">
+                        <!-- Pagination will be populated dynamically -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Subscriber Details</h5>
+                <button class="modal-close" onclick="profileModal.classList.remove('show')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Name</label>
+                    <p id="custName"></p>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <p id="custEmail"></p>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <p id="custPhone"></p>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <p id="custUsername"></p>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <p id="custAddress"></p>
+                </div>
+                <div class="form-group">
+                    <label>Activation Date</label>
+                    <p id="custActivationDate"></p>
+                </div>
+                <div class="form-group">
+                    <label>Last Recharge</label>
+                    <p id="custLastRecharge"></p>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <p id="custStatus"></p>
+                </div>
+                <h6>Transaction History</h6>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Plan</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionBody">
+                        <!-- Transaction data will be populated via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="profileModal.classList.remove('show')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        let token = sessionStorage.getItem('accessToken');
+        let refreshToken = sessionStorage.getItem('refreshToken');
+        let subscriberCurrentFilter = 'all';
+        let currentPage = 0;
+        let pageSize = 5;
+        let totalPages = 0;
+        let totalEntries = 0;
+        let searchQuery = '';
+        let sort = 'userId,asc';
+
+        const profileModal = document.getElementById('profileModal');
+
+        const customers = [
+            { id: "john", name: "John Smith", email: "john.smith@example.com", phone: "9876543210", plan: "Validity", expiry: "2025-03-04", amount: "₹299", transactions: [
+                { date: "2025-02-01", plan: "Validity", amount: "₹299", status: "Completed" },
+                { date: "2025-01-01", plan: "Entertainment", amount: "₹299", status: "Completed" }
+            ]},
+            { id: "jane", name: "Jane Doe", email: "jane.doe@example.com", phone: "8124477033", plan: "Validity", expiry: "2025-03-04", amount: "₹499", transactions: [
+                { date: "2025-02-28", plan: "Validity", amount: "₹499", status: "Completed" }
+            ]},
+        ];
+
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!token) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Session Expired',
+                    text: 'Please log in again.',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = 'login.html';
+                });
+                return;
+            }
+
+            setupEventListeners();
+            fetchSubscribers();
+            checkRechargeStatus();
+        });
+
+        function setupEventListeners() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const userProfile = document.getElementById('userProfile');
+            const subscriberSearchInput = document.getElementById('subscriberSearchInput');
+
+            function isMobile() {
+                return window.innerWidth <= 992;
+            }
+
+            if (isMobile()) {
+                sidebar.classList.add('collapsed');
+                content.classList.add('expanded');
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                if (isMobile()) {
+                    sidebar.classList.toggle('expanded');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    content.classList.toggle('expanded');
+                }
+            });
+
+            userProfile.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const customer = customers[0];
+                document.getElementById('custName').textContent = customer.name;
+                document.getElementById('custEmail').textContent = customer.email;
+                document.getElementById('custPhone').textContent = customer.phone;
+                document.getElementById('custUsername').textContent = customer.id;
+                document.getElementById('custAddress').textContent = 'N/A';
+                document.getElementById('custActivationDate').textContent = customer.expiry;
+                document.getElementById('custLastRecharge').textContent = 'N/A';
+                document.getElementById('custStatus').textContent = 'Active';
+                const transactionBody = document.getElementById('transactionBody');
+                transactionBody.innerHTML = '';
+                customer.transactions.forEach(tx => {
+                    transactionBody.innerHTML += `
+                        <tr>
+                            <td>${tx.date}</td>
+                            <td>${tx.plan}</td>
+                            <td>${tx.amount}</td>
+                            <td>${tx.status}</td>
+                        </tr>
+                    `;
+                });
+                profileModal.classList.add('show');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!userProfile.contains(e.target) && !profileModal.contains(e.target)) {
+                    profileModal.classList.remove('show');
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                if (isMobile()) {
+                    if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
+                        sidebar.classList.add('collapsed');
+                        content.classList.add('expanded');
+                    }
+                } else {
+                    sidebar.classList.remove('expanded');
+                    if (!sidebar.classList.contains('collapsed')) {
+                        content.classList.remove('expanded');
+                    }
+                }
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.classList.contains('logout-btn')) return;
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    if (isMobile() && sidebar.classList.contains('expanded')) {
+                        sidebar.classList.remove('expanded');
+                    }
+                    const href = this.getAttribute('href');
+                    if (href && href !== '#') {
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 300);
+                    }
+                });
+            });
+
+            // Search Functionality
+            subscriberSearchInput.addEventListener('input', debounce(() => {
+                searchQuery = subscriberSearchInput.value.trim();
+                currentPage = 0;
+                fetchSubscribers();
+            }, 500));
+
+            // Filter Buttons
+            const subscriberFilterButtons = document.querySelectorAll('.subscriber-filter-btn');
+            subscriberFilterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    document.querySelectorAll('.subscriber-filter-btn').forEach(btn => {
+                        btn.classList.toggle('active', btn.getAttribute('data-filter') === filter);
+                    });
+                    subscriberCurrentFilter = filter;
+                    currentPage = 0;
+                    fetchSubscribers();
+                    showToast('Showing ' + filter.charAt(0).toUpperCase() + filter.slice(1) + ' Subscribers');
+                });
+            });
+
+            // Sorting
+            document.getElementById('subscriber-sort').addEventListener('change', () => {
+                sort = document.getElementById('subscriber-sort').value;
+                currentPage = 0;
+                fetchSubscribers();
+            });
+
+            // Page Size
+            document.getElementById('page-size').addEventListener('change', () => {
+                pageSize = parseInt(document.getElementById('page-size').value);
+                currentPage = 0;
+                fetchSubscribers();
+            });
+
+            // Pagination
+            document.getElementById('pagination').addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = e.target.closest('.page-link');
+                if (!target) return;
+                const page = target.dataset.page;
+                if (page === 'prev' && currentPage > 0) {
+                    currentPage--;
+                } else if (page === 'next' && currentPage < totalPages - 1) {
+                    currentPage++;
+                } else if (!isNaN(page)) {
+                    currentPage = parseInt(page);
+                }
+                fetchSubscribers();
+                showToast('Loading page ' + (currentPage + 1));
+            });
+
+            const logoutBtn = document.querySelector('.logout-btn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                loadingOverlay.classList.add('active');
+                setTimeout(() => {
+                    sessionStorage.clear();
+                    token = null;
+                    refreshToken = null;
+                    window.location.href = 'index.html';
+                }, 1500);
+            });
+        }
+
+        async function refreshAccessToken() {
+            try {
+                const response = await fetch('http://localhost:8080/api/auth/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refreshToken })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Token refresh failed');
+                }
+                
+                const data = await response.json();
+                token = data.accessToken;
+                refreshToken = data.refreshToken;
+                
+                sessionStorage.setItem('accessToken', token);
+                sessionStorage.setItem('refreshToken', refreshToken);
+                
+                return token;
+            } catch (error) {
+                handleLogout();
+                return null;
+            }
+        }
+
+        async function apiRequest(url, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+
+                if (response.status === 401) {
+                    const newToken = await refreshAccessToken();
+                    if (newToken) {
+                        headers['Authorization'] = `Bearer ${newToken}`;
+                        return fetch(url, {
+                            ...options,
+                            headers
+                        });
+                    }
+                    return null;
+                } else if (response.status === 403) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Permission Denied',
+                        text: 'You do not have permission to access this resource.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        handleLogout();
+                    });
+                    return null;
+                }
+
+                return response;
+            } catch (error) {
+                console.error('API Request Error:', error);
+                throw error;
+            }
+        }
+
+        function handleLogout() {
+            sessionStorage.clear();
+            token = null;
+            refreshToken = null;
+            window.location.href = 'index.html';
+        }
+
+        function showToast(message, type = 'success') {
+            const toastEl = document.createElement('div');
+            toastEl.className = 'toast';
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'polite');
+            toastEl.setAttribute('aria-atomic', 'true');
+            toastEl.innerHTML = `
+                <div class="toast-header">
+                    <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            document.querySelector('.toast-container').appendChild(toastEl);
+            const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 3000 });
+            toast.show();
+        }
+
+        async function checkRechargeStatus() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const response = await apiRequest('http://localhost:8080/api/admin/check-recharge-status', {
+                    method: 'POST'
+                });
+
+                if (!response || !response.ok) {
+                    throw new Error('Failed to check recharge status');
+                }
+
+                const result = await response.json();
+                if (result.status === 'SUCCESS') {
+                    if (result.data && result.data.updated) {
+                        showToast('User statuses updated based on recharge activity', 'success');
+                        fetchSubscribers();
+                    }
+                } else {
+                    throw new Error(result.message || 'Failed to check recharge status');
+                }
+            } catch (error) {
+                console.error('Error checking recharge status:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to check recharge status'
+                });
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        async function fetchSubscribers() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+
+            try {
+                let url = `http://localhost:8080/api/admin/subscribers?page=${currentPage}&size=${pageSize}&sort=${sort}`;
+                if (searchQuery) {
+                    url += `&search=${encodeURIComponent(searchQuery)}`;
+                }
+                if (subscriberCurrentFilter !== 'all') {
+                    url += `&status=${subscriberCurrentFilter}`;
+                }
+
+                const response = await apiRequest(url);
+                
+                if (!response || !response.ok) {
+                    throw new Error('Failed to load subscribers');
+                }
+                
+                const apiResponse = await response.json();
+                const pageData = apiResponse.data || apiResponse;
+                const subscribers = pageData.content || [];
+
+                renderSubscribersTable(subscribers);
+                updatePagination(pageData);
+            } catch (error) {
+                console.error('Error loading subscribers:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load subscribers: ' + error.message
+                });
+                renderSubscribersTable([]);
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        function renderSubscribersTable(subscribers) {
+            const tbody = document.querySelector('#subscribers-table tbody');
+            tbody.innerHTML = '';
+
+            subscribers.forEach(user => {
+                const row = document.createElement('tr');
+                row.setAttribute('data-status', user.status.toLowerCase());
+                row.setAttribute('data-user-id', user.userId);
+                const lastRecharge = user.lastRechargeDate ? user.lastRechargeDate : 'N/A';
+                row.innerHTML = `
+                    <td>${user.userId}</td>
+                    <td>${user.firstName} ${user.lastName}</td>
+                    <td>${user.phoneNumber || 'N/A'}</td>
+                    <td>${user.activationDate}</td>
+                    <td>${user.username}</td>
+                    <td><a href="mailto:${user.email}">${user.email}</a></td>
+                    <td>${user.address || 'N/A'}</td>
+                    <td>${lastRecharge}</td>
+                    <td><span class="status-badge status-${user.status.toLowerCase()}">${user.status.charAt(0).toUpperCase() + user.status.slice(1)}</span></td>
+                    <td>
+                        ${user.status === 'active' ? `
+                            <button class="action-btn btn-danger subscriber-deactivate-btn" title="Deactivate"><i class="fas fa-power-off"></i></button>
+                            <button class="action-btn btn-warning subscriber-suspend-btn" title="Suspend"><i class="fas fa-pause"></i></button>
+                        ` : (user.status === 'inactive' || user.status === 'suspended') ? `
+                            <button class="action-btn btn-success subscriber-activate-btn" title="Activate"><i class="fas fa-play"></i></button>
+                        ` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            setupSubscriberActionButtons();
+        }
+
+        function setupSubscriberActionButtons() {
+            document.querySelectorAll('.subscriber-activate-btn').forEach(button => {
+                button.addEventListener('click', handleSubscriberActivate);
+            });
+
+            document.querySelectorAll('.subscriber-deactivate-btn').forEach(button => {
+                button.addEventListener('click', handleSubscriberDeactivate);
+            });
+
+            document.querySelectorAll('.subscriber-suspend-btn').forEach(button => {
+                button.addEventListener('click', handleSubscriberSuspend);
+            });
+        }
+
+        async function handleSubscriberActivate() {
+            const row = this.closest('tr');
+            const userId = row.getAttribute('data-user-id');
+            const statusCell = row.querySelector('td:nth-child(9) .status-badge');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const response = await apiRequest(`http://localhost:8080/api/admin/user/${userId}/activate`, {
+                    method: 'POST'
+                });
+
+                if (!response || !response.ok) {
+                    throw new Error('Failed to activate user');
+                }
+
+                const result = await response.json();
+                if (result.status === 'SUCCESS') {
+                    statusCell.className = 'status-badge status-active';
+                    statusCell.textContent = 'Active';
+                    row.setAttribute('data-status', 'active');
+                    this.className = 'action-btn btn-danger subscriber-deactivate-btn';
+                    this.innerHTML = '<i class="fas fa-power-off"></i>';
+                    this.title = 'Deactivate';
+                    this.removeEventListener('click', handleSubscriberActivate);
+                    this.addEventListener('click', handleSubscriberDeactivate);
+                    const suspendBtn = document.createElement('button');
+                    suspendBtn.className = 'action-btn btn-warning subscriber-suspend-btn';
+                    suspendBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    suspendBtn.title = 'Suspend';
+                    row.querySelector('td:last-child').appendChild(suspendBtn);
+                    suspendBtn.addEventListener('click', handleSubscriberSuspend);
+                    fetchSubscribers();
+                    showToast('User activated successfully', 'success');
+                } else {
+                    throw new Error(result.message || 'Failed to activate user');
+                }
+            } catch (error) {
+                console.error('Error activating user:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to activate user'
+                });
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        async function handleSubscriberDeactivate() {
+            const row = this.closest('tr');
+            const userId = row.getAttribute('data-user-id');
+            const statusCell = row.querySelector('td:nth-child(9) .status-badge');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const response = await apiRequest(`http://localhost:8080/api/admin/user/${userId}/deactivate`, {
+                    method: 'POST'
+                });
+
+                if (!response || !response.ok) {
+                    throw new Error('Failed to deactivate user');
+                }
+
+                const result = await response.json();
+                if (result.status === 'SUCCESS') {
+                    statusCell.className = 'status-badge status-inactive';
+                    statusCell.textContent = 'Inactive';
+                    row.setAttribute('data-status', 'inactive');
+                    this.className = 'action-btn btn-success subscriber-activate-btn';
+                    this.innerHTML = '<i class="fas fa-play"></i>';
+                    this.title = 'Activate';
+                    this.removeEventListener('click', handleSubscriberDeactivate);
+                    this.addEventListener('click', handleSubscriberActivate);
+                    const suspendBtn = row.querySelector('.subscriber-suspend-btn');
+                    if (suspendBtn) suspendBtn.remove();
+                    fetchSubscribers();
+                    showToast('User deactivated successfully', 'danger');
+                } else {
+                    throw new Error(result.message || 'Failed to deactivate user');
+                }
+            } catch (error) {
+                console.error('Error deactivating user:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to deactivate user'
+                });
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        async function handleSubscriberSuspend() {
+            const row = this.closest('tr');
+            const userId = row.getAttribute('data-user-id');
+            const statusCell = row.querySelector('td:nth-child(9) .status-badge');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const response = await apiRequest(`http://localhost:8080/api/admin/user/${userId}/suspend`, {
+                    method: 'POST'
+                });
+
+                if (!response || !response.ok) {
+                    throw new Error('Failed to suspend user');
+                }
+
+                const result = await response.json();
+                if (result.status === 'SUCCESS') {
+                    statusCell.className = 'status-badge status-suspended';
+                    statusCell.textContent = 'Suspended';
+                    row.setAttribute('data-status', 'suspended');
+                    this.remove();
+                    const deactivateBtn = row.querySelector('.subscriber-deactivate-btn');
+                    if (deactivateBtn) {
+                        deactivateBtn.className = 'action-btn btn-success subscriber-activate-btn';
+                        deactivateBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        deactivateBtn.title = 'Activate';
+                        deactivateBtn.removeEventListener('click', handleSubscriberDeactivate);
+                        deactivateBtn.addEventListener('click', handleSubscriberActivate);
+                    }
+                    fetchSubscribers();
+                    showToast('User suspended successfully', 'warning');
+                } else {
+                    throw new Error(result.message || 'Failed to suspend user');
+                }
+            } catch (error) {
+                console.error('Error suspending user:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to suspend user'
+                });
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        function updatePagination(pageData) {
+            totalPages = pageData.totalPages || 0;
+            totalEntries = pageData.totalElements || 0;
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 0 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" data-page="prev">Previous</a>`;
+            pagination.appendChild(prevLi);
+
+            const startPage = Math.max(0, currentPage - 2);
+            const endPage = Math.min(totalPages - 1, currentPage + 2);
+
+            if (startPage > 0) {
+                const firstPage = document.createElement('li');
+                firstPage.className = 'page-item';
+                firstPage.innerHTML = `<a class="page-link" href="#" data-page="0">1</a>`;
+                pagination.appendChild(firstPage);
+
+                if (startPage > 1) {
+                    const dots = document.createElement('li');
+                    dots.className = 'page-item disabled';
+                    dots.innerHTML = `<span class="page-link">...</span>`;
+                    pagination.appendChild(dots);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageLi = document.createElement('li');
+                pageLi.className = `page-item ${currentPage === i ? 'active' : ''}`;
+                pageLi.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i + 1}</a>`;
+                pagination.appendChild(pageLi);
+            }
+
+            if (endPage < totalPages - 1) {
+                if (endPage < totalPages - 2) {
+                    const dots = document.createElement('li');
+                    dots.className = 'page-item disabled';
+                    dots.innerHTML = `<span class="page-link">...</span>`;
+                    pagination.appendChild(dots);
+                }
+
+                const lastPage = document.createElement('li');
+                lastPage.className = 'page-item';
+                lastPage.innerHTML = `<a class="page-link" href="#" data-page="${totalPages - 1}">${totalPages}</a>`;
+                pagination.appendChild(lastPage);
+            }
+
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages - 1 ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" data-page="next">Next</a>`;
+            pagination.appendChild(nextLi);
+
+            const start = currentPage * pageSize + 1;
+            const end = Math.min((currentPage + 1) * pageSize, totalEntries);
+            document.getElementById('pagination-info').textContent = `Showing ${start} to ${end} of ${totalEntries} entries`;
+        }
+    </script>
 </body>
 </html>

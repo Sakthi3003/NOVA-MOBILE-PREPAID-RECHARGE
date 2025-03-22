@@ -66,72 +66,463 @@
             opacity: 0;
             animation: fadeInSection 1s ease-in-out forwards;
         }
-        
-        .logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
-        .nav-links { display: flex; align-items: center; gap: 2rem; }
-        .nav-link { color: white; text-decoration: none; position: relative; padding: 0.5rem 0; transition: color 0.3s ease; }
-        .nav-link:hover::after, .nav-link.active::after {
-            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background-color: white;
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
         }
-        .mobile-menu-btn { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-        .user-avatar { width: 35px; height: 35px; background-color: #0a21c0; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease; position: relative; }
-        .user-avatar:hover { transform: scale(1.1); box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
-        .dropdown-menu { background: black; border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 8px; margin-top: 10px; }
-        .dropdown-item { color: white; padding: 10px 20px; font-size: 14px; transition: all 0.3s ease; }
-        .dropdown-item:hover { background-color: #0a21c0; color: white; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn {
+            background-color: white;
+            color: black;
+        }
+
+        .login-btn:hover {
+            background-color: #0a21c0;
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: #0a21c0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .user-avatar::after {
+            content: '\f0d7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-avatar:hover::after {
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            background-color: #000;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #0a21c0;
+            color: white;
+        }
 
         /* Loading Overlay */
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .spinner-border { width: 3rem; height: 3rem; border: 0.4em solid #0a21c0; border-right-color: transparent; }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 0.4em solid #0a21c0;
+            border-right-color: transparent;
+        }
 
         /* Support Options */
-        .support-card { background: white; border-radius: 10px; padding: 25px 20px; text-align: center; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; height: 100%; }
-        .support-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
-        .support-icon { width: 60px; height: 60px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; background-color: #e8f0ff; border-radius: 50%; color: #0a21c0; font-size: 24px; }
+        .support-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .support-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .support-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e8f0ff;
+            border-radius: 50%;
+            color: #0a21c0;
+            font-size: 24px;
+        }
 
         /* FAQ Section */
-        .faq-container { margin-bottom: 50px; }
-        .faq-search { margin-bottom: 25px; }
-        .faq-categories { display: flex; overflow-x: auto; margin-bottom: 25px; padding-bottom: 5px; gap: 10px; }
-        .faq-category { padding: 8px 15px; background-color: #f1f5ff; border-radius: 20px; color: #0a21c0; cursor: pointer; white-space: nowrap; transition: all 0.3s ease; }
-        .faq-category.active { background-color: #0a21c0; color: white; }
-        .faq-item { background: white; margin-bottom: 15px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); cursor: pointer; transition: all 0.3s ease; }
-        .faq-item:hover { background: #f8f9ff; }
-        .faq-question { font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
-        .faq-answer { padding-top: 15px; color: #666; line-height: 1.6; border-top: 1px solid #eee; margin-top: 15px; display: none; }
+        .faq-container {
+            margin-bottom: 50px;
+        }
+
+        .faq-search {
+            margin-bottom: 25px;
+        }
+
+        .faq-categories {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 25px;
+            padding-bottom: 5px;
+            gap: 10px;
+        }
+
+        .faq-category {
+            padding: 8px 15px;
+            background-color: #f1f5ff;
+            border-radius: 20px;
+            color: #0a21c0;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .faq-category.active {
+            background-color: #0a21c0;
+            color: white;
+        }
+
+        .faq-item {
+            background: white;
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            background: #f8f9ff;
+        }
+
+        .faq-question {
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-answer {
+            padding-top: 15px;
+            color: #666;
+            line-height: 1.6;
+            border-top: 1px solid #eee;
+            margin-top: 15px;
+            display: none;
+        }
 
         /* Contact Section */
-        .contact-section { display: flex; justify-content: space-between; flex-wrap: wrap; background: white; padding: 40px 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 50px; }
-        .contact-info { flex: 1; padding: 20px; min-width: 300px; }
-        .contact-form { flex: 1; padding: 20px; min-width: 300px; }
-        .form-group { margin-bottom: 20px; position: relative; }
-        .form-label { display: block; margin-bottom: 8px; font-weight: 500; }
-        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; transition: all 0.3s ease; background-color: #fafafa; }
-        .form-control:focus { border-color: #0a21c0; box-shadow: 0 0 0 3px rgba(10, 33, 192, 0.1); outline: none; background-color: white; }
-        .form-control.error { border-color: #dc3545; background-color: #fff2f2; }
+        .contact-section {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            background: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 50px;
+        }
+
+        .contact-info {
+            flex: 1;
+            padding: 20px;
+            min-width: 300px;
+        }
+
+        .contact-form {
+            flex: 1;
+            padding: 20px;
+            min-width: 300px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: #fafafa;
+        }
+
+        .form-control:focus {
+            border-color: #0a21c0;
+            box-shadow: 0 0 0 3px rgba(10, 33, 192, 0.1);
+            outline: none;
+            background-color: white;
+        }
+
+        .form-control.error {
+            border-color: #dc3545;
+            background-color: #fff2f2;
+        }
 
         /* Validation Styles */
-        .error-message { color: #dc3545; font-size: 12px; margin-top: 5px; display: none; padding: 6px 10px; border-radius: 4px; background-color: #fff2f2; border-left: 2px solid #dc3545; animation: shake 0.5s ease-in-out; }
-        .error-message:before { content: "⚠️ "; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-3px); } 40%, 80% { transform: translateX(3px); } }
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            background-color: #fff2f2;
+            border-left: 2px solid #dc3545;
+            animation: shake 0.5s ease-in-out;
+        }
 
-        .btn-primary { background-color: #0a21c0; border-color: #0a21c0; padding: 12px 20px; font-weight: 500; width: 100%; transition: all 0.3s ease; }
-        .btn-primary:hover { background-color: #081894; border-color: #081894; transform: translateY(-2px); }
-        .btn-primary:disabled { background-color: #6c757d; border-color: #6c757d; cursor: not-allowed; }
+        .error-message:before {
+            content: "⚠️ ";
+        }
 
-        /* Footer */
-        .footer { background: #141619; color: white; padding: 20px; text-align: center; margin-top: 40px; }
-        .footer a { color: #b3b4bd; text-decoration: none; margin: 0 10px; transition: all 0.3s ease; }
-        .footer a:hover { color: white; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-3px); }
+            40%, 80% { transform: translateX(3px); }
+        }
+
+        .btn-primary {
+            background-color: #0a21c0;
+            border-color: #0a21c0;
+            padding: 12px 20px;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #081894;
+            border-color: #081894;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        /* Footer Styles (Updated to match plans.html) */
+        footer {
+            background: linear-gradient(135deg, #141619, #000000);
+            color: white;
+            padding: 40px 20px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: auto;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 1.6s;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #0a21c0;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            font-size: 14px;
+            color: #b3b4bd;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer-social a {
+            font-size: 20px;
+            margin-right: 15px;
+            color: #b3b4bd;
+            transition: color 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            color: #0a21c0;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        .footer-bottom p {
+            font-size: 14px;
+            color: #b3b4bd;
+            margin: 0;
+        }
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
-            .mobile-menu-btn { display: block; }
-            .nav-links { position: fixed; top: 70px; left: 0; width: 100%; flex-direction: column; background-color: #000; padding: 1rem; gap: 1rem; transform: translateY(-150%); transition: transform 0.3s ease-in-out; }
-            .nav-links.active { transform: translateY(0); }
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                background-color: #000;
+                padding: 1rem;
+                gap: 1rem;
+                transform: translateY(-150%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+            }
+
+            .user-avatar::after {
+                display: none;
+            }
+
+            .dropdown-menu {
+                width: 100%;
+                text-align: center;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-social a {
+                margin: 0 10px;
+            }
         }
 
-        @keyframes fadeInSection { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInSection {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -144,13 +535,10 @@
 
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
-        <a href="./indexu.html" class="logo"><img src="../assets/images/logo.webp" alt="Nova SIM Logo" height="40px" width="100px"></a>
+        <a href="../index.html" class="logo"><img src="../assets/images/logo.webp" alt="Nova SIM Logo" height="40px" width="100px"></a>
         <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
         <div class="nav-links" id="nav-links">
-            <a href="./indexu.html" class="nav-link" id="home-link">Home</a>
-            <a href="./plansu.html" class="nav-link" id="plans-link">Plans</a>
-            <a href="./support.html" class="nav-link active" id="support-link">Support</a>
-            <a href="./about.html" class="nav-link" id="about-link">About Us</a>
+            <!-- Navigation links will be dynamically generated -->
         </div>
     </nav>
 
@@ -242,7 +630,7 @@
             </div>
         </section>
 
-        <!-- FAQ Section -->
+        <!-- FAQ Section (Updated with FAQ Items) -->
         <section class="faq-container" id="faq-section">
             <h3 class="section-heading">Frequently Asked Questions</h3>
             <div class="faq-search">
@@ -260,87 +648,227 @@
                 <div class="faq-category" data-category="account">Account & Services</div>
             </div>
             <div class="faq-list">
-                <!-- FAQ items remain unchanged for brevity -->
+                <!-- Plans & Pricing -->
+                <div class="faq-item" data-category="plans">
+                    <div class="faq-question">
+                        <span>What plans does NOVA offer?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        NOVA offers a variety of plans including prepaid and postpaid options. You can choose from data-only plans, voice and data bundles, or international roaming plans. Visit our <a href="./plans.html">Plans page</a> to explore all available options.
+                    </div>
+                </div>
+                <div class="faq-item" data-category="plans">
+                    <div class="faq-question">
+                        <span>Can I change my plan after subscribing?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Yes, you can change your plan at any time through your account dashboard. Go to "My Plans," select a new plan, and follow the prompts to update your subscription. Note that some changes may take effect in the next billing cycle.
+                    </div>
+                </div>
+
+                <!-- Billing & Payment -->
+                <div class="faq-item" data-category="billing">
+                    <div class="faq-question">
+                        <span>How can I pay my bill?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        You can pay your bill online through our website using credit/debit cards, net banking, or UPI. Alternatively, you can set up auto-pay to ensure your bill is paid automatically each month.
+                    </div>
+                </div>
+                <div class="faq-item" data-category="billing">
+                    <div class="faq-question">
+                        <span>What happens if I miss a payment?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        If you miss a payment, you’ll receive a reminder via email and SMS. After a grace period of 7 days, your services may be temporarily suspended until the payment is cleared. To avoid interruptions, we recommend setting up auto-pay.
+                    </div>
+                </div>
+
+                <!-- Technical Issues -->
+                <div class="faq-item" data-category="technical">
+                    <div class="faq-question">
+                        <span>Why is my internet speed slow?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Slow internet speed can be due to several factors, such as network congestion, signal strength, or device issues. Try restarting your device, checking your signal strength, or contacting our support team for assistance.
+                    </div>
+                </div>
+                <div class="faq-item" data-category="technical">
+                    <div class="faq-question">
+                        <span>How do I troubleshoot call drop issues?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        To troubleshoot call drops, ensure you’re in an area with good network coverage, restart your phone, and check for any software updates. If the issue persists, contact our support team for further assistance.
+                    </div>
+                </div>
+
+                <!-- SIM & Devices -->
+                <div class="faq-item" data-category="sim">
+                    <div class="faq-question">
+                        <span>How do I activate my new SIM?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        To activate your new SIM, insert it into your device, restart your phone, and follow the on-screen instructions. You may need to verify your identity using an OTP sent to your registered number. If you encounter issues, contact support.
+                    </div>
+                </div>
+                <div class="faq-item" data-category="sim">
+                    <div class="faq-question">
+                        <span>Can I use my NOVA SIM in another device?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Yes, you can use your NOVA SIM in any compatible device. Ensure the device supports the network bands used by NOVA (e.g., 4G/5G). You may need to configure APN settings for data to work properly.
+                    </div>
+                </div>
+
+                <!-- Account & Services -->
+                <div class="faq-item" data-category="account">
+                    <div class="faq-question">
+                        <span>How do I update my account details?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        You can update your account details by logging into your account and navigating to the "Profile" section. Here, you can update your name, email, address, and other information.
+                    </div>
+                </div>
+                <div class="faq-item" data-category="account">
+                    <div class="faq-question">
+                        <span>What should I do if I forget my password?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        If you forget your password, click on "Forgot Password" on the login page. You’ll receive an OTP on your registered email or phone number to reset your password.
+                    </div>
+                </div>
             </div>
         </section>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>© 2025 NOVA Telecommunications. All rights reserved.</p>
-            <div class="mt-2">
-                <a href="#">Terms of Service</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Contact Us</a>
+   <!-- Footer -->
+   <footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h4>Explore</h4>
+            <a href="../index.html">Home</a><br>
+            <a href="./plans.html">Plans</a><br>
+            <a href="./support.html">Support</a><br>
+            <a href="./about.html">About Us</a><br>
+            <a href="./login.html">Login</a>
+        </div>
+        <div class="footer-section">
+            <h4>Get Started</h4>
+            <a href="./buy-sim.html">Get sim</a><br>
+            <a href="./port.html">Switch to NOVA</a><br>
+        </div>
+        <div class="footer-section">
+            <h4>Contact Us</h4>
+            <p>Email: support@nova.com</p>
+            <p>Phone: +91 9876543210</p>
+        </div>
+        <div class="footer-section">
+            <h4>Follow Us</h4>
+            <div class="footer-social">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
             </div>
         </div>
-    </footer>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2025 Mobi Comm Service Limited. All rights reserved.</p>
+    </div>
+</footer>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- SweetAlert2 Script -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        const loggedInDropdownPages = [
-            { id: "myplans", label: "My Plans", url: "myplans.html" },
-            { id: "transactions", label: "Transactions", url: "transaction.html" },
-            { id: "profile", label: "Profile", url: "profilef.html" },
-        ];
-        const mainPages = [
-            { id: "home", label: "Home", url: "./indexu.html" },
+        // Pages configuration (consistent with plans.html)
+        const guestPages = [
+            { id: "home", label: "Home", url: "../index.html" },
             { id: "plans", label: "Plans", url: "./plans.html" },
             { id: "support", label: "Support", url: "./support.html" },
             { id: "about", label: "About Us", url: "./about.html" }
         ];
+
+        const loggedInDropdownPages = [
+            { id: "myplans", label: "My Plans", url: "./myplans.html" },
+            { id: "transactions", label: "Transactions", url: "./transaction.html" },
+            { id: "profile", label: "Profile", url: "./profile.html" },
+        ];
+
         let currentPage = "support";
-        let userData = null;
+        let isLoggedIn = false;
+        let userInitials = "U";
 
-        async function fetchUsers() {
-            try {
-                const response = await fetch('./user.json');
-                if (!response.ok) throw new Error('Failed to fetch user.json');
-                userData = await response.json();
-            } catch (error) {
-                console.error('Error fetching user.json:', error);
-                userData = { users: [] };
-            }
-        }
-
+        // Generate navigation (consistent with plans.html)
         function generateNavigation() {
             const navLinks = document.getElementById("nav-links");
-            const homeLink = document.getElementById("home-link");
-            const plansLink = document.getElementById("plans-link");
-            const supportLink = document.getElementById("support-link");
-            const aboutLink = document.getElementById("about-link");
-
-            homeLink.className = `nav-link ${currentPage === 'home' ? 'active' : ''}`;
-            plansLink.className = `nav-link ${currentPage === 'plans' ? 'active' : ''}`;
-            supportLink.className = `nav-link ${currentPage === 'support' ? 'active' : ''}`;
-            aboutLink.className = `nav-link ${currentPage === 'about' ? 'active' : ''}`;
-
-            const existingDropdown = navLinks.querySelector('.dropdown');
-            if (existingDropdown) existingDropdown.remove();
+            navLinks.innerHTML = "";
 
             const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-            if (loggedInUser) {
+            const userDetailsString = sessionStorage.getItem('userDetails');
+            const accessToken = sessionStorage.getItem('accessToken');
+            let userDetails = null;
+
+            if (userDetailsString) {
+                try {
+                    userDetails = JSON.parse(userDetailsString);
+                } catch (error) {
+                    console.error('Error parsing userDetails:', error);
+                    sessionStorage.removeItem('userDetails');
+                }
+            }
+
+            // User is considered logged in if either loggedInUser or (userDetails and accessToken) exist
+            isLoggedIn = !!(loggedInUser || (userDetails && accessToken));
+
+            if (isLoggedIn) {
+                userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || loggedInUser?.simHolderName?.charAt(0)?.toUpperCase() || 'U';
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
+                });
+
                 const dropdownDiv = document.createElement('div');
                 dropdownDiv.className = 'dropdown';
+
                 const avatar = document.createElement('div');
                 avatar.className = 'user-avatar dropdown-toggle';
                 avatar.id = 'profileDropdown';
                 avatar.setAttribute('data-bs-toggle', 'dropdown');
-                avatar.textContent = loggedInUser.simHolderName ? loggedInUser.simHolderName.charAt(0).toUpperCase() : 'U';
+                avatar.textContent = userInitials;
                 dropdownDiv.appendChild(avatar);
 
                 const dropdownMenu = document.createElement('div');
                 dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+
                 loggedInDropdownPages.forEach(page => {
                     const link = document.createElement('a');
                     link.href = page.url;
                     link.className = 'dropdown-item';
                     link.textContent = page.label;
-                    link.onclick = (e) => { e.preventDefault(); setCurrentPage(page.id); };
+                    link.onclick = (e) => {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
                     dropdownMenu.appendChild(link);
                 });
 
@@ -348,34 +876,78 @@
                 logoutLink.href = '#';
                 logoutLink.className = 'dropdown-item';
                 logoutLink.textContent = 'Logout';
-                logoutLink.onclick = (e) => { e.preventDefault(); logout(); };
+                logoutLink.onclick = (e) => {
+                    e.preventDefault();
+                    logout();
+                };
                 dropdownMenu.appendChild(logoutLink);
 
                 dropdownDiv.appendChild(dropdownMenu);
                 navLinks.appendChild(dropdownDiv);
             } else {
-                window.location.href = '../index.html';
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
+                });
+
+                const loginBtn = document.createElement("a");
+                loginBtn.href = "./login.html";
+                loginBtn.className = "btn login-btn";
+                loginBtn.textContent = "Login";
+                navLinks.appendChild(loginBtn);
             }
         }
 
+        // Set current page and navigate
         function setCurrentPage(pageId) {
             currentPage = pageId;
-            const page = [...mainPages, ...loggedInDropdownPages].find(p => p.id === pageId);
-            if (page) {
+            const guestPage = guestPages.find(p => p.id === pageId);
+            const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
+            if (guestPage || loggedInPage) {
                 $('#loadingOverlay').css('display', 'flex');
-                setTimeout(() => { window.location.href = page.url; }, 1000);
+                setTimeout(() => {
+                    window.location.href = guestPage ? guestPage.url : loggedInPage.url;
+                }, 1000);
             }
             generateNavigation();
         }
 
+        // Logout function with SweetAlert2 and loading overlay
         function logout() {
-            $('#loadingOverlay').css('display', 'flex');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+
             localStorage.removeItem('loggedInUser');
             localStorage.removeItem('profileSetup');
             sessionStorage.removeItem('phoneNumber');
-            setTimeout(() => { window.location.href = '../index.html'; }, 1000);
+            sessionStorage.clear();
+            isLoggedIn = false;
+            currentPage = 'home';
+            generateNavigation();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Logged Out',
+                text: 'You have been logged out successfully.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#0a21c0',
+                timer: 1500,
+                timerProgressBar: true,
+                willClose: () => {
+                    loadingOverlay.style.display = 'none';
+                    window.location.href = '../index.html';
+                }
+            });
         }
 
+        // Toggle mobile menu
         function toggleMenu() {
             document.getElementById("nav-links").classList.toggle("active");
         }
@@ -530,10 +1102,9 @@
         }
 
         $(document).ready(function() {
-            fetchUsers().then(() => {
-                generateNavigation();
-            });
+            generateNavigation();
 
+            // FAQ Toggle Functionality
             document.querySelectorAll('.faq-item').forEach(item => {
                 item.addEventListener('click', function() {
                     const answer = this.querySelector('.faq-answer');
@@ -543,6 +1114,7 @@
                 });
             });
 
+            // FAQ Category Filtering
             document.querySelectorAll('.faq-category').forEach(category => {
                 category.addEventListener('click', function() {
                     document.querySelectorAll('.faq-category').forEach(cat => cat.classList.remove('active'));
@@ -554,6 +1126,7 @@
                 });
             });
 
+            // FAQ Search Functionality
             document.getElementById('faqSearch').addEventListener('keyup', function() {
                 const searchTerm = this.value.toLowerCase();
                 document.querySelectorAll('.faq-item').forEach(item => {

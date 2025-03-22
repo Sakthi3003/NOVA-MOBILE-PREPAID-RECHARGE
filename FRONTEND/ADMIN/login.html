@@ -4,15 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Nova SIM</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <!-- Google Font: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- jQuery Validate Plugin -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <style>
+        /* [Your existing CSS remains unchanged] */
         * {
             margin: 0;
             padding: 0;
@@ -325,17 +322,10 @@
 
     <script>
         $(document).ready(function() {
-            // Login Form Validation
             $("#adminLoginForm").validate({
                 rules: {
-                    username: {
-                        required: true,
-                        minlength: 3
-                    },
-                    password: {
-                        required: true,
-                        minlength: 6
-                    }
+                    username: { required: true, minlength: 3 },
+                    password: { required: true, minlength: 6 }
                 },
                 messages: {
                     username: {
@@ -361,14 +351,8 @@
                 }
             });
 
-            // Forgot Password Form Validation
             $("#requestResetForm").validate({
-                rules: {
-                    email: {
-                        required: true,
-                        email: true
-                    }
-                },
+                rules: { email: { required: true, email: true } },
                 messages: {
                     email: {
                         required: "Please enter your email",
@@ -389,7 +373,6 @@
                 }
             });
 
-            // Reset Password Form Validation
             $("#resetPasswordForm").validate({
                 rules: {
                     newPassword: {
@@ -397,10 +380,7 @@
                         minlength: 8,
                         pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
                     },
-                    confirmNewPassword: {
-                        required: true,
-                        equalTo: "#newPassword"
-                    }
+                    confirmNewPassword: { required: true, equalTo: "#newPassword" }
                 },
                 messages: {
                     newPassword: {
@@ -427,7 +407,6 @@
                 }
             });
 
-            // Real-time password requirements
             $("#newPassword").on("input", function() {
                 const password = $(this).val();
                 $("#length").toggleClass("valid", password.length >= 8).toggleClass("invalid", password.length < 8);
@@ -437,7 +416,6 @@
             });
         });
 
-        // Form elements
         const adminLoginForm = document.getElementById('adminLoginForm');
         const forgotPasswordLink = document.getElementById('forgotPasswordLink');
         const backToLoginLink = document.getElementById('backToLoginLink');
@@ -445,7 +423,6 @@
         const backToLoginFromConfirm = document.getElementById('backToLoginFromConfirm');
         const resetPasswordForm = document.getElementById('resetPasswordForm');
 
-        // Event listeners
         adminLoginForm.addEventListener('submit', handleAdminLogin);
         forgotPasswordLink.addEventListener('click', showForgotPasswordForm);
         backToLoginLink.addEventListener('click', showLoginForm);
@@ -453,18 +430,23 @@
         backToLoginFromConfirm.addEventListener('click', showLoginForm);
         resetPasswordForm.addEventListener('submit', handleResetPassword);
 
-        // Logout function
         function logout() {
-            // Clear all authentication-related storage
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('role');
-            sessionStorage.clear(); // Clear any session data
-            window.location.href = 'login.html'; // Redirect to login page
+            fetch('http://localhost:8080/api/auth/logout', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}` }
+            })
+            .then(() => {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            })
+            .catch(error => {
+                console.error('Logout Error:', error);
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            });
         }
 
-        // Check if already logged in
-        if (localStorage.getItem('accessToken')) {
+        if (sessionStorage.getItem('accessToken')) {
             window.location.href = 'manageplans.html';
         }
 
@@ -477,9 +459,7 @@
 
             fetch('http://localhost:8080/api/auth/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             })
             .then(response => {
@@ -487,10 +467,22 @@
                 return response.json();
             })
             .then(data => {
-                localStorage.setItem('accessToken', data.accessToken);
-                localStorage.setItem('refreshToken', data.refreshToken);
-                localStorage.setItem('role', data.role);
-                window.location.href = 'manageplans.html';
+                // Store all data in sessionStorage
+                sessionStorage.setItem('accessToken', data.accessToken);
+                sessionStorage.setItem('refreshToken', data.refreshToken);
+                sessionStorage.setItem('role', data.role);
+                sessionStorage.setItem('user_id', data.user_id);
+                sessionStorage.setItem('userDetails', JSON.stringify(data.userDetails));
+
+                console.log('Stored in sessionStorage:', {
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                    role: data.role,
+                    user_id: data.user_id,
+                    userDetails: data.userDetails
+                });
+
+                window.location.href = 'analytics.html';
             })
             .catch(error => {
                 console.error('Login Error:', error);
@@ -524,9 +516,7 @@
 
             fetch('http://localhost:8080/api/auth/request-reset', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
             })
             .then(response => {
@@ -553,9 +543,7 @@
 
             fetch('http://localhost:8080/api/auth/reset-password', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ newPassword, confirmNewPassword })
             })
             .then(response => {
@@ -573,7 +561,6 @@
             });
         }
 
-        // Expose logout function globally so it can be called from other pages
         window.logout = logout;
     </script>
 </body>

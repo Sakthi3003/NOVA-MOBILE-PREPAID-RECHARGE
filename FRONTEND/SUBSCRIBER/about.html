@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA About Us</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="icon" type="image/png" href="./assets/images/android-chrome-192x192.png">
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 32px;
+            margin: 30px 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #0a21c0;
+        }
+
+        .section-heading {
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .section-heading:after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background-color: #0a21c0;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #0a21c0;
+            border-color: #0a21c0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #081894;
+            border-color: #081894;
+        }
+
+        .login-btn {
+            background-color: white;
+            color: black;
+        }
+
+        .login-btn:hover {
+            background-color: #0a21c0;
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: #0a21c0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .user-avatar::after {
+            content: '\f0d7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-avatar:hover::after {
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            background-color: #000;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 10px;
+            min-width: 150px;
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-item {
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dropdown-item:hover {
+            background-color: #0a21c0;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 0.4em solid #0a21c0;
+            border-right-color: transparent;
+        }
+
+        /* About Us Hero Section */
+        .about-hero {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+        }
+
+        .about-hero h1 {
+            color: #0a21c0;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .about-hero p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .hero-img {
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .hero-img:hover {
+            transform: translateY(-10px);
+        }
+
+        .counter {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            color: #0a21c0;
+        }
+
+        /* Our Mission Section */
+        .our-mission {
+            padding: 60px 0;
+            background-color: #fff;
+        }
+
+        .mission-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .mission-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e8f0ff;
+            border-radius: 50%;
+            color: #0a21c0;
+            font-size: 28px;
+        }
+
+        /* Our Technology Section */
+        .our-technology {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+        }
+
+        .tech-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .tech-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e8f0ff;
+            border-radius: 50%;
+            color: #0a21c0;
+            font-size: 28px;
+        }
+
+        /* Partners Section */
+        .partners {
+            padding: 60px 0;
+            background-color: #fff;
+        }
+
+        .partner-logo {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .partner-logo:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .partner-logo img {
+            max-width: 80%;
+            max-height: 80px;
+        }
+
+        /* Footer Styles (Updated to match support.html) */
+        footer {
+            background: linear-gradient(135deg, #141619, #000000);
+            color: white;
+            padding: 40px 20px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: auto;
+            opacity: 0;
+            animation: fadeInSection 1s ease-in-out forwards;
+            animation-delay: 1.6s;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #0a21c0;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            font-size: 14px;
+            color: #b3b4bd;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer-social a {
+            font-size: 20px;
+            margin-right: 15px;
+            color: #b3b4bd;
+            transition: color 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            color: #0a21c0;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        .footer-bottom p {
+            font-size: 14px;
+            color: #b3b4bd;
+            margin: 0;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .mission-card, .tech-card, .partner-logo {
+                margin-bottom: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                background-color: #000;
+                padding: 1rem;
+                gap: 1rem;
+                transform: translateY(-150%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+            }
+
+            .user-avatar::after {
+                display: none;
+            }
+
+            .dropdown-menu {
+                position: static;
+                width: 100%;
+                box-shadow: none;
+                border-radius: 0;
+                text-align: center;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-social a {
+                margin: 0 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            h2 {
+                font-size: 24px;
+            }
+
+            .logo img {
+                height: 30px;
+                width: 80px;
+            }
+
+            .nav-link {
+                font-size: 14px;
+            }
+
+            .btn {
+                font-size: 14px;
+            }
+
+            .user-avatar {
+                width: 30px;
+                height: 30px;
+            }
+
+            .counter {
+                font-size: 2rem;
+            }
+
+            .footer-section h4 {
+                font-size: 16px;
+            }
+
+            .footer-section p, .footer-section a {
+                font-size: 12px;
+            }
+
+            .footer-social a {
+                font-size: 18px;
+                margin-right: 10px;
+            }
+        }
+
+        @keyframes fadeInSection {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="../index.html" class="logo"><img src="../assets/images/logo.webp" alt="Nova SIM Logo" height="40px" width="100px"></a>
+        <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="nav-links" id="nav-links">
+            <!-- Navigation links will be dynamically generated -->
+        </div>
+    </nav>
+
+    <!-- About Us Hero Section -->
+    <section class="about-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold">About NOVA</h1>
+                    <p class="lead">Welcome to <strong>NOVA</strong>, your trusted prepaid recharge platform! We make mobile recharges <span class="text-primary">fast, secure, and hassle-free</span>.</p>
+                    <p>Our mission is to provide a seamless recharge experience with <span class="text-primary">one-click payments</span>, <span class="text-primary">instant processing</span>, and <span class="text-primary">24/7 support</span> to keep you always connected.</p>
+                    <a href="support.html" class="btn btn-primary mt-3">Contact Us</a>
+                    
+                    <div class="row text-center mt-5">
+                        <div class="col-md-4 mb-4 mb-md-0">
+                            <h2 id="totalCustomers" class="counter text-primary">150K+</h2>
+                            <p>Happy Users</p>
+                        </div>
+                        <div class="col-md-4 mb-4 mb-md-0">
+                            <h2 id="totalRecharges" class="counter text-primary">2M+</h2>
+                            <p>Recharges Processed</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h2 id="avgRating" class="counter text-primary">4.8</h2>
+                            <div class="rating">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            </div>
+                            <p>User Rating</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                    <img src="../assets/images/about.png" alt="About NOVA" class="img-fluid hero-img">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Mission Section -->
+    <section class="our-mission">
+        <div class="container">
+            <h2 class="mb-5">Our Mission & Values</h2>
+            
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="mission-card">
+                        <div class="mission-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h4 class="text-center mb-3">Fast & Reliable</h4>
+                        <p class="text-center">We ensure instant recharges and seamless transactions, delivering reliable service whenever you need it.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="mission-card">
+                        <div class="mission-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4 class="text-center mb-3">Safe & Secure</h4>
+                        <p class="text-center">Your security is our priority. We use industry-leading encryption to protect your personal and payment information.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="mission-card">
+                        <div class="mission-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h4 class="text-center mb-3">24/7 Support</h4>
+                        <p class="text-center">Our customer support team is always available to assist you with any questions or concerns, any time of day.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-4 mb-4">
+                    <div class="mission-card">
+                        <div class="mission-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h4 class="text-center mb-3">Multi-Device</h4>
+                        <p class="text-center">Our platform works seamlessly across all devices, allowing you to recharge from anywhere, anytime.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="mission-card">
+                        <div class="mission-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4 class="text-center mb-3">Innovation</h4>
+                        <p class="text-center">We continuously improve our services and introduce new features to enhance your recharge experience.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="mission-card">
+                        <div class="mission-icon">
+                            <i class="fas fa-sim-card"></i>
+                        </div>
+                        <h4 class="text-center mb-3">Personalized SIM Cards</h4>
+                        <p class="text-center">We provide personalized SIM cards with easy activation to ensure a seamless and customized experience for our users.</p>
+                    </div>
+                </div></div>
+            </div>
+        </div>
+    </section>
+
+   
+
+   
+
+      <!-- Footer -->
+      <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Explore</h4>
+                <a href="../index.html">Home</a><br>
+                <a href="./plans.html">Plans</a><br>
+                <a href="./support.html">Support</a><br>
+                <a href="./about.html">About Us</a><br>
+                <a href="./login.html">Login</a>
+            </div>
+            <div class="footer-section">
+                <h4>Get Started</h4>
+                <a href="./buy-sim.html">Get sim</a><br>
+                <a href="./port.html">Switch to NOVA</a><br>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Us</h4>
+                <p>Email: support@nova.com</p>
+                <p>Phone: +91 9876543210</p>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Mobi Comm Service Limited. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 Script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom Script -->
+    <script>
+        // Pages configuration (consistent with support.html)
+        const guestPages = [
+            { id: "home", label: "Home", url: "../index.html" },
+            { id: "plans", label: "Plans", url: "./plans.html" },
+            { id: "support", label: "Support", url: "./support.html" },
+            { id: "about", label: "About Us", url: "./about.html" }
+        ];
+
+        const loggedInDropdownPages = [
+            { id: "myplans", label: "My Plans", url: "./myplans.html" },
+            { id: "transactions", label: "Transactions", url: "./transaction.html" },
+            { id: "profile", label: "Profile", url: "./profile.html" },
+        ];
+
+        let currentPage = "about";
+        let isLoggedIn = false;
+        let userInitials = "U";
+
+        // Generate navigation (consistent with support.html)
+        function generateNavigation() {
+            const navLinks = document.getElementById("nav-links");
+            navLinks.innerHTML = "";
+
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            const userDetailsString = sessionStorage.getItem('userDetails');
+            const accessToken = sessionStorage.getItem('accessToken');
+            let userDetails = null;
+
+            if (userDetailsString) {
+                try {
+                    userDetails = JSON.parse(userDetailsString);
+                } catch (error) {
+                    console.error('Error parsing userDetails:', error);
+                    sessionStorage.removeItem('userDetails');
+                }
+            }
+
+            // User is considered logged in if either loggedInUser or (userDetails and accessToken) exist
+            isLoggedIn = !!(loggedInUser || (userDetails && accessToken));
+
+            if (isLoggedIn) {
+                userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || loggedInUser?.simHolderName?.charAt(0)?.toUpperCase() || 'U';
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
+                });
+
+                const dropdownDiv = document.createElement('div');
+                dropdownDiv.className = 'dropdown';
+
+                const avatar = document.createElement('div');
+                avatar.className = 'user-avatar dropdown-toggle';
+                avatar.id = 'profileDropdown';
+                avatar.setAttribute('data-bs-toggle', 'dropdown');
+                avatar.textContent = userInitials;
+                dropdownDiv.appendChild(avatar);
+
+                const dropdownMenu = document.createElement('div');
+                dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+
+                loggedInDropdownPages.forEach(page => {
+                    const link = document.createElement('a');
+                    link.href = page.url;
+                    link.className = 'dropdown-item';
+                    link.textContent = page.label;
+                    link.onclick = (e) => {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    dropdownMenu.appendChild(link);
+                });
+
+                const logoutLink = document.createElement('a');
+                logoutLink.href = '#';
+                logoutLink.className = 'dropdown-item';
+                logoutLink.textContent = 'Logout';
+                logoutLink.onclick = (e) => {
+                    e.preventDefault();
+                    logout();
+                };
+                dropdownMenu.appendChild(logoutLink);
+
+                dropdownDiv.appendChild(dropdownMenu);
+                navLinks.appendChild(dropdownDiv);
+            } else {
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
+                });
+
+                const loginBtn = document.createElement("a");
+                loginBtn.href = "./login.html";
+                loginBtn.className = "btn login-btn";
+                loginBtn.textContent = "Login";
+                navLinks.appendChild(loginBtn);
+            }
+        }
+
+        // Set current page and navigate
+        function setCurrentPage(pageId) {
+            currentPage = pageId;
+            const guestPage = guestPages.find(p => p.id === pageId);
+            const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
+            if (guestPage || loggedInPage) {
+                $('#loadingOverlay').css('display', 'flex');
+                setTimeout(() => {
+                    window.location.href = guestPage ? guestPage.url : loggedInPage.url;
+                }, 1000);
+            }
+            generateNavigation();
+        }
+
+        // Logout function with SweetAlert2 and loading overlay
+        function logout() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+
+            localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('profileSetup');
+            sessionStorage.removeItem('phoneNumber');
+            sessionStorage.clear();
+            isLoggedIn = false;
+            currentPage = 'home';
+            generateNavigation();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Logged Out',
+                text: 'You have been logged out successfully.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#0a21c0',
+                timer: 1500,
+                timerProgressBar: true,
+                willClose: () => {
+                    loadingOverlay.style.display = 'none';
+                    window.location.href = '../index.html';
+                }
+            });
+        }
+
+        // Toggle mobile menu
+        function toggleMenu() {
+            document.getElementById("nav-links").classList.toggle("active");
+        }
+
+        // Initialize navigation on page load
+        $(document).ready(function() {
+            generateNavigation();
+        });
+    </script>
+</body>
+</html>

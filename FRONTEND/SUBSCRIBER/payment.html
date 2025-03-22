@@ -14,856 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        /* Loading Spinner */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-            border: 0.4em solid #0a21c0;
-            border-right-color: transparent;
-        }
-
-        /* Navbar Styles (Copied from plans.html) */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #000;
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            opacity: 0;
-            animation: fadeInSection 1s ease-in-out forwards;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .nav-link {
-            color: white;
-            text-decoration: none;
-            position: relative;
-            padding: 0.5rem 0;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: white;
-        }
-
-        .nav-link.active {
-            font-weight: bold;
-        }
-
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: white;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 4px;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .login-btn {
-            background-color: white;
-            color: black;
-        }
-
-        .login-btn:hover {
-            background-color: #0a21c0;
-            color: white;
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            background-color: #0a21c0;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .user-avatar:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-        }
-
-        .user-avatar::after {
-            content: '\f0d7';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            font-size: 12px;
-            color: white;
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .user-avatar:hover::after {
-            opacity: 1;
-        }
-
-        .dropdown-menu {
-            background-color: #000;
-            border: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
-        .dropdown-item {
-            color: white;
-            padding: 10px 20px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .dropdown-item:hover {
-            background-color: #0a21c0;
-            color: white;
-        }
-
-        /* Payment Page Styles */
-        .payment-page {
-            padding: 30px 15px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .container {
-            display: flex;
-            max-width: 900px;
-            width: 100%;
-            background-color: #fff;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            margin: 0 auto;
-        }
-
-        .payment-details {
-            width: 40%;
-            background-color: #f0f2ff;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .payment-methods {
-            width: 60%;
-            padding: 20px;
-        }
-
-        h1 {
-            color: #0a21c0;
-            margin-bottom: 18px;
-            font-size: 20px;
-            position: relative;
-        }
-
-        h1:after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 40px;
-            height: 3px;
-            background-color: #0a21c0;
-            border-radius: 2px;
-        }
-
-        h2, h3 {
-            color: #0a21c0;
-            margin-bottom: 14px;
-            font-size: 16px;
-        }
-
-        .recharge-details {
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(10, 33, 192, 0.1);
-            padding-bottom: 18px;
-        }
-
-        .detail-item {
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-
-        .detail-item .label {
-            font-weight: 600;
-            color: #444;
-        }
-
-        .payment-options {
-            display: flex;
-            border-bottom: 1px solid #e1e4ed;
-            margin-bottom: 20px;
-        }
-
-        .option-tab {
-            padding: 10px 18px;
-            cursor: pointer;
-            font-weight: 600;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            position: relative;
-        }
-
-        .option-tab.active {
-            border-bottom: 2px solid #0a21c0;
-            color: #0a21c0;
-        }
-
-        .option-tab:hover:not(.active) {
-            background-color: rgba(10, 33, 192, 0.03);
-            color: #081899;
-        }
-
-        .payment-option-content {
-            display: none;
-            padding: 12px 0;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(10px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .payment-option-content.active {
-            display: block;
-        }
-
-        .upi-apps {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-
-        .upi-app {
-            width: 22%;
-            margin-bottom: 10px;
-            text-align: center;
-            padding: 10px 6px;
-            border: 1px solid #e1e4ed;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .upi-app:hover {
-            border-color: #0a21c0;
-            background-color: rgba(10, 33, 192, 0.03);
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(10, 33, 192, 0.08);
-        }
-
-        .upi-app.selected {
-            border-color: #0a21c0;
-            background-color: rgba(10, 33, 192, 0.08);
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(10, 33, 192, 0.12);
-        }
-
-        .upi-app.selected:before {
-            content: '✓';
-            position: absolute;
-            top: 3px;
-            right: 5px;
-            color: #0a21c0;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .upi-app img {
-            width: 30px;
-            height: 30px;
-            margin-bottom: 5px;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-        }
-
-        .upi-app:hover img {
-            transform: scale(1.1);
-        }
-
-        .upi-app p {
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-            position: relative;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            font-size: 13px;
-            color: #333;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #e1e4ed;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background-color: #FAFAFA;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #0a21c0;
-            box-shadow: 0 0 0 2px rgba(10, 33, 192, 0.1);
-            background-color: white;
-        }
-
-        .card-inputs {
-            display: flex;
-            gap: 15px;
-        }
-
-        .expiry-cvv {
-            display: flex;
-            gap: 15px;
-        }
-
-        .expiry-cvv > div {
-            flex: 1;
-        }
-
-        .submit-btn {
-            background-color: #0a21c0;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: auto;
-            display: inline-block;
-            margin-top: 10px;
-            letter-spacing: 0.5px;
-            box-shadow: 0 3px 5px rgba(10, 33, 192, 0.2);
-        }
-
-        .submit-btn:hover {
-            background-color: #081899;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(10, 33, 192, 0.25);
-        }
-
-        .error-message {
-            color: #dc3545;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            background-color: #fff2f2;
-            border-left: 2px solid #dc3545;
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-3px); }
-            40%, 80% { transform: translateX(3px); }
-        }
-
-        .error-message:before {
-            content: "⚠️ ";
-        }
-
-        input.error {
-            border-color: #dc3545;
-            background-color: #fff2f2;
-        }
-
-        .banks-list {
-            max-height: 180px;
-            overflow-y: auto;
-            border: 1px solid #e1e4ed;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            background-color: #FAFAFA;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
-
-        .bank-option {
-            padding: 8px 12px;
-            border-bottom: 1px solid #e1e4ed;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-        }
-
-        .bank-option:last-child {
-            border-bottom: none;
-        }
-
-        .bank-option:hover {
-            background-color: #f0f2ff;
-        }
-
-        .bank-option.selected {
-            background-color: rgba(10, 33, 192, 0.08);
-            border-left: 3px solid #0a21c0;
-        }
-
-        .bank-option img {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            object-fit: contain;
-        }
-
-        .order-summary {
-            margin-top: auto;
-            border-top: 1px solid rgba(10, 33, 192, 0.1);
-            padding-top: 15px;
-        }
-
-        .total-amount {
-            font-size: 16px;
-            font-weight: bold;
-            color: #0a21c0;
-            margin-top: 8px;
-        }
-
-        .plan-badge {
-            display: inline-block;
-            background-color: rgba(10, 33, 192, 0.1);
-            color: #0a21c0;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 14px;
-        }
-
-        .customer-support {
-            margin-top: 18px;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .customer-support a {
-            color: #0a21c0;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .customer-support a:hover {
-            text-decoration: underline;
-        }
-
-        .customer-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 18px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(10, 33, 192, 0.1);
-        }
-
-        .customer-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #e1e4ed;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            color: #0a21c0;
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 2px 6px rgba(10, 33, 192, 0.1);
-        }
-
-        .customer-text {
-            flex: 1;
-        }
-
-        .customer-text h3 {
-            margin-bottom: 3px;
-            font-size: 15px;
-        }
-
-        .customer-text p {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .payment-footer {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 18px;
-            align-items: center;
-        }
-
-        .secure-badge {
-            display: flex;
-            align-items: center;
-            font-size: 11px;
-            color: #666;
-            padding: 5px 8px;
-            background-color: rgba(40, 167, 69, 0.1);
-            border-radius: 12px;
-        }
-
-        .secure-badge svg {
-            margin-right: 5px;
-            color: #28a745;
-        }
-
-        /* Form validation indicators */
-        .input-with-validation {
-            position: relative;
-        }
-
-        .validation-indicator {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: none;
-            font-size: 12px;
-        }
-
-        .validation-indicator.valid {
-            color: #28a745;
-            display: block;
-        }
-
-        .validation-indicator.invalid {
-            color: #dc3545;
-            display: block;
-        }
-
-        /* Real-time validation styles */
-        .upi-validation-message {
-            margin-top: 6px;
-            font-size: 11px;
-            color: #666;
-            transition: all 0.3s ease;
-        }
-
-        /* Footer Styles */
-        footer {
-            background: linear-gradient(135deg, #141619, #000000);
-            color: white;
-            padding: 40px 20px;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-            margin-top: 40px;
-            opacity: 0;
-            animation: fadeInSection 1s ease-in-out forwards;
-            animation-delay: 1.6s;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-        }
-
-        .footer-section h4 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #0a21c0;
-            text-transform: uppercase;
-        }
-
-        .footer-section p,
-        .footer-section a {
-            font-size: 14px;
-            color: #b3b4bd;
-            text-decoration: none;
-            margin-bottom: 10px;
-        }
-
-        .footer-section a:hover {
-            color: white;
-            text-decoration: underline;
-        }
-
-        .footer-social a {
-            font-size: 20px;
-            margin-right: 15px;
-            color: #b3b4bd;
-            transition: color 0.3s ease;
-        }
-
-        .footer-social a:hover {
-            color: #0a21c0;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
-        }
-
-        .footer-bottom p {
-            font-size: 14px;
-            color: #b3b4bd;
-            margin: 0;
-        }
-
-        /* Breadcrumb Styles */
-        .breadcrumb {
-            padding: 10px 15px;
-            background-color: #fff;
-            border-bottom: 1px solid #e1e4ed;
-            max-width: 1200px;
-            margin: 0 auto;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .breadcrumb-list {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            padding: 0;
-            margin: 0;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .breadcrumb-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .breadcrumb-item a {
-            color: #0a21c0;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .breadcrumb-item a:hover {
-            text-decoration: underline;
-            color: #081899;
-        }
-
-        .breadcrumb-item:not(:last-child)::after {
-            content: '/';
-            margin: 0 8px;
-            color: #666;
-        }
-
-        .breadcrumb-item.active {
-            color: #333;
-            font-weight: 600;
-            cursor: default;
-        }
-
-        .breadcrumb-item.active a {
-            color: #333;
-            pointer-events: none;
-            text-decoration: none;
-        }
-
-        @keyframes fadeInSection {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 750px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .payment-details, .payment-methods {
-                width: 100%;
-            }
-
-            .payment-details {
-                order: 1;
-            }
-
-            .payment-methods {
-                order: 2;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .upi-app {
-                width: 47%;
-            }
-
-            .option-tab {
-                padding: 8px 12px;
-                font-size: 13px;
-            }
-
-            .expiry-cvv {
-                flex-direction: column;
-                gap: 16px;
-            }
-
-            .payment-details, .payment-methods {
-                padding: 15px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .nav-links {
-                position: fixed;
-                top: 70px;
-                left: 0;
-                width: 100%;
-                flex-direction: column;
-                background-color: #000;
-                padding: 1rem;
-                gap: 1rem;
-                transform: translateY(-150%);
-                transition: transform 0.3s ease-in-out;
-            }
-
-            .nav-links.active {
-                transform: translateY(0);
-            }
-
-            .user-avatar::after {
-                display: none;
-            }
-
-            .dropdown-menu {
-                width: 100%;
-                text-align: center;
-            }
-
-            .footer-container {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .footer-social a {
-                margin: 0 10px;
-            }
-
-            .breadcrumb {
-                padding: 8px 10px;
-            }
-
-            .breadcrumb-list {
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .payment-page {
-                padding: 20px 10px;
-            }
-
-            .breadcrumb {
-                padding: 6px 8px;
-            }
-
-            .breadcrumb-list {
-                font-size: 10px;
-            }
-        }
-    </style>
+    <!-- Existing CSS (unchanged as per your instruction) -->
+    <link rel="stylesheet" href="../assets/css/payment.css">
 </head>
 <body>
     <!-- Loading Spinner -->
@@ -1110,526 +262,634 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
         // Pages configuration (consistent with plans.html)
-        const guestPages = [
-            { id: "admin", label: "Admin", url: "../ADMIN/login.html" },
-            { id: "home", label: "Home", url: "../index.html" },
-            { id: "plans", label: "Plans", url: "./plans.html" },
-            { id: "support", label: "Support", url: "./support.html" },
-            { id: "about", label: "About Us", url: "./about.html" }
-        ];
+// Pages configuration (consistent with plans.html)
+const guestPages = [
+    { id: "admin", label: "Admin", url: "../ADMIN/login.html" },
+    { id: "home", label: "Home", url: "../index.html" },
+    { id: "plans", label: "Plans", url: "./plans.html" },
+    { id: "support", label: "Support", url: "./support.html" },
+    { id: "about", label: "About Us", url: "./about.html" }
+];
 
-        const loggedInDropdownPages = [
-            { id: "myplans", label: "My Plans", url: "./myplans.html" },
-            { id: "transactions", label: "Transactions", url: "./transaction.html" },
-            { id: "profile", label: "Profile", url: "./profile.html" },
-        ];
+const loggedInDropdownPages = [
+    { id: "myplans", label: "My Plans", url: "./myplans.html" },
+    { id: "transactions", label: "Transactions", url: "./transaction.html" },
+    { id: "profile", label: "Profile", url: "./profile.html" },
+];
 
-        let currentPage = "payment";
-        let isLoggedIn = false;
-        let userInitials = "U";
-        let paymentMethod = ""; // To store the selected payment method
+let currentPage = "payment";
+let isLoggedIn = false;
+let userInitials = "U";
+let paymentMethod = "";
 
-        // Check if user is logged in based on access token
-        function checkLoginStatus() {
-            const accessToken = localStorage.getItem('accessToken');
-            isLoggedIn = !!accessToken;
-            if (isLoggedIn) {
-                const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-                userInitials = loggedInUser?.simHolderName?.charAt(0).toUpperCase() || 'U';
-            }
-        }
-
-        // Generate navigation (consistent with plans.html)
-        function generateNavigation() {
-            const navLinks = document.getElementById("nav-links");
-            navLinks.innerHTML = "";
-
-            if (isLoggedIn) {
-                guestPages.forEach(page => {
-                    const link = document.createElement("a");
-                    link.href = page.url;
-                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
-                    link.textContent = page.label;
-                    link.onclick = function(e) {
-                        e.preventDefault();
-                        setCurrentPage(page.id);
-                    };
-                    navLinks.appendChild(link);
-                });
-
-                const dropdownDiv = document.createElement('div');
-                dropdownDiv.className = 'dropdown';
-
-                const avatar = document.createElement('div');
-                avatar.className = 'user-avatar dropdown-toggle';
-                avatar.id = 'profileDropdown';
-                avatar.setAttribute('data-bs-toggle', 'dropdown');
-                avatar.textContent = userInitials;
-                dropdownDiv.appendChild(avatar);
-
-                const dropdownMenu = document.createElement('div');
-                dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
-
-                loggedInDropdownPages.forEach(page => {
-                    const link = document.createElement('a');
-                    link.href = page.url;
-                    link.className = 'dropdown-item';
-                    link.textContent = page.label;
-                    link.onclick = (e) => {
-                        e.preventDefault();
-                        setCurrentPage(page.id);
-                    };
-                    dropdownMenu.appendChild(link);
-                });
-
-                const logoutLink = document.createElement('a');
-                logoutLink.href = '#';
-                logoutLink.className = 'dropdown-item';
-                logoutLink.textContent = 'Logout';
-                logoutLink.onclick = (e) => {
-                    e.preventDefault();
-                    logout();
-                };
-                dropdownMenu.appendChild(logoutLink);
-
-                dropdownDiv.appendChild(dropdownMenu);
-                navLinks.appendChild(dropdownDiv);
-            } else {
-                guestPages.forEach(page => {
-                    const link = document.createElement("a");
-                    link.href = page.url;
-                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
-                    link.textContent = page.label;
-                    link.onclick = function(e) {
-                        e.preventDefault();
-                        setCurrentPage(page.id);
-                    };
-                    navLinks.appendChild(link);
-                });
-
-                const loginBtn = document.createElement("a");
-                loginBtn.href = "./login.html";
-                loginBtn.className = "btn login-btn";
-                loginBtn.textContent = "Login";
-                navLinks.appendChild(loginBtn);
-            }
-        }
-
-        // Set current page and navigate
-        function setCurrentPage(pageId) {
-            currentPage = pageId;
-            const guestPage = guestPages.find(p => p.id === pageId);
-            const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
-            if (guestPage) {
-                window.location.href = guestPage.url;
-            } else if (loggedInPage) {
-                window.location.href = loggedInPage.url;
-            }
-            generateNavigation();
-        }
-
-        // Logout function with SweetAlert2 and loading overlay
-        function logout() {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.style.display = 'flex';
-
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('loggedInUser');
-            localStorage.removeItem('profileSetup');
-            sessionStorage.removeItem('phoneNumber');
-            sessionStorage.clear();
-            isLoggedIn = false;
-            currentPage = 'home';
-            generateNavigation();
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Logged Out',
-                text: 'You have been logged out successfully.',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#0a21c0',
-                timer: 1500,
-                timerProgressBar: true,
-                willClose: () => {
-                    loadingOverlay.style.display = 'none';
-                    window.location.href = '../index.html';
-                }
-            });
-        }
-
-        // Toggle mobile menu
-        function toggleMenu() {
-            const navLinks = document.getElementById("nav-links");
-            navLinks.classList.toggle("active");
-        }
-
-        // Display user details and plan details using sessionStorage
-        function displayUserDetails() {
-            const mobileNumber = sessionStorage.getItem('phoneNumber');
-            const selectedPlan = JSON.parse(sessionStorage.getItem('selectedPlan'));
-            const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-
-            if (!mobileNumber || !selectedPlan || !userDetails) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Plan, mobile number, or user details not found. Please select a plan again.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                }).then(() => {
-                    window.location.href = 'plans.html';
-                });
-                return;
-            }
-
-            // Display user details
-            const fullName = `${userDetails.firstName} ${userDetails.lastName}`;
-            $('#customerName').text(fullName);
-            $('#customerNumber').text(`+91 ${mobileNumber}`);
-            const initials = fullName.split(' ').map(word => word[0]).join('').toUpperCase();
-            $('#customerAvatar').text(initials);
-
-            // Display plan details
-            $('#planName').text(selectedPlan.name);
-            $('#planData').text(selectedPlan.data);
-            $('#planValidity').text(selectedPlan.validity);
-            $('#planCalls').text(selectedPlan.calls);
-            $('#planSMS').text(selectedPlan.sms);
-
-            // Calculate GST and total
-            const planPrice = parseFloat(selectedPlan.price);
-            const gstRate = 0.18; // 18% GST
-            const gstAmount = planPrice * gstRate;
-            const totalAmount = planPrice + gstAmount;
-
-            $('#planPrice').text(`₹${planPrice.toFixed(2)}`);
-            $('#gstAmount').text(`₹${gstAmount.toFixed(2)}`);
-            $('#totalAmount').text(`₹${totalAmount.toFixed(2)}`);
-            $('#payUpiAmount').text(`₹${totalAmount.toFixed(2)}`);
-            $('#payCardAmount').text(`₹${totalAmount.toFixed(2)}`);
-            $('#payNetbankingAmount').text(`₹${totalAmount.toFixed(2)}`);
-        }
-
-        // Generate a random reference number
-        function generateRefNo() {
-            return `REF${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}${Math.floor(100000 + Math.random() * 900000)}`;
-        }
-
-        // Generate a random transaction ID
-        function generateTxnId() {
-            return `TXN${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}${Math.floor(100000 + Math.random() * 900000)}`;
-        }
-
-        // Format current date as DD Mon YYYY
-        function formatDate() {
-            const date = new Date();
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            return `${String(date.getDate()).padStart(2, '0')} ${months[date.getMonth()]} ${date.getFullYear()}`;
-        }
-
-        // Format current time as HH:MM:SS IST
-        function formatTime() {
-            const date = new Date();
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${hours}:${minutes}:${seconds} IST`;
-        }
-
-        // Confirm payment and redirect to success page
-        function confirmPayment() {
-            const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-            const selectedPlan = JSON.parse(sessionStorage.getItem('selectedPlan'));
-            const planPrice = parseFloat(selectedPlan.price);
-            const gstRate = 0.18; // 18% GST
-            const totalAmount = planPrice + (planPrice * gstRate);
-
-            // Generate transaction details
-            const transactionDetails = {
-                mobileNumber: `+91 ${sessionStorage.getItem('phoneNumber')}`,
-                customerName: `${userDetails.firstName} ${userDetails.lastName}`,
-                amount: `₹${totalAmount.toFixed(2)}`,
-                refNo: generateRefNo(),
-                txnId: generateTxnId(),
-                date: formatDate(),
-                time: formatTime(),
-                paymentMode: paymentMethod
-            };
-
-            // Store transaction details in sessionStorage
-            sessionStorage.setItem('transactionDetails', JSON.stringify(transactionDetails));
-
-            // Redirect to success page
-            window.location.href = 'success.html';
-        }
-
-        // Update breadcrumb to show only Plans > Payment
-        function updateBreadcrumb() {
-            const breadcrumbList = $('#breadcrumbList');
-            breadcrumbList.empty(); // Clear existing breadcrumb items
-
-            // Show Plans > Payment
-            const plansItem = `<li class="breadcrumb-item"><a href="plans.html">Plans</a></li>`;
-            const paymentItem = `<li class="breadcrumb-item active" aria-current="page">Payment</li>`;
-            breadcrumbList.append(plansItem).append(paymentItem);
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check login status
-            checkLoginStatus();
-
-            // Generate navigation
-            generateNavigation();
-
-            // Display user and plan details
-            displayUserDetails();
-
-            // Update breadcrumb
-            updateBreadcrumb();
-
-            // Tab switching with enhanced animations
-            const tabs = document.querySelectorAll('.option-tab');
-            const contents = document.querySelectorAll('.payment-option-content');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const target = tab.getAttribute('data-tab');
-                    
-                    // Remove active class from all tabs and contents
-                    tabs.forEach(t => t.classList.remove('active'));
-                    contents.forEach(c => {
-                        c.classList.remove('active');
-                        c.style.display = 'none';
-                    });
-                    
-                    // Add active class to current tab and content
-                    tab.classList.add('active');
-                    const currentContent = document.getElementById(target);
-                    
-                    // Animate the content becoming visible
-                    setTimeout(() => {
-                        currentContent.style.display = 'block';
-                        currentContent.classList.add('active');
-                    }, 50);
-                });
-            });
-            
-            // UPI App Selection with improved feedback
-            const upiApps = document.querySelectorAll('.upi-app');
-            upiApps.forEach(app => {
-                app.addEventListener('click', () => {
-                    upiApps.forEach(a => a.classList.remove('selected'));
-                    app.classList.add('selected');
-                    
-                    // Show selection feedback
-                    const appName = app.querySelector('p').textContent;
-                    const upiInput = document.getElementById('upi-id');
-                    const upiValidationMsg = document.querySelector('.upi-validation-message');
-                    
-                    // Update the validation message based on selected app
-                    upiValidationMsg.textContent = `Enter your UPI ID for ${appName} (e.g. username@${app.getAttribute('data-app')})`;
-                });
-            });
-            
-            // Bank Selection with improved feedback
-            const bankOptions = document.querySelectorAll('.bank-option');
-            const bankError = document.getElementById('bank-error');
-            
-            bankOptions.forEach(bank => {
-                bank.addEventListener('click', () => {
-                    bankOptions.forEach(b => b.classList.remove('selected'));
-                    bank.classList.add('selected');
-                    bankError.style.display = 'none';
-                });
-            });
-            
-            // Enhanced UPI Validation with real-time feedback
-            const upiInput = document.getElementById('upi-id');
-            const upiError = document.getElementById('upi-id-error');
-            const upiValidIndicator = document.querySelector('.input-with-validation .validation-indicator.valid');
-            const upiInvalidIndicator = document.querySelector('.input-with-validation .validation-indicator.invalid');
-            const upiValidationMsg = document.querySelector('.upi-validation-message');
-            const payUpiBtn = document.getElementById('pay-upi-btn');
-            
-            function validateUPI() {
-                const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
-                const isValid = upiRegex.test(upiInput.value);
-                
-                // Show appropriate validation feedback
-                if (!isValid) {
-                    upiInput.classList.add('error');
-                    upiError.style.display = 'block';
-                    upiValidIndicator.style.display = 'none';
-                    upiInvalidIndicator.style.display = 'block';
-                    return false;
-                } else {
-                    upiInput.classList.remove('error');
-                    upiError.style.display = 'none';
-                    upiValidIndicator.style.display = 'block';
-                    upiInvalidIndicator.style.display = 'none';
-                    return true;
-                }
-            }
-            
-            // Real-time UPI validation
-            upiInput.addEventListener('input', function() {
-                if (this.value.length > 0) {
-                    const isPartiallyValid = this.value.includes('@');
-                    
-                    if (isPartiallyValid) {
-                        upiValidationMsg.style.color = '#28a745';
-                        upiValidationMsg.textContent = 'Valid UPI ID format';
-                    } else {
-                        upiValidationMsg.style.color = '#666';
-                        upiValidationMsg.textContent = 'UPI ID must include @ symbol (e.g. username@upi)';
-                    }
-                    
-                    if (this.value.length > 5) {
-                        validateUPI();
-                    }
-                } else {
-                    upiValidIndicator.style.display = 'none';
-                    upiInvalidIndicator.style.display = 'none';
-                    upiValidationMsg.style.color = '#666';
-                    upiValidationMsg.textContent = 'Enter your UPI ID like yourname@bankname';
-                }
-            });
-            
-            // Card validation functions
-            const cardNameInput = document.getElementById('card-name');
-            const cardNumberInput = document.getElementById('card-number');
-            const expiryInput = document.getElementById('expiry-date');
-            const cvvInput = document.getElementById('cvv');
-            const cardNameError = document.getElementById('card-name-error');
-            const cardNumberError = document.getElementById('card-number-error');
-            const expiryError = document.getElementById('expiry-error');
-            const cvvError = document.getElementById('cvv-error');
-            const payCardBtn = document.getElementById('pay-card-btn');
-            
-            function validateCardName() {
-                const name = cardNameInput.value.trim();
-                if (name.length < 2 || !/^[a-zA-Z\s]+$/.test(name)) {
-                    cardNameInput.classList.add('error');
-                    cardNameError.style.display = 'block';
-                    return false;
-                } else {
-                    cardNameInput.classList.remove('error');
-                    cardNameError.style.display = 'none';
-                    return true;
-                }
-            }
-            
-            function validateCardNumber() {
-                const number = cardNumberInput.value.replace(/\s/g, '');
-                const cardNumberRegex = /^\d{16}$/;
-                if (!cardNumberRegex.test(number)) {
-                    cardNumberInput.classList.add('error');
-                    cardNumberError.style.display = 'block';
-                    return false;
-                } else {
-                    cardNumberInput.classList.remove('error');
-                    cardNumberError.style.display = 'none';
-                    return true;
-                }
-            }
-            
-            function validateExpiry() {
-                const expiry = expiryInput.value;
-                const expiryRegex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
-                if (!expiryRegex.test(expiry)) {
-                    expiryInput.classList.add('error');
-                    expiryError.style.display = 'block';
-                    return false;
-                }
-                
-                const [month, year] = expiry.split('/');
-                const currentYear = new Date().getFullYear() % 100;
-                const currentMonth = new Date().getMonth() + 1;
-                if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
-                    expiryInput.classList.add('error');
-                    expiryError.textContent = 'Card has expired';
-                    expiryError.style.display = 'block';
-                    return false;
-                }
-                
-                expiryInput.classList.remove('error');
-                expiryError.style.display = 'none';
-                return true;
-            }
-            
-            function validateCVV() {
-                const cvv = cvvInput.value;
-                const cvvRegex = /^\d{3}$/;
-                if (!cvvRegex.test(cvv)) {
-                    cvvInput.classList.add('error');
-                    cvvError.style.display = 'block';
-                    return false;
-                } else {
-                    cvvInput.classList.remove('error');
-                    cvvError.style.display = 'none';
-                    return true;
-                }
-            }
-            
-            // Card number formatting
-            cardNumberInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.replace(/(\d{4})/g, '$1 ').trim();
-                e.target.value = value;
-                validateCardNumber();
-            });
-            
-            // Expiry date formatting
-            expiryInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length >= 2) {
-                    value = value.substring(0, 2) + '/' + value.substring(2);
-                }
-                e.target.value = value;
-                validateExpiry();
-            });
-            
-            // Real-time validation for card inputs
-            cardNameInput.addEventListener('input', validateCardName);
-            expiryInput.addEventListener('input', validateExpiry);
-            cvvInput.addEventListener('input', validateCVV);
-            
-            // Card payment submission
-            payCardBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                paymentMethod = "Cards";
-                const isCardNameValid = validateCardName();
-                const isCardNumberValid = validateCardNumber();
-                const isExpiryValid = validateExpiry();
-                const isCVVValid = validateCVV();
-                
-                if (isCardNameValid && isCardNumberValid && isExpiryValid && isCVVValid) {
-                    confirmPayment();
-                }
-            });
-            
-            // UPI payment submission
-            payUpiBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                paymentMethod = "UPI";
-                if (validateUPI()) {
-                    confirmPayment();
-                }
-            });
-            
-            // Netbanking payment submission
-            const payNetbankingBtn = document.getElementById('pay-netbanking-btn');
-            payNetbankingBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                paymentMethod = "Net Banking";
-                const selectedBank = document.querySelector('.bank-option.selected');
-                if (!selectedBank) {
-                    bankError.style.display = 'block';
-                    return;
-                }
-                confirmPayment();
-            });
+// Utility function for fetching with timeout
+async function fetchWithTimeout(url, options, timeout = 10000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
         });
+        clearTimeout(id);
+        return response;
+    } catch (error) {
+        clearTimeout(id);
+        if (error.name === 'AbortError') {
+            throw new Error('Request timed out. Please check your internet connection and try again.');
+        }
+        throw error;
+    }
+}
+
+// Check if user is logged in based on access token
+function checkLoginStatus() {
+    const accessToken = localStorage.getItem('accessToken');
+    isLoggedIn = !!accessToken;
+    if (isLoggedIn) {
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        userInitials = loggedInUser?.simHolderName?.charAt(0).toUpperCase() || 'U';
+    }
+}
+
+// Generate navigation (consistent with plans.html)
+function generateNavigation() {
+    const navLinks = document.getElementById("nav-links");
+    navLinks.innerHTML = "";
+
+    if (isLoggedIn) {
+        guestPages.forEach(page => {
+            const link = document.createElement("a");
+            link.href = page.url;
+            link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+            link.textContent = page.label;
+            link.onclick = function(e) {
+                e.preventDefault();
+                setCurrentPage(page.id);
+            };
+            navLinks.appendChild(link);
+        });
+
+        const dropdownDiv = document.createElement('div');
+        dropdownDiv.className = 'dropdown';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'user-avatar dropdown-toggle';
+        avatar.id = 'profileDropdown';
+        avatar.setAttribute('data-bs-toggle', 'dropdown');
+        avatar.textContent = userInitials;
+        dropdownDiv.appendChild(avatar);
+
+        const dropdownMenu = document.createElement('div');
+        dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+
+        loggedInDropdownPages.forEach(page => {
+            const link = document.createElement('a');
+            link.href = page.url;
+            link.className = 'dropdown-item';
+            link.textContent = page.label;
+            link.onclick = (e) => {
+                e.preventDefault();
+                setCurrentPage(page.id);
+            };
+            dropdownMenu.appendChild(link);
+        });
+
+        const logoutLink = document.createElement('a');
+        logoutLink.href = '#';
+        logoutLink.className = 'dropdown-item';
+        logoutLink.textContent = 'Logout';
+        logoutLink.onclick = (e) => {
+            e.preventDefault();
+            logout();
+        };
+        dropdownMenu.appendChild(logoutLink);
+
+        dropdownDiv.appendChild(dropdownMenu);
+        navLinks.appendChild(dropdownDiv);
+    } else {
+        guestPages.forEach(page => {
+            const link = document.createElement("a");
+            link.href = page.url;
+            link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+            link.textContent = page.label;
+            link.onclick = function(e) {
+                e.preventDefault();
+                setCurrentPage(page.id);
+            };
+            navLinks.appendChild(link);
+        });
+
+        const loginBtn = document.createElement("a");
+        loginBtn.href = "./login.html";
+        loginBtn.className = "btn login-btn";
+        loginBtn.textContent = "Login";
+        navLinks.appendChild(loginBtn);
+    }
+}
+
+// Set current page and navigate
+function setCurrentPage(pageId) {
+    currentPage = pageId;
+    const guestPage = guestPages.find(p => p.id === pageId);
+    const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
+    if (guestPage) {
+        window.location.href = guestPage.url;
+    } else if (loggedInPage) {
+        window.location.href = loggedInPage.url;
+    }
+    generateNavigation();
+}
+
+// Logout function with SweetAlert2 and loading overlay
+function logout() {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    loadingOverlay.style.display = 'flex';
+
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('profileSetup');
+    sessionStorage.removeItem('phoneNumber');
+    sessionStorage.clear();
+    isLoggedIn = false;
+    currentPage = 'home';
+    generateNavigation();
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Logged Out',
+        text: 'You have been logged out successfully.',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0a21c0',
+        timer: 1500,
+        timerProgressBar: true,
+        willClose: () => {
+            loadingOverlay.style.display = 'none';
+            window.location.href = '../index.html';
+        }
+    });
+}
+
+// Toggle mobile menu
+function toggleMenu() {
+    const navLinks = document.getElementById("nav-links");
+    navLinks.classList.toggle("active");
+}
+
+// Display user details and plan details using sessionStorage
+function displayUserDetails() {
+    const mobileNumber = sessionStorage.getItem('phoneNumber');
+    const selectedPlan = JSON.parse(sessionStorage.getItem('selectedPlan'));
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
+    if (!mobileNumber || !selectedPlan || !userDetails) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Plan, mobile number, or user details not found. Please select a plan again.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#0a21c0'
+        }).then(() => {
+            window.location.href = 'plans.html';
+        });
+        return;
+    }
+
+    // Display user details
+    const fullName = `${userDetails.firstName} ${userDetails.lastName}`;
+    $('#customerName').text(fullName);
+    $('#customerNumber').text(`+91 ${mobileNumber}`);
+    const initials = fullName.split(' ').map(word => word[0]).join('').toUpperCase();
+    $('#customerAvatar').text(initials);
+
+    // Display plan details
+    $('#planName').text(selectedPlan.name);
+    $('#planData').text(selectedPlan.data);
+    $('#planValidity').text(selectedPlan.validity);
+    $('#planCalls').text(selectedPlan.calls);
+    $('#planSMS').text(selectedPlan.sms);
+
+    // Calculate GST and total
+    const planPrice = parseFloat(selectedPlan.price);
+    const gstRate = 0.18; // 18% GST
+    const gstAmount = planPrice * gstRate;
+    const totalAmount = planPrice + gstAmount;
+
+    $('#planPrice').text(`₹${planPrice.toFixed(2)}`);
+    $('#gstAmount').text(`₹${gstAmount.toFixed(2)}`);
+    $('#totalAmount').text(`₹${totalAmount.toFixed(2)}`);
+    $('#payUpiAmount').text(`₹${totalAmount.toFixed(2)}`);
+    $('#payCardAmount').text(`₹${totalAmount.toFixed(2)}`);
+    $('#payNetbankingAmount').text(`₹${totalAmount.toFixed(2)}`);
+}
+
+// Generate a random reference number
+function generateRefNo() {
+    return `REF${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}${Math.floor(100000 + Math.random() * 900000)}`;
+}
+
+// Format current date as DD Mon YYYY
+function formatDate() {
+    const date = new Date();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${String(date.getDate()).padStart(2, '0')} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+// Format current time as HH:MM:SS IST
+function formatTime() {
+    const date = new Date();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds} IST`;
+}
+
+// Process payment by calling the backend API
+async function confirmPayment() {
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    const selectedPlan = JSON.parse(sessionStorage.getItem('selectedPlan'));
+    const phoneNumber = sessionStorage.getItem('phoneNumber');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // Validate all required data
+    if (!userDetails || !selectedPlan || !phoneNumber || !paymentMethod) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Missing required data. Please try again.',
+            confirmButtonColor: '#0a21c0'
+        }).then(() => {
+            window.location.href = 'plans.html';
+        });
+        return;
+    }
+
+    // Ensure all fields are present and in the correct format
+    const rechargeData = {
+        userId: userDetails.userId ? String(userDetails.userId) : null, // Use userId from userDetails
+        planId: selectedPlan.id ? String(selectedPlan.id) : null, // Use planId from selectedPlan
+        phoneNumber: phoneNumber ? String(phoneNumber) : null,
+        paymentMethod: paymentMethod ? paymentMethod.toUpperCase() : null
+    };
+
+    // Validate the payload
+    if (!rechargeData.userId || !rechargeData.planId || !rechargeData.phoneNumber || !rechargeData.paymentMethod) {
+        console.error('Invalid recharge data:', rechargeData);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Invalid recharge data. Please try again.',
+            confirmButtonColor: '#0a21c0'
+        });
+        return;
+    }
+
+    // Log the payload for debugging
+    console.log('Sending recharge request with payload:', rechargeData);
+
+    loadingOverlay.style.display = 'flex'; // Show loading overlay
+
+    try {
+        const response = await fetchWithTimeout('http://localhost:8080/api/recharge/recharge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Uncomment if authentication is required
+                // 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            body: JSON.stringify(rechargeData)
+        });
+
+        // Log the raw response for debugging
+        console.log('Raw response:', response);
+
+        // Check if the response is OK
+        if (!response.ok) {
+            let errorMessage = 'Failed to process recharge';
+            try {
+                const errorData = await response.json();
+                console.log('Error response data:', errorData);
+                errorMessage = errorData.message || `Server error: ${response.status}`;
+            } catch (jsonError) {
+                console.error('Error parsing error response:', jsonError);
+                errorMessage = `Server error: ${response.status} - Unable to parse response`;
+            }
+            throw new Error(errorMessage);
+        }
+
+        const result = await response.json();
+        console.log('Success response data:', result);
+        if (result.status !== 'Success') {
+            throw new Error(result.message || 'Recharge failed');
+        }
+
+        const planPrice = parseFloat(selectedPlan.price);
+        const gstRate = 0.18;
+        const totalAmount = planPrice + (planPrice * gstRate);
+
+        const transactionDetails = {
+            mobileNumber: `+91 ${phoneNumber}`,
+            customerName: `${userDetails.firstName} ${userDetails.lastName}`,
+            amount: `₹${totalAmount.toFixed(2)}`,
+            refNo: generateRefNo(),
+            txnId: result.transactionId,
+            date: formatDate(),
+            time: formatTime(),
+            paymentMode: paymentMethod
+        };
+
+        // Store transaction details in sessionStorage
+        sessionStorage.setItem('transactionDetails', JSON.stringify(transactionDetails));
+
+        // Redirect to success page
+        window.location.href = 'success.html';
+    } catch (error) {
+        console.error('Error processing recharge:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Recharge Failed',
+            text: error.message || 'An error occurred while processing your recharge. Please try again.',
+            confirmButtonColor: '#0a21c0'
+        });
+    } finally {
+        loadingOverlay.style.display = 'none'; // Hide loading overlay
+    }
+}
+
+// Update breadcrumb to show only Plans > Payment
+function updateBreadcrumb() {
+    const breadcrumbList = $('#breadcrumbList');
+    breadcrumbList.empty(); // Clear existing breadcrumb items
+
+    // Show Plans > Payment
+    const plansItem = `<li class="breadcrumb-item"><a href="plans.html">Plans</a></li>`;
+    const paymentItem = `<li class="breadcrumb-item active" aria-current="page">Payment</li>`;
+    breadcrumbList.append(plansItem).append(paymentItem);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Check login status
+    checkLoginStatus();
+
+    // Generate navigation
+    generateNavigation();
+
+    // Display user and plan details
+    displayUserDetails();
+
+    // Update breadcrumb
+    updateBreadcrumb();
+
+    // Tab switching with enhanced animations
+    const tabs = document.querySelectorAll('.option-tab');
+    const contents = document.querySelectorAll('.payment-option-content');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.getAttribute('data-tab');
+            
+            // Remove active class from all tabs and contents
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => {
+                c.classList.remove('active');
+                c.style.display = 'none';
+            });
+            
+            // Add active class to current tab and content
+            tab.classList.add('active');
+            const currentContent = document.getElementById(target);
+            
+            // Animate the content becoming visible
+            setTimeout(() => {
+                currentContent.style.display = 'block';
+                currentContent.classList.add('active');
+            }, 50);
+        });
+    });
+    
+    // UPI App Selection with improved feedback
+    const upiApps = document.querySelectorAll('.upi-app');
+    upiApps.forEach(app => {
+        app.addEventListener('click', () => {
+            upiApps.forEach(a => a.classList.remove('selected'));
+            app.classList.add('selected');
+            
+            // Show selection feedback
+            const appName = app.querySelector('p').textContent;
+            const upiInput = document.getElementById('upi-id');
+            const upiValidationMsg = document.querySelector('.upi-validation-message');
+            
+            // Update the validation message based on selected app
+            upiValidationMsg.textContent = `Enter your UPI ID for ${appName} (e.g. username@${app.getAttribute('data-app')})`;
+        });
+    });
+    
+    // Bank Selection with improved feedback
+    const bankOptions = document.querySelectorAll('.bank-option');
+    const bankError = document.getElementById('bank-error');
+    
+    bankOptions.forEach(bank => {
+        bank.addEventListener('click', () => {
+            bankOptions.forEach(b => b.classList.remove('selected'));
+            bank.classList.add('selected');
+            bankError.style.display = 'none';
+        });
+    });
+    
+    // Enhanced UPI Validation with real-time feedback
+    const upiInput = document.getElementById('upi-id');
+    const upiError = document.getElementById('upi-id-error');
+    const upiValidIndicator = document.querySelector('.input-with-validation .validation-indicator.valid');
+    const upiInvalidIndicator = document.querySelector('.input-with-validation .validation-indicator.invalid');
+    const upiValidationMsg = document.querySelector('.upi-validation-message');
+    const payUpiBtn = document.getElementById('pay-upi-btn');
+    
+    function validateUPI() {
+        const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+        const isValid = upiRegex.test(upiInput.value);
+        
+        // Show appropriate validation feedback
+        if (!isValid) {
+            upiInput.classList.add('error');
+            upiError.style.display = 'block';
+            upiValidIndicator.style.display = 'none';
+            upiInvalidIndicator.style.display = 'block';
+            return false;
+        } else {
+            upiInput.classList.remove('error');
+            upiError.style.display = 'none';
+            upiValidIndicator.style.display = 'block';
+            upiInvalidIndicator.style.display = 'none';
+            return true;
+        }
+    }
+    
+    // Real-time UPI validation
+    upiInput.addEventListener('input', function() {
+        if (this.value.length > 0) {
+            const isPartiallyValid = this.value.includes('@');
+            
+            if (isPartiallyValid) {
+                upiValidationMsg.style.color = '#28a745';
+                upiValidationMsg.textContent = 'Valid UPI ID format';
+            } else {
+                upiValidationMsg.style.color = '#666';
+                upiValidationMsg.textContent = 'UPI ID must include @ symbol (e.g. username@upi)';
+            }
+            
+            if (this.value.length > 5) {
+                validateUPI();
+            }
+        } else {
+            upiValidIndicator.style.display = 'none';
+            upiInvalidIndicator.style.display = 'none';
+            upiValidationMsg.style.color = '#666';
+            upiValidationMsg.textContent = 'Enter your UPI ID like yourname@bankname';
+        }
+    });
+    
+    // Card validation functions
+    const cardNameInput = document.getElementById('card-name');
+    const cardNumberInput = document.getElementById('card-number');
+    const expiryInput = document.getElementById('expiry-date');
+    const cvvInput = document.getElementById('cvv');
+    const cardNameError = document.getElementById('card-name-error');
+    const cardNumberError = document.getElementById('card-number-error');
+    const expiryError = document.getElementById('expiry-error');
+    const cvvError = document.getElementById('cvv-error');
+    const payCardBtn = document.getElementById('pay-card-btn');
+    
+    function validateCardName() {
+        const name = cardNameInput.value.trim();
+        if (name.length < 2 || !/^[a-zA-Z\s]+$/.test(name)) {
+            cardNameInput.classList.add('error');
+            cardNameError.style.display = 'block';
+            return false;
+        } else {
+            cardNameInput.classList.remove('error');
+            cardNameError.style.display = 'none';
+            return true;
+        }
+    }
+    
+    function validateCardNumber() {
+        const number = cardNumberInput.value.replace(/\s/g, '');
+        const cardNumberRegex = /^\d{16}$/;
+        if (!cardNumberRegex.test(number)) {
+            cardNumberInput.classList.add('error');
+            cardNumberError.style.display = 'block';
+            return false;
+        } else {
+            cardNumberInput.classList.remove('error');
+            cardNumberError.style.display = 'none';
+            return true;
+        }
+    }
+    
+    function validateExpiry() {
+        const expiry = expiryInput.value;
+        const expiryRegex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
+        if (!expiryRegex.test(expiry)) {
+            expiryInput.classList.add('error');
+            expiryError.style.display = 'block';
+            return false;
+        }
+        
+        const [month, year] = expiry.split('/');
+        const currentYear = new Date().getFullYear() % 100;
+        const currentMonth = new Date().getMonth() + 1;
+        if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+            expiryInput.classList.add('error');
+            expiryError.textContent = 'Card has expired';
+            expiryError.style.display = 'block';
+            return false;
+        }
+        
+        expiryInput.classList.remove('error');
+        expiryError.style.display = 'none';
+        return true;
+    }
+    
+    function validateCVV() {
+        const cvv = cvvInput.value;
+        const cvvRegex = /^\d{3}$/;
+        if (!cvvRegex.test(cvv)) {
+            cvvInput.classList.add('error');
+            cvvError.style.display = 'block';
+            return false;
+        } else {
+            cvvInput.classList.remove('error');
+            cvvError.style.display = 'none';
+            return true;
+        }
+    }
+    
+    // Real-time validation for card inputs
+    cardNameInput.addEventListener('input', validateCardName);
+    cardNumberInput.addEventListener('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        value = value.replace(/(\d{4})/g, '$1 ').trim();
+        this.value = value;
+        validateCardNumber();
+    });
+    expiryInput.addEventListener('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.slice(0, 2) + '/' + value.slice(2, 4);
+        }
+        this.value = value;
+        if (this.value.length === 5) {
+            validateExpiry();
+        }
+    });
+    cvvInput.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 3);
+        validateCVV();
+    });
+    
+    // Netbanking validation
+    const payNetbankingBtn = document.getElementById('pay-netbanking-btn');
+    
+    function validateNetbanking() {
+        const selectedBank = document.querySelector('.bank-option.selected');
+        if (!selectedBank) {
+            bankError.style.display = 'block';
+            return false;
+        }
+        bankError.style.display = 'none';
+        return true;
+    }
+    
+    // Payment button handlers
+    payUpiBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (validateUPI()) {
+            paymentMethod = 'UPI';
+            await confirmPayment();
+        }
+    });
+    
+    payCardBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const isNameValid = validateCardName();
+        const isNumberValid = validateCardNumber();
+        const isExpiryValid = validateExpiry();
+        const isCVVValid = validateCVV();
+        
+        if (isNameValid && isNumberValid && isExpiryValid && isCVVValid) {
+            paymentMethod = 'CARD';
+            await confirmPayment();
+        }
+    });
+    
+    payNetbankingBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (validateNetbanking()) {
+            paymentMethod = 'NETBANKING';
+            await confirmPayment();
+        }
+    });
+});
     </script>
 </body>
 </html>

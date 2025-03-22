@@ -1020,6 +1020,148 @@
                 font-size: 0.85rem;
             }
         }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 0 10px;
+            }
+
+            .logo-text {
+                font-size: 1.2rem;
+            }
+
+            .top-bar-right {
+                gap: 8px;
+            }
+
+            .user-profile {
+                padding: 6px;
+            }
+
+            .avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .user-name {
+                font-size: 0.9rem;
+            }
+
+            .user-role {
+                font-size: 0.75rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+
+            .table th, .table td {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .top-bar {
+                height: 60px;
+            }
+
+            .logo-text {
+                font-size: 1rem;
+            }
+
+            .top-action-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .notification-badge {
+                width: 15px;
+                height: 15px;
+                font-size: 0.6rem;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+
+            .action-btn {
+                padding: 5px 8px;
+                font-size: 0.8rem;
+            }
+
+            .table th, .table td {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+
+            .page-container {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .top-bar {
+                padding: 0 5px;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .top-logo {
+                gap: 5px;
+            }
+
+            .user-profile {
+                padding: 5px;
+            }
+
+            .avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+
+            .user-name {
+                font-size: 0.8rem;
+            }
+
+            .user-role {
+                display: none;
+            }
+
+            .section-title {
+                font-size: 1rem;
+            }
+
+            .action-btn {
+                padding: 4px 6px;
+                font-size: 0.75rem;
+            }
+
+            .table th, .table td {
+                padding: 6px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Ensure table scrolls horizontally on small screens */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            min-width: 600px; /* Ensures table doesn't break on small screens */
+        }
+
     </style>
 </head>
 <body>
@@ -1032,31 +1174,37 @@
         </div>
         <ul class="nav-list">
             <li class="nav-item">
-                <a href="#" class="nav-link" id="profile-tab">
-                    <span class="nav-icon"><i class="fas fa-user"></i></span>
-                    <span class="nav-text">Profile Management</span>
+                <a href="./analytics.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="nav-text">Analytics</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link" id="subscribers-tab">
-                    <span class="nav-icon"><i class="fas fa-users"></i></span>
-                    <span class="nav-text">Subscriber Management</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link active" id="plans-tab">
-                    <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
-                    <span class="nav-text">Plan Management</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" id="expiring-plans-tab">
+                <a href="./expiringplans.html" class="nav-link">
                     <span class="nav-icon"><i class="fas fa-clock"></i></span>
                     <span class="nav-text">Expiring Plans</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link" id="logout-btn">
+                <a href="./manageplans.html" class="nav-link active">
+                    <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                    <span class="nav-text">Manage Plans</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./subscriberManagement.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    <span class="nav-text">Manage Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./profile.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-user"></i></span>
+                    <span class="nav-text">Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../index.html" class="nav-link logout-btn">
                     <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
                     <span class="nav-text">Logout</span>
                 </a>
@@ -1068,7 +1216,7 @@
         <div class="top-bar">
             <div class="top-logo">
                 <img src="../assets/images/logo.webp" alt="Company Logo" class="logo-img">
-                <span class="logo-text">Admin Dashboard</span>
+                <span class="logo-text"></span>
             </div>
             
             <div class="top-bar-right">
@@ -1139,8 +1287,8 @@
                 <div class="user-profile" id="userProfile">
                     <div class="avatar">A</div>
                     <div class="user-info">
-                        <div class="user-name">Admin User</div>
-                        <div class="user-role">Super Admin</div>
+                        <div class="user-name">Admin</div>
+                        <div class="user-role"></div>
                     </div>
                     
                     <div class="user-dropdown" id="userDropdown">
@@ -1358,8 +1506,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-        let token = localStorage.getItem('accessToken');
-        let refreshToken = localStorage.getItem('refreshToken');
+        let token = sessionStorage.getItem('accessToken');
+        let refreshToken =sessionStorage.getItem('refreshToken');
         let categories = [];
         let currentPage = 0;
         let pageSize = 10;
@@ -1455,7 +1603,6 @@
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
-                    e.preventDefault();
                     navLinks.forEach(l => l.classList.remove('active'));
                     this.classList.add('active');
                     if (isMobile() && sidebar.classList.contains('expanded')) {
@@ -2019,12 +2166,12 @@
         async function togglePlanStatus(id) {
             Swal.fire({
                 title: 'Are you sure?',
-                text: "Do you want to toggle the status of this plan?",
+                text: "Do you want to change the status of this plan?",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0a21c0',
                 cancelButtonColor: '#dc3545',
-                confirmButtonText: 'Yes, toggle it!'
+                confirmButtonText: 'Yes, change it!'
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
@@ -2033,7 +2180,7 @@
                         });
                         
                         if (!response || !response.ok) {
-                            throw new Error('Failed to toggle plan status');
+                            throw new Error('Failed to change plan status');
                         }
                         
                         loadPlans();
@@ -2045,11 +2192,11 @@
                             showConfirmButton: false
                         });
                     } catch (error) {
-                        console.error('Error toggling plan status:', error);
+                        console.error('Error changing plan status:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Failed to toggle plan status: ' + error.message
+                            text: 'Failed to change plan status: ' + error.message
                         });
                     }
                 }
