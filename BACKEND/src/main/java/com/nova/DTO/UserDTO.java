@@ -1,6 +1,6 @@
 package com.nova.DTO;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class UserDTO {
     private Long userId;
@@ -9,6 +9,7 @@ public class UserDTO {
     private String phoneNumber;
     private String email;
     private Date activationDate;
+    private String lastRechargeDate; // Derived from Recharge.startDate
     private String status;
     private String address;
     private String username;
@@ -26,6 +27,8 @@ public class UserDTO {
     public void setEmail(String email) { this.email = email; }
     public Date getActivationDate() { return activationDate; }
     public void setActivationDate(Date activationDate) { this.activationDate = activationDate; }
+    public String getLastRechargeDate() { return lastRechargeDate; }
+    public void setLastRechargeDate(String lastRechargeDate) { this.lastRechargeDate = lastRechargeDate; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getAddress() { return address; }

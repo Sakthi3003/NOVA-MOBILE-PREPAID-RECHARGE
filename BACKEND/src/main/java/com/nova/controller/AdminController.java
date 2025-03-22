@@ -1,6 +1,10 @@
 package com.nova.controller;
 
 import com.nova.DTO.RechargeDTO;
+import com.nova.DTO.RechargeStatusResponse;
+import com.nova.DTO.ResponseDTO;
+import com.nova.DTO.UpdateAdminRequest;
+import com.nova.DTO.UserDTO;
 import com.nova.entity.User;
 import com.nova.repository.UserRepository;
 import com.nova.security.JwtUtil;
@@ -8,12 +12,14 @@ import com.nova.service.AdminService;
 import com.nova.service.CustomUserDetailsService;
 import com.nova.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.data.domain.Pageable;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +27,7 @@ import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/admin")
 public class AdminController {
 
     @Autowired
@@ -42,19 +48,8 @@ public class AdminController {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
-    // DTO for admin profile update request (email and password only)
-    public static class UpdateAdminRequest {
-        private String email;
-        private String password;
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-    }
-
-    // Update Admin Profile (PUT /api/profile)
     @PutMapping("/profile")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateAdminProfile(HttpServletRequest request, @RequestBody UpdateAdminRequest updateRequest) {
         try {
             // Extract token from Authorization header
@@ -130,8 +125,9 @@ public class AdminController {
     
     
     
- // Fetch plans expiring within 3 days
+    // Fetch plans expiring within 3 days
     @GetMapping("/expiring-plans")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getExpiringPlans(@RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -152,6 +148,7 @@ public class AdminController {
 
     // Fetch user details and transaction history
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getUserDetailsAndTransactions(
             @PathVariable Long userId,
             @RequestHeader("Authorization") String token) {
@@ -174,6 +171,7 @@ public class AdminController {
 
     // Send notification
     @PostMapping("/notify")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> sendNotification(
             @RequestBody Map<String, String> request,
             @RequestHeader("Authorization") String token) {
@@ -195,5 +193,44 @@ public class AdminController {
             response.put("message", "Failed to send notification: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+    
+    @GetMapping("/subscribers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseDTO<Page<UserDTO>>> getAllSubscribers(
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "") String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Page<UserDTO> usersPage = adminService.getAllSubscribers(search, status, page, size);
+        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "Subscribers fetched successfully", usersPage));
+    }
+
+    @PostMapping("/user/{userId}/activate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseDTO<String>> activateUser(@PathVariable Long userId) {
+        adminService.activateUser(userId);
+        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "User activated successfully", null));
+    }
+
+    @PostMapping("/user/{userId}/deactivate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseDTO<String>> deactivateUser(@PathVariable Long userId) {
+        adminService.deactivateUser(userId);
+        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "User deactivated successfully", null));
+    }
+
+    @PostMapping("/user/{userId}/suspend")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseDTO<String>> suspendUser(@PathVariable Long userId) {
+        adminService.suspendUser(userId);
+        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "User suspended successfully", null));
+    }
+
+    @PostMapping("/check-recharge-status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseDTO<RechargeStatusResponse>> checkRechargeStatus() {
+        RechargeStatusResponse response = adminService.checkRechargeStatus();
+        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "Recharge status checked", response));
     }
 }

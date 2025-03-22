@@ -1,6 +1,8 @@
 package com.nova.repository;
 
 import com.nova.entity.Recharge;
+import com.nova.entity.User;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -25,4 +27,10 @@ public interface RechargeRepository extends JpaRepository<Recharge, Long> {
     
     List<Recharge> findByEndDateBetween(LocalDate start, LocalDate end);
     List<Recharge> findByUserUserId(Long userId);
+    
+    
+    @Query("SELECT r FROM Recharge r WHERE r.user = :user ORDER BY r.startDate DESC")
+    Optional<Recharge> findTopByUserOrderByStartDateDesc(User user);
+    
+    List<Recharge> findByUser(User user);
 }

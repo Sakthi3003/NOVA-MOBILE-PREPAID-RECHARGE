@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth  
                 		.requestMatchers("/**").permitAll()
                 		.requestMatchers("/api/user/**","/api/recharge/**").permitAll()
+                		.requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/auth/**","/api/plans","/api/categories").permitAll()
                         .requestMatchers("/api/plans/**","/api/categories/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/plans/add", "/api/plans/edit/**", "/api/plans/delete/**", "/api/plans/**/toggle-status").hasRole("ADMIN")

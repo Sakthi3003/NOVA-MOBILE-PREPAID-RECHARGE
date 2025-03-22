@@ -4,6 +4,8 @@ import com.nova.DTO.PlanCreateDTO;
 import com.nova.DTO.PlanDTO;
 import com.nova.DTO.PlanUpdateDTO;
 import com.nova.service.PlanService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/plans")
 public class PlanController {
+    private static final Logger logger = LoggerFactory.getLogger(PlanController.class);
+
     @Autowired
     private PlanService planService;
 
@@ -25,38 +29,55 @@ public class PlanController {
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
+        logger.info("Fetching all plans - page: {}, size: {}, search: {}, status: {}, sortBy: {}, sortDir: {}",
+                page, size, search, status, sortBy, sortDir);
         Page<PlanDTO> plans = planService.getAllPlans(page, size, search, status, sortBy, sortDir);
+        logger.debug("Retrieved {} plans", plans.getTotalElements());
         return ResponseEntity.ok(plans);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PlanDTO> getPlanById(@PathVariable Long id) {
-        return ResponseEntity.ok(planService.getPlanById(id));
+        logger.info("Fetching plan with ID: {}", id);
+        PlanDTO plan = planService.getPlanById(id);
+        logger.debug("Retrieved plan: {}", plan);
+        return ResponseEntity.ok(plan);
     }
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlanDTO> createPlan(@RequestBody PlanCreateDTO planCreateDTO) {
-        return ResponseEntity.ok(planService.createPlan(planCreateDTO));
+        logger.info("Creating new plan: {}", planCreateDTO);
+        PlanDTO createdPlan = planService.createPlan(planCreateDTO);
+        logger.info("Plan created successfully with ID: {}", createdPlan.getId());
+        return ResponseEntity.ok(createdPlan);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlanDTO> updatePlan(@PathVariable Long id, @RequestBody PlanUpdateDTO planUpdateDTO) {
+        logger.info("Updating plan with ID: {}, data: {}", id, planUpdateDTO);
         planUpdateDTO.setId(id);
-        return ResponseEntity.ok(planService.updatePlan(planUpdateDTO));
+        PlanDTO updatedPlan = planService.updatePlan(planUpdateDTO);
+        logger.info("Plan updated successfully: {}", updatedPlan);
+        return ResponseEntity.ok(updatedPlan);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePlan(@PathVariable Long id) {
+        logger.info("Deleting plan with ID: {}", id);
         planService.deletePlan(id);
+        logger.info("Plan deleted successfully with ID: {}", id);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}/toggle-status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlanDTO> togglePlanStatus(@PathVariable Long id) {
-        return ResponseEntity.ok(planService.togglePlanStatus(id));
+        logger.info("Toggling status for plan with ID: {}", id);
+        PlanDTO updatedPlan = planService.togglePlanStatus(id);
+        logger.info("Plan status toggled successfully: {}", updatedPlan);
+        return ResponseEntity.ok(updatedPlan);
     }
 }
