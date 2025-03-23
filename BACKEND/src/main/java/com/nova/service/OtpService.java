@@ -34,6 +34,7 @@ public class OtpService {
     private String twilioPhoneNumber;
 
     private final OtpRepository otpRepository;
+    
     private boolean isTwilioInitialized = false;
 
     public OtpService(OtpRepository otpRepository) {

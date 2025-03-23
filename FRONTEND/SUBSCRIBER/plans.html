@@ -467,9 +467,18 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            z-index: 3000;
             justify-content: center;
             align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            visibility: visible;
+            opacity: 1;
         }
 
         .modal-content {
@@ -577,9 +586,18 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            z-index: 3000;
             justify-content: center;
             align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s ease;
+        }
+
+        .confirm-modal.show {
+            display: flex;
+            visibility: visible;
+            opacity: 1;
         }
 
         .confirm-modal-content {
@@ -870,6 +888,7 @@
                         </div>
                         <div class="error-message" id="modalErrorMessage"></div>
                     </div>
+                    <button type="button" class="btn btn-primary" onclick="submitNumberModal()">Submit</button>
                 </form>
             </div>
         </div>
@@ -877,7 +896,7 @@
         <!-- Confirmation Modal -->
         <div class="confirm-modal" id="confirmModal">
             <div class="confirm-modal-content">
-                <h3>Do you want to proceed with this recharge?</h3>
+                <h3>Do you want to recharge?</h3>
                 <div class="buttons">
                     <button class="yes-btn" onclick="confirmYes()">Yes</button>
                     <button class="no-btn" onclick="confirmNo()">No</button>
@@ -1299,7 +1318,7 @@
         function showChangeNumberModal(isChangeNumber = false, plan = null) {
             const modal = document.getElementById("numberModal");
             const modalTitle = document.getElementById("modalTitle");
-            modal.style.display = "flex";
+            modal.classList.add('show');
             document.getElementById("modalNumberInput").value = sessionStorage.getItem('phoneNumber') || '';
             document.getElementById("modalErrorMessage").style.display = "none";
             modal.dataset.isChangeNumber = isChangeNumber ? "true" : "false";
@@ -1312,20 +1331,39 @@
             }
         }
 
-        // Show confirmation modal
+        // Show confirmation modal with dynamic text
         function showConfirmModal(plan) {
+            console.log("showConfirmModal called with plan:", plan);
             const modal = document.getElementById("confirmModal");
+            if (!modal) {
+                console.error("Confirm modal not found in the DOM!");
+                return;
+            }
+            const modalTitle = modal.querySelector('h3');
+            if (!modalTitle) {
+                console.error("Modal title (h3) not found!");
+                return;
+            }
+            modalTitle.textContent = `Do you want to recharge with the ${plan.name} plan?`;
             selectedPlan = plan;
-            modal.style.display = "flex";
+            modal.classList.add('show');
+            console.log("Modal class 'show' added, current display:", window.getComputedStyle(modal).display);
+            const computedStyle = window.getComputedStyle(modal);
+            console.log("Computed display:", computedStyle.display);
+            console.log("Computed visibility:", computedStyle.visibility);
+            console.log("Computed opacity:", computedStyle.opacity);
+            console.log("Modal offsetHeight:", modal.offsetHeight);
         }
 
         // Handle Yes button in confirmation modal
         function confirmYes() {
+            console.log("confirmYes called");
             const modal = document.getElementById("confirmModal");
-            modal.style.display = "none";
+            modal.classList.remove('show');
             const phoneNumber = sessionStorage.getItem('phoneNumber');
             if (phoneNumber && selectedPlan) {
-                validateModalNumber();
+                console.log("Phone number exists, proceeding to payment");
+                proceedToPayment(selectedPlan);
             } else {
                 showChangeNumberModal(false, selectedPlan);
             }
@@ -1334,29 +1372,33 @@
         // Handle No button in confirmation modal
         function confirmNo() {
             const modal = document.getElementById("confirmModal");
-            modal.style.display = "none";
+            modal.classList.remove('show');
             selectedPlan = null;
         }
 
-        // Validate modal number input by calling the backend API
-        async function validateModalNumber() {
-            const mobileNumber = document.getElementById("modalNumberInput").value.trim();
-            const errorMessage = document.getElementById("modalErrorMessage");
-            const modal = document.getElementById("numberModal");
-            const isChangeNumber = modal.dataset.isChangeNumber === "true";
+        // Submit number modal
+        function submitNumberModal() {
+            validateModalNumber();
+        }
 
+        // Dynamic validation for phone number input
+        async function validateNumberDynamic(mobileNumber) {
+            const errorMessage = document.getElementById("modalErrorMessage");
             const mobileNumberPattern = /^[6789]\d{9}$/;
+
+            // Client-side validation
             if (!mobileNumber) {
                 errorMessage.textContent = 'Phone number is required';
                 errorMessage.style.display = "block";
-                return;
+                return false;
             }
             if (!mobileNumberPattern.test(mobileNumber)) {
                 errorMessage.textContent = 'Please enter a valid 10-digit phone number starting with 6, 7, 8, or 9.';
                 errorMessage.style.display = "block";
-                return;
+                return false;
             }
 
+            // Backend validation
             try {
                 const response = await fetch(`http://localhost:8080/api/user/check-number?number=${mobileNumber}`, {
                     method: 'GET',
@@ -1368,31 +1410,70 @@
                 if (response.ok) {
                     const user = await response.json();
                     errorMessage.style.display = "none";
-                    sessionStorage.setItem('phoneNumber', mobileNumber);
-                    sessionStorage.setItem('userDetails', JSON.stringify(user));
-                    document.getElementById("selectedNumber").textContent = mobileNumber;
-                    document.getElementById("numberModal").style.display = "none";
-                    document.getElementById("numberDisplay").style.display = "flex";
-
-                    if (!isChangeNumber && selectedPlan) {
-                        proceedToPayment(selectedPlan);
-                    }
+                    return true; // Number is valid
                 } else {
                     const errorData = await response.json();
                     errorMessage.textContent = errorData.message || 'This doesn’t seem to be a NOVA number. Please check and try again.';
                     errorMessage.style.display = "block";
+                    return false; // Number is invalid
                 }
             } catch (error) {
-                console.error('Error validating phone number:', error);
+                console.error('Error validating phone number dynamically:', error);
                 errorMessage.textContent = 'An error occurred while validating the phone number. Please try again.';
+                errorMessage.style.display = "block";
+                return false;
+            }
+        }
+
+        // Validate modal number input on submit
+        async function validateModalNumber() {
+            console.log("validateModalNumber called");
+            const mobileNumber = document.getElementById("modalNumberInput").value.trim();
+            const errorMessage = document.getElementById("modalErrorMessage");
+            const modal = document.getElementById("numberModal");
+            const isChangeNumber = modal.dataset.isChangeNumber === "true";
+
+            // Perform validation
+            const isValid = await validateNumberDynamic(mobileNumber);
+            if (!isValid) {
+                return; // Stop if validation fails
+            }
+
+            // If validation passes, update sessionStorage and UI
+            try {
+                const response = await fetch(`http://localhost:8080/api/user/check-number?number=${mobileNumber}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    sessionStorage.setItem('phoneNumber', mobileNumber);
+                    sessionStorage.setItem('userDetails', JSON.stringify(user));
+                    document.getElementById("selectedNumber").textContent = mobileNumber;
+                    document.getElementById("numberModal").classList.remove('show');
+                    document.getElementById("numberDisplay").style.display = "flex";
+
+                    if (!isChangeNumber && selectedPlan) {
+                        console.log("Proceeding to payment after number validation, isChangeNumber:", isChangeNumber);
+                        proceedToPayment(selectedPlan);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in validateModalNumber:', error);
+                errorMessage.textContent = 'An error occurred while processing the phone number. Please try again.';
                 errorMessage.style.display = "block";
             }
         }
 
         // Proceed to payment page with user details and plan
         function proceedToPayment(plan) {
+            console.log("proceedToPayment called with plan:", plan);
+            console.trace("Stack trace for proceedToPayment");
             sessionStorage.setItem('selectedPlan', JSON.stringify({
-                id: plan.id, // Include planId
+                id: plan.id,
                 name: plan.name,
                 price: plan.price,
                 validity: plan.validity,
@@ -1433,8 +1514,9 @@
             // Buy now buttons
             document.addEventListener('click', (e) => {
                 if (e.target.classList.contains('buy-now-btn')) {
+                    console.log("Recharge Now button clicked");
                     const plan = {
-                        id: e.target.dataset.planId, // Include planId
+                        id: e.target.dataset.planId,
                         name: e.target.dataset.planName,
                         price: e.target.dataset.planPrice,
                         validity: e.target.dataset.planValidity,
@@ -1444,40 +1526,44 @@
                         benefits: JSON.parse(decodeURIComponent(e.target.dataset.planBenefits))
                     };
 
-                    const fromQuickRecharge = sessionStorage.getItem('fromQuickRecharge') === 'true';
-                    if (fromQuickRecharge) {
-                        showConfirmModal(plan);
-                    } else {
-                        showChangeNumberModal(false, plan);
-                    }
+                    // Always show the confirmation modal when a plan is selected
+                    showConfirmModal(plan);
                 }
             });
 
             // Close modals on outside click or Esc key
             ['numberModal', 'confirmModal'].forEach(id => {
                 document.getElementById(id).addEventListener('click', (e) => {
-                    if (e.target === e.currentTarget) e.currentTarget.style.display = "none";
+                    if (e.target === e.currentTarget) {
+                        console.log(`Outside click detected on ${id}, hiding modal`);
+                        e.currentTarget.classList.remove('show');
+                    }
                 });
             });
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    document.getElementById("numberModal").style.display = "none";
-                    document.getElementById("confirmModal").style.display = "none";
+                    document.getElementById("numberModal").classList.remove('show');
+                    document.getElementById("confirmModal").classList.remove('show');
                 }
             });
 
             // Dynamic phone number input validation
             const modalNumberInput = document.getElementById('modalNumberInput');
-            modalNumberInput.addEventListener('input', (e) => {
+            modalNumberInput.addEventListener('input', async (e) => {
                 let value = e.target.value.replace(/[^0-9]/g, '');
                 e.target.value = value.slice(0, 10);
 
-                if (value.length > 0) {
-                    validateModalNumber();
+                const errorMessage = document.getElementById('modalErrorMessage');
+                if (value.length === 0) {
+                    errorMessage.textContent = 'Phone number is required';
+                    errorMessage.style.display = 'block';
+                } else if (value.length === 10) {
+                    // Perform dynamic validation against the backend
+                    await validateNumberDynamic(value);
                 } else {
-                    document.getElementById('modalErrorMessage').textContent = 'Phone number is required';
-                    document.getElementById('modalErrorMessage').style.display = 'block';
+                    errorMessage.textContent = 'Please enter a 10-digit phone number.';
+                    errorMessage.style.display = 'block';
                 }
             });
         });

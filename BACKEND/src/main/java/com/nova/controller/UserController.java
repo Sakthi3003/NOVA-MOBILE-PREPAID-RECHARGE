@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -92,80 +94,91 @@ public class UserController {
 	    }
 	 
 	 @GetMapping("/plans")
-	 public ResponseEntity<?> getUserPlans(@RequestParam String phoneNumber) {
-	     try {
-	         String formattedNumber = formatPhoneNumber(phoneNumber);
-	         User user = repo.findByPhoneNumber(formattedNumber)
-	                 .orElseThrow(() -> new RuntimeException("User not found with phone number: " + phoneNumber));
+	    public ResponseEntity<?> getUserPlans() {
+	        try {
+	            // Extract the authenticated user's details from SecurityContextHolder
+	            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	            
+	            // Use a temporary variable to determine the username
+	            final String username;
+	            if (principal instanceof UserDetails) {
+	                username = ((UserDetails) principal).getUsername();
+	            } else {
+	                username = principal.toString();
+	            }
 
-	         List<Recharge> recharges = repo1.findByUser(user);
+	            // Fetch the user by username
+	            User user = repo.findByUsername(username)
+	                    .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
-	         // Separate active and previous plans
-	         Map<String, Object> response = new HashMap<>();
-	         LocalDate today = LocalDate.now();
+	            List<Recharge> recharges = repo1.findByUser(user);
 
-	         // Active plans: Where today's date is between startDate and endDate, and status is "active"
-	         List<Map<String, Object>> activePlans = recharges.stream()
-	                 .filter(recharge -> recharge.getStatus().equalsIgnoreCase("active") &&
-	                         (today.isEqual(recharge.getStartDate()) || today.isAfter(recharge.getStartDate())) &&
-	                         (today.isEqual(recharge.getEndDate()) || today.isBefore(recharge.getEndDate())))
-	                 .map(recharge -> {
-	                     Map<String, Object> planData = new HashMap<>();
-	                     planData.put("id", recharge.getRechargeId());
-	                     planData.put("name", recharge.getPlan().getName());
-	                     planData.put("category", recharge.getPlan().getCategory().getName());
-	                     planData.put("price", recharge.getPlan().getPrice());
-	                     planData.put("startDate", recharge.getStartDate().toString());
-	                     planData.put("endDate", recharge.getEndDate().toString());
-	                     planData.put("sms", recharge.getPlan().getSms());
-	                     planData.put("calls", recharge.getPlan().getCalls());
-	                     planData.put("data", recharge.getPlan().getData());
-	                     planData.put("benefits", List.of(
-	                             recharge.getPlan().getBenefit1() != null ? recharge.getPlan().getBenefit1() : "",
-	                             recharge.getPlan().getBenefit2() != null ? recharge.getPlan().getBenefit2() : ""
-	                     ).stream().filter(b -> !b.isEmpty()).collect(Collectors.toList()));
-	                     planData.put("status", recharge.getStatus());
-	                     return planData;
-	                 })
-	                 .collect(Collectors.toList());
+	            // Separate active and previous plans
+	            Map<String, Object> response = new HashMap<>();
+	            LocalDate today = LocalDate.now();
 
-	         // Previous plans: All plans that are expired or not active
-	         List<Map<String, Object>> previousPlans = recharges.stream()
-	                 .filter(recharge -> !recharge.getStatus().equalsIgnoreCase("active") ||
-	                         today.isAfter(recharge.getEndDate()))
-	                 .map(recharge -> {
-	                     Map<String, Object> planData = new HashMap<>();
-	                     planData.put("id", recharge.getRechargeId());
-	                     planData.put("name", recharge.getPlan().getName());
-	                     planData.put("category", recharge.getPlan().getCategory().getName());
-	                     planData.put("price", recharge.getPlan().getPrice());
-	                     planData.put("startDate", recharge.getStartDate().toString());
-	                     planData.put("endDate", recharge.getEndDate().toString());
-	                     planData.put("sms", recharge.getPlan().getSms());
-	                     planData.put("calls", recharge.getPlan().getCalls());
-	                     planData.put("data", recharge.getPlan().getData());
-	                     planData.put("benefits", List.of(
-	                             recharge.getPlan().getBenefit1() != null ? recharge.getPlan().getBenefit1() : "",
-	                             recharge.getPlan().getBenefit2() != null ? recharge.getPlan().getBenefit2() : ""
-	                     ).stream().filter(b -> !b.isEmpty()).collect(Collectors.toList()));
-	                     planData.put("status", recharge.getStatus());
-	                     return planData;
-	                 })
-	                 .collect(Collectors.toList());
+	            // Active plans: Where today's date is between startDate and endDate, and status is "active"
+	            List<Map<String, Object>> activePlans = recharges.stream()
+	                    .filter(recharge -> recharge.getStatus().equalsIgnoreCase("active") &&
+	                            (today.isEqual(recharge.getStartDate()) || today.isAfter(recharge.getStartDate())) &&
+	                            (today.isEqual(recharge.getEndDate()) || today.isBefore(recharge.getEndDate())))
+	                    .map(recharge -> {
+	                        Map<String, Object> planData = new HashMap<>();
+	                        planData.put("id", recharge.getRechargeId());
+	                        planData.put("name", recharge.getPlan().getName());
+	                        planData.put("category", recharge.getPlan().getCategory().getName());
+	                        planData.put("price", recharge.getPlan().getPrice());
+	                        planData.put("startDate", recharge.getStartDate().toString());
+	                        planData.put("endDate", recharge.getEndDate().toString());
+	                        planData.put("sms", recharge.getPlan().getSms());
+	                        planData.put("calls", recharge.getPlan().getCalls());
+	                        planData.put("data", recharge.getPlan().getData());
+	                        planData.put("benefits", List.of(
+	                                recharge.getPlan().getBenefit1() != null ? recharge.getPlan().getBenefit1() : "",
+	                                recharge.getPlan().getBenefit2() != null ? recharge.getPlan().getBenefit2() : ""
+	                        ).stream().filter(b -> !b.isEmpty()).collect(Collectors.toList()));
+	                        planData.put("status", recharge.getStatus());
+	                        return planData;
+	                    })
+	                    .collect(Collectors.toList());
 
-	         response.put("activePlans", activePlans);
-	         response.put("previousPlans", previousPlans);
+	            // Previous plans: All plans that are expired or not active
+	            List<Map<String, Object>> previousPlans = recharges.stream()
+	                    .filter(recharge -> !recharge.getStatus().equalsIgnoreCase("active") ||
+	                            today.isAfter(recharge.getEndDate()))
+	                    .map(recharge -> {
+	                        Map<String, Object> planData = new HashMap<>();
+	                        planData.put("id", recharge.getRechargeId());
+	                        planData.put("name", recharge.getPlan().getName());
+	                        planData.put("category", recharge.getPlan().getCategory().getName());
+	                        planData.put("price", recharge.getPlan().getPrice());
+	                        planData.put("startDate", recharge.getStartDate().toString());
+	                        planData.put("endDate", recharge.getEndDate().toString());
+	                        planData.put("sms", recharge.getPlan().getSms());
+	                        planData.put("calls", recharge.getPlan().getCalls());
+	                        planData.put("data", recharge.getPlan().getData());
+	                        planData.put("benefits", List.of(
+	                                recharge.getPlan().getBenefit1() != null ? recharge.getPlan().getBenefit1() : "",
+	                                recharge.getPlan().getBenefit2() != null ? recharge.getPlan().getBenefit2() : ""
+	                        ).stream().filter(b -> !b.isEmpty()).collect(Collectors.toList()));
+	                        planData.put("status", recharge.getStatus());
+	                        return planData;
+	                    })
+	                    .collect(Collectors.toList());
 
-	         return ResponseEntity.ok(response);
-	     } catch (RuntimeException e) {
-	         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-	                 .body("User not found with phone number: " + phoneNumber);
-	     } catch (Exception e) {
-	         Map<String, String> errorResponse = new HashMap<>();
-	         errorResponse.put("message", "An unexpected error occurred while fetching plans");
-	         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-	     }
-	 }
+	            response.put("activePlans", activePlans);
+	            response.put("previousPlans", previousPlans);
+
+	            return ResponseEntity.ok(response);
+	        } catch (RuntimeException e) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                    .body("User not found with username: " + (e.getMessage().contains("User not found") ? e.getMessage().split(": ")[1] : "unknown"));
+	        } catch (Exception e) {
+	            Map<String, String> errorResponse = new HashMap<>();
+	            errorResponse.put("message", "An unexpected error occurred while fetching plans");
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+	        }
+	    }
 
 
 

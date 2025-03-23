@@ -15,11 +15,34 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Existing CSS -->
     <link rel="stylesheet" href="../assets/css/success.css">
+    <style>
+        /* Ensure long text wraps in the invoice table */
+        .invoice-table td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        /* Style the breadcrumb */
+        .breadcrumb {
+            background-color: #f8f9fa; /* Light background */
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <!-- Success Content -->
     <div class="success-container">
         <a href="javascript:history.back()" class="logo" style="color: blue; padding: 20px;"><i class="fas fa-arrow-left"></i></a>
+        <!-- Breadcrumb Navigation -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../index.html">Plans</a></li>
+                <li class="breadcrumb-item"><a href="payment.html">Payment</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Success</li>
+            </ol>
+        </nav>
+
         <div class="success-header">
             <i class="fas fa-check-circle success-icon"></i>
             <h1>Payment Successful!</h1>
@@ -31,7 +54,6 @@
             <p><strong>Mobile Number:</strong> <span id="mobileNumber"></span></p>
             <p><strong>Amount:</strong> <span id="amount"></span></p>
             <p><strong>Reference No:</strong> <span id="refNo"></span></p>
-            <p><strong>Transaction ID:</strong> <span id="txnId"></span></p>
             <p><strong>Date:</strong> <span id="date"></span></p>
             <p><strong>Time:</strong> <span id="time"></span></p>
             <p><strong>Payment Method:</strong> <span id="paymentMethod"></span></p>
@@ -82,10 +104,6 @@
                     <tr>
                         <td><strong>Mobile Number</strong></td>
                         <td id="invoiceMobileNumber"></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Transaction ID</strong></td>
-                        <td id="invoiceTxnId"></td>
                     </tr>
                 </table>
             </div>
@@ -215,16 +233,14 @@
             $('#mobileNumber').text(transactionDetails.mobileNumber || 'N/A');
             $('#amount').text(transactionDetails.amount || '₹0.00');
             $('#refNo').text(transactionDetails.refNo || 'N/A');
-            $('#txnId').text(transactionDetails.txnId || 'N/A');
             $('#date').text(transactionDetails.date || 'N/A');
             $('#time').text(transactionDetails.time || 'N/A');
             $('#paymentMethod').text(transactionDetails.paymentMode || 'Unknown');
 
             // Populate invoice template
-            $('#invoiceCustomerName').text(userDetails.simHolderName || 'Unknown');
-            $('#invoiceMobileNumber').text(userDetails.number || 'N/A');
+            $('#invoiceCustomerName').text(`${userDetails.firstName || ''} ${userDetails.lastName || ''}`.trim() || 'Unknown');
+            $('#invoiceMobileNumber').text(userDetails.phone_number ? `+91 ${userDetails.phone_number}` : 'N/A');
             $('#invoiceRefNo').text(transactionDetails.refNo || 'N/A');
-            $('#invoiceTxnId').text(transactionDetails.txnId || 'N/A');
             $('#invoiceDateTime').text(`${transactionDetails.date} ${transactionDetails.time}` || 'N/A');
             $('#invoicePaymentMethod').text(transactionDetails.paymentMode || 'Unknown');
             $('#invoicePlanName').text(selectedPlan.name || 'N/A');
@@ -261,7 +277,6 @@
             // Share via Email button
             $('#shareEmailBtn').on('click', async function() {
                 const invoiceData = {
-                    transactionId: transactionDetails.txnId,
                     email: userDetails.email || prompt('Please enter your email address:'),
                     customerName: transactionDetails.customerName,
                     mobileNumber: transactionDetails.mobileNumber,
@@ -338,9 +353,11 @@
                 $('#invoice').css('display', 'block');
                 
                 const element = document.getElementById('invoice');
+                // Sanitize mobile number for filename
+                const mobileNumber = transactionDetails.mobileNumber.replace(/[^0-9]/g, ''); // e.g., "+91 9487381354" -> "919487381354"
                 const opt = {
                     margin: 10,
-                    filename: `Nova_SIM_Invoice_${transactionDetails.refNo}.pdf`,
+                    filename: `Nova_SIM_Invoice_${mobileNumber}.pdf`, // Updated to use mobile number
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { scale: 2, useCORS: true },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
