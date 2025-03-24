@@ -33,7 +33,6 @@ public class Invoice {
     @Column(name = "payment_mode", nullable = false)
     private String paymentMode;
 
-    // Getters and Setters
     public Long getInvoiceId() { return invoiceId; }
     public void setInvoiceId(Long invoiceId) { this.invoiceId = invoiceId; }
     public User getUser() { return user; }

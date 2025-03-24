@@ -41,10 +41,6 @@ public class CategoryService {
         return convertToDTO(updatedCategory);
     }
 
-    public void deleteCategory(Long id) {
-        categoryRepository.deleteById(id);
-    }
-
     private CategoryDTO convertToDTO(Category category) {
         CategoryDTO categoryDTO = new CategoryDTO();
         categoryDTO.setId(category.getId());

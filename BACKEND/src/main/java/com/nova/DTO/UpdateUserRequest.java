@@ -9,7 +9,6 @@ public class UpdateUserRequest {
     @Email(message = "Please provide a valid email address")
     private String email;
 
-    // Getters and Setters
     public String getEmail() {
         return email;
     }

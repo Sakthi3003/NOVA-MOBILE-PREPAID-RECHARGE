@@ -19,7 +19,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Pageable;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
@@ -123,8 +122,6 @@ public class AdminController {
         }
     }
     
-    
-    
     // Fetch plans expiring within 3 days
     @GetMapping("/expiring-plans")
     @PreAuthorize("hasRole('ADMIN')")
@@ -201,36 +198,65 @@ public class AdminController {
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "") String status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        Page<UserDTO> usersPage = adminService.getAllSubscribers(search, status, page, size);
-        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "Subscribers fetched successfully", usersPage));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "userId,asc") String sort) {
+        try {
+            Page<UserDTO> usersPage = adminService.getAllSubscribers(search, status, page, size, sort);
+            return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "Subscribers fetched successfully", usersPage));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseDTO<>("ERROR", e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO<>("ERROR", "Failed to fetch subscribers: " + e.getMessage(), null));
+        }
     }
 
     @PostMapping("/user/{userId}/activate")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO<String>> activateUser(@PathVariable Long userId) {
-        adminService.activateUser(userId);
-        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "User activated successfully", null));
+        try {
+            adminService.activateUser(userId);
+            return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "User activated successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO<>("ERROR", "Failed to activate user: " + e.getMessage(), null));
+        }
     }
 
     @PostMapping("/user/{userId}/deactivate")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO<String>> deactivateUser(@PathVariable Long userId) {
-        adminService.deactivateUser(userId);
-        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "User deactivated successfully", null));
+        try {
+            adminService.deactivateUser(userId);
+            return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "User deactivated successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO<>("ERROR", "Failed to deactivate user: " + e.getMessage(), null));
+        }
     }
 
     @PostMapping("/user/{userId}/suspend")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO<String>> suspendUser(@PathVariable Long userId) {
-        adminService.suspendUser(userId);
-        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "User suspended successfully", null));
+        try {
+            adminService.suspendUser(userId);
+            return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "User suspended successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO<>("ERROR", "Failed to suspend user: " + e.getMessage(), null));
+        }
     }
 
     @PostMapping("/check-recharge-status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO<RechargeStatusResponse>> checkRechargeStatus() {
-        RechargeStatusResponse response = adminService.checkRechargeStatus();
-        return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "Recharge status checked", response));
+        try {
+            RechargeStatusResponse response = adminService.checkRechargeStatus();
+            return ResponseEntity.ok(new ResponseDTO<>("SUCCESS", "Recharge status checked", response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO<>("ERROR", "Failed to check recharge status: " + e.getMessage(), null));
+        }
     }
 }

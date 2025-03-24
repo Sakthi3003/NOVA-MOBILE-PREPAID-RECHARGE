@@ -13,7 +13,7 @@ import java.util.*;
 @Component
 public class JwtUtil {
     private final SecretKey secretKey;
-    private Set<String> invalidatedTokens = new HashSet<>(); // Add this line
+    private Set<String> invalidatedTokens = new HashSet<>(); 
 
 
     @Value("${jwt.access.expiration}")
@@ -49,7 +49,7 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(secretKey, SignatureAlgorithm.HS256)  // Use SecretKey
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -69,7 +69,7 @@ public class JwtUtil {
 
     private Claims extractClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)  // Use SecretKey
+                .setSigningKey(secretKey) 
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

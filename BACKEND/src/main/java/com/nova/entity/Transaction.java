@@ -30,7 +30,6 @@ public class Transaction {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    // Getters and Setters
     public Long getTransactionId() { return transactionId; }
     public void setTransactionId(Long transactionId) { this.transactionId = transactionId; }
     public User getUser() { return user; }

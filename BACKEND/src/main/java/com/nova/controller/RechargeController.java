@@ -1,13 +1,11 @@
 package com.nova.controller;
 
 import com.nova.entity.*;
+import com.nova.service.EmailService;
 import com.nova.service.PdfGeneratorService;
 import com.nova.service.RechargeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,10 +25,12 @@ public class RechargeController {
     @Autowired
     private PdfGeneratorService pdfGeneratorService;
 
+    @Autowired
+    private EmailService emailService;
+
     @PostMapping("/recharge")
     public ResponseEntity<Map<String, Object>> recharge(@RequestBody Map<String, Object> request) {
         Map<String, Object> response = new HashMap<>();
-
         try {
             Long userId = Long.parseLong(request.get("userId").toString());
             Long planId = Long.parseLong(request.get("planId").toString());
@@ -43,7 +43,6 @@ public class RechargeController {
             response.put("transactionId", recharge.getTransactionId());
             response.put("message", "Recharge successful");
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
             response.put("status", "Error");
             response.put("message", "Failed to process recharge: " + e.getMessage());
@@ -82,61 +81,105 @@ public class RechargeController {
         return ResponseEntity.ok(invoices);
     }
 
-    @GetMapping(value = "/invoice/download/{transactionId}", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<ByteArrayResource> downloadInvoice(@PathVariable Long transactionId) {
-        Optional<Transaction> transactionOptional = rechargeService.findTransactionsByUserId(
-                rechargeService.findInvoiceByTransactionId(transactionId).get().getUser().getUserId()
-        ).stream().filter(t -> t.getTransactionId().equals(transactionId)).findFirst();
-
-        if (!transactionOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        Transaction transaction = transactionOptional.get();
-        Optional<Invoice> invoiceOptional = rechargeService.findInvoiceByTransactionId(transactionId);
-        if (!invoiceOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        Invoice invoice = invoiceOptional.get();
-        Optional<Recharge> rechargeOptional = rechargeService.findRechargeByTransactionId(transactionId);
-        if (!rechargeOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        Recharge recharge = rechargeOptional.get();
-        User user = transaction.getUser();
-        Plan plan = recharge.getPlan();
-
-        Map<String, Object> invoiceData = new HashMap<>();
-        invoiceData.put("invoiceId", invoice.getInvoiceId());
-        invoiceData.put("transactionId", transaction.getTransactionId());
-        invoiceData.put("userName", user.getFirstName() + " " + user.getLastName());
-        invoiceData.put("phoneNumber", recharge.getPhoneNumber());
-        invoiceData.put("planName", plan.getName());
-        invoiceData.put("planPrice", plan.getPrice());
-        invoiceData.put("gst", invoice.getGst());
-        invoiceData.put("totalAmount", invoice.getTotalAmount());
-        invoiceData.put("transactionDate", invoice.getTransactionDate().toString());
-        invoiceData.put("paymentMode", invoice.getPaymentMode());
-
+    @PostMapping("/invoice/email")
+    public ResponseEntity<Map<String, Object>> sendInvoiceEmail(@RequestBody Map<String, Object> request) {
+        Map<String, Object> response = new HashMap<>();
         try {
+            String email = validateField(request, "email");
+            String customerName = validateField(request, "customerName");
+            String mobileNumber = validateField(request, "mobileNumber");
+            String amount = validateField(request, "amount");
+            String refNo = validateField(request, "refNo");
+            String date = validateField(request, "date");
+            String time = validateField(request, "time");
+            String paymentMode = validateField(request, "paymentMode");
+            String planName = validateField(request, "planName");
+            String data = validateField(request, "data");
+            String validity = validateField(request, "validity");
+            String calls = validateField(request, "calls");
+            String sms = request.get("sms") != null ? request.get("sms").toString() : "N/A"; // Optional field
+
+            Double baseAmount = validateDoubleField(request, "baseAmount");
+            Double gst = validateDoubleField(request, "gst");
+            Double totalAmount = validateDoubleField(request, "totalAmount");
+
+            Map<String, Object> invoiceData = new HashMap<>();
+            invoiceData.put("invoiceId", refNo);
+            invoiceData.put("transactionId", refNo);
+            invoiceData.put("userName", customerName);
+            invoiceData.put("phoneNumber", mobileNumber);
+            invoiceData.put("planName", planName);
+            invoiceData.put("planPrice", baseAmount);
+            invoiceData.put("gst", gst);
+            invoiceData.put("totalAmount", totalAmount);
+            invoiceData.put("transactionDate", date + " " + time);
+            invoiceData.put("paymentMode", paymentMode);
+            invoiceData.put("data", data);
+            invoiceData.put("validity", validity);
+            invoiceData.put("calls", calls);
+            invoiceData.put("sms", sms); // Include even if optional
+
             ByteArrayOutputStream pdfStream = pdfGeneratorService.generateInvoice(invoiceData);
-            ByteArrayResource resource = new ByteArrayResource(pdfStream.toByteArray());
+            byte[] pdfBytes = pdfStream.toByteArray();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice_" + transactionId + ".pdf");
-            headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-            headers.add(HttpHeaders.PRAGMA, "no-cache");
-            headers.add(HttpHeaders.EXPIRES, "0");
+            String emailSubject = "Your Nova Recharge Invoice - Ref No: " + refNo;
+            String emailBody = String.format(
+                "<h2>Dear %s,</h2>" +
+                "<p>Thank you for recharging with Nova! Your recharge has been successfully processed. Below are the details:</p>" +
+                "<ul>" +
+                "<li><strong>Ref No:</strong> %s</li>" +
+                "<li><strong>Plan:</strong> %s</li>" +
+                "<li><strong>Amount:</strong> ₹%.2f (including GST)</li>" +
+                "<li><strong>Phone Number:</strong> %s</li>" +
+                "<li><strong>Data:</strong> %s</li>" +
+                "<li><strong>Validity:</strong> %s</li>" +
+                "<li><strong>Voice:</strong> %s</li>" +
+                (sms.equals("N/A") ? "" : "<li><strong>SMS:</strong> %s</li>") +
+                "</ul>" +
+                "<p>Please find the invoice attached for your records.</p>" +
+                "<p>For any assistance, feel free to contact us at support@nova.com or +91 9876543210.</p>" +
+                "<p>Best regards,<br>The Nova Team</p>",
+                customerName, refNo, planName, totalAmount, mobileNumber, data, validity, calls, sms.equals("N/A") ? "" : sms
+            );
 
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(pdfStream.size())
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .body(resource);
+            emailService.sendEmailWithAttachment(
+                email, emailSubject, emailBody, pdfBytes, "Nova_Invoice_" + refNo + ".pdf"
+            );
+
+            response.put("status", "SUCCESS");
+            response.put("message", "Invoice sent successfully to " + email);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            response.put("status", "ERROR");
+            response.put("message", "Failed to send invoice email: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    private String validateField(Map<String, Object> request, String key) {
+        Object value = request.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing required field: " + key);
+        }
+        String stringValue = value.toString();
+        if (stringValue.trim().isEmpty()) {
+            throw new IllegalArgumentException("Field cannot be empty: " + key);
+        }
+        if (key.equals("email") && !stringValue.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new IllegalArgumentException("Invalid email format: " + stringValue);
+        }
+        return stringValue;
+    }
+
+    private Double validateDoubleField(Map<String, Object> request, String key) {
+        Object value = request.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing required field: " + key);
+        }
+        try {
+            return Double.parseDouble(value.toString());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid numeric value for field: " + key);
         }
     }
 }

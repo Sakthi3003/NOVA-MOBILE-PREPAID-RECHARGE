@@ -12,7 +12,6 @@ public class Role {
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
-    // Getters and Setters
     public Long getRoleId() { return id; }
     public void setRoleId(Long roleId) { this.id = roleId; }
     public String getRoleName() { return name; }

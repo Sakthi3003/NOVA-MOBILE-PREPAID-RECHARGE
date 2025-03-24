@@ -2,17 +2,26 @@ package com.nova.controller;
 
 import com.nova.DTO.AuthRequest;
 import com.nova.DTO.AuthResponse;
+import com.nova.DTO.OtpRequest;
 import com.nova.entity.Otp;
 import com.nova.entity.Role;
 import com.nova.DTO.OtpVerify;
 import com.nova.entity.User;
+import com.nova.exception.InvalidCredentialsException;
+import com.nova.exception.InvalidOtpException;
+import com.nova.exception.InvalidRoleException;
+import com.nova.exception.UserNotFoundException;
 import com.nova.repository.RoleRepository;
 import com.nova.repository.UserRepository;
 import com.nova.security.JwtUtil;
 import com.nova.service.OtpService;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,6 +37,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
@@ -50,85 +61,46 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) throws Exception {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-        );
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody AuthRequest authRequest) {
+        logger.info("Login attempt for username: {}", authRequest.getUsername());
+        Map<String, Object> response = new HashMap<>();
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-        User user = userRepository.findByUsername(authRequest.getUsername())
-                .orElseThrow(() -> new Exception("User not found with username: " + authRequest.getUsername()));
-
-        List<String> roles = user.getRoles().stream()
-                .map(Role::getRoleName)
-                .filter(role -> role.equals("ADMIN") || role.equals("USER"))
-                .collect(Collectors.toList());
-
-        if (roles.isEmpty()) {
-            throw new Exception("No valid roles (ADMIN or USER) assigned to user: " + authRequest.getUsername());
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+            );
+        } catch (BadCredentialsException e) {
+            logger.warn("Invalid credentials for username: {}", authRequest.getUsername());
+            throw new InvalidCredentialsException("Invalid username or password");
+        } catch (Exception e) {
+            logger.error("Authentication failed for username: {}: {}", authRequest.getUsername(), e.getMessage(), e);
+            throw new RuntimeException("Authentication failed: " + e.getMessage(), e);
         }
 
-        String accessToken = jwtUtil.generateToken(userDetails.getUsername(), roles);
-        String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), roles);
-        String responseRole = roles.contains("ADMIN") ? "ADMIN" : "USER";
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+            User user = userRepository.findByUsername(authRequest.getUsername())
+                    .orElseThrow(() -> {
+                        logger.warn("Admin not found with username: {}", authRequest.getUsername());
+                        return new UserNotFoundException("Admin not found with username: " + authRequest.getUsername());
+                    });
 
-        // Include user details in the response
-        Map<String, Object> response = new HashMap<>();
-        response.put("accessToken", accessToken);
-        response.put("refreshToken", refreshToken);
-        response.put("role", responseRole);
-        response.put("user_id", user.getUserId());
-        response.put("userDetails", new HashMap<String, Object>() {{
-            put("activation_date", user.getActivationDate().toString());
-            put("address", user.getAddress());
-            put("email", user.getEmail());
-            put("first_name", user.getFirstName());
-            put("last_name", user.getLastName());
-            put("phone_number", formatPhoneNumber(user.getPhoneNumber()));
-            put("status", user.getStatus());
-            put("username", user.getUsername());
-            put("password",user.getPassword());
-        }});
 
-        return ResponseEntity.ok(response);
-    }
-
- // 1. Send OTP (Updated to return JSON)
-    @PostMapping("/otp/request")
-    public ResponseEntity<Map<String, Object>> requestOtp(@RequestBody Otp otp) throws Exception {
-        String formattedPhoneNumber = formatPhoneNumber(otp.getPhoneNumber());
-        User user = userRepository.findByPhoneNumber(otp.getPhoneNumber())
-                .orElseThrow(() -> new Exception("Phone number not registered: " + otp.getPhoneNumber()));
-        otpService.generateOtp(otp.getPhoneNumber());
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "OTP sent to " + formattedPhoneNumber);
-        return ResponseEntity.ok(response);
-    }
-
-    // 2. Verify OTP (Updated to include user_id and user details)
-    @PostMapping("/otp/verify")
-    public ResponseEntity<?> verifyOtp(@RequestBody OtpVerify verifyRequest) throws Exception {
-        if (otpService.verifyOtp(verifyRequest.getPhoneNumber(), verifyRequest.getOtp())) {
-            User user = userRepository.findByPhoneNumber(verifyRequest.getPhoneNumber())
-                    .orElseThrow(() -> new Exception("User not found with phone number: " + verifyRequest.getPhoneNumber()));
-            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
             List<String> roles = user.getRoles().stream()
                     .map(Role::getRoleName)
                     .filter(role -> role.equals("ADMIN") || role.equals("USER"))
                     .collect(Collectors.toList());
 
             if (roles.isEmpty()) {
-                throw new Exception("No valid roles (ADMIN or USER) assigned to user with phone: " + verifyRequest.getPhoneNumber());
+                logger.warn("No valid roles for user: {}", authRequest.getUsername());
+                throw new InvalidRoleException("No valid roles (ADMIN or USER) assigned to user: " + authRequest.getUsername());
             }
 
             String accessToken = jwtUtil.generateToken(userDetails.getUsername(), roles);
             String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), roles);
-            String responseRole = roles.contains("ADMIN") ? "ADMIN" : "USER";
+            String responseRole = "ADMIN";
 
-            // Include user details in the response
-            Map<String, Object> response = new HashMap<>();
+            response.put("status", "Success");
             response.put("accessToken", accessToken);
             response.put("refreshToken", refreshToken);
             response.put("role", responseRole);
@@ -142,24 +114,142 @@ public class AuthController {
                 put("phone_number", formatPhoneNumber(user.getPhoneNumber()));
                 put("status", user.getStatus());
                 put("username", user.getUsername());
-     
             }});
 
+            logger.info("Login successful for username: {}", authRequest.getUsername());
             return ResponseEntity.ok(response);
+
+        } catch (UserNotFoundException | InvalidRoleException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Failed to process login for username: {}: {}", authRequest.getUsername(), e.getMessage(), e);
+            throw new RuntimeException("Failed to process login: " + e.getMessage(), e);
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid OTP"));
+    }
+
+    @PostMapping("/otp/request")
+    public ResponseEntity<Map<String, Object>> requestOtp(@Valid @RequestBody OtpRequest otp) {
+        logger.info("OTP request for phone number: {}", otp.getPhoneNumber());
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String formattedPhoneNumber = formatPhoneNumber(otp.getPhoneNumber());
+            User user = userRepository.findByPhoneNumber(otp.getPhoneNumber())
+                    .orElseThrow(() -> {
+                        logger.warn("Phone number not registered: {}", otp.getPhoneNumber());
+                        return new UserNotFoundException("Phone number not registered: " + otp.getPhoneNumber());
+                    });
+
+            otpService.generateOtp(otp.getPhoneNumber());
+
+            response.put("status", "Success");
+            response.put("message", "OTP sent to " + formattedPhoneNumber);
+            logger.info("OTP sent successfully to: {}", formattedPhoneNumber);
+            return ResponseEntity.ok(response);
+
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Failed to process OTP request for phone number: {}: {}", otp.getPhoneNumber(), e.getMessage(), e);
+            throw new RuntimeException("Failed to process OTP request: " + e.getMessage(), e);
+        }
+    }
+
+    @PostMapping("/otp/verify")
+    public ResponseEntity<Map<String, Object>> verifyOtp(@Valid @RequestBody OtpVerify verifyRequest) {
+        logger.info("Verifying OTP for phone number: {}", verifyRequest.getPhoneNumber());
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (!otpService.verifyOtp(verifyRequest.getPhoneNumber(), verifyRequest.getOtp())) {
+                logger.warn("Invalid OTP for phone: {}", verifyRequest.getPhoneNumber());
+                throw new InvalidOtpException("Invalid OTP for phone number: " + verifyRequest.getPhoneNumber());
+            }
+
+            User user = userRepository.findByPhoneNumber(verifyRequest.getPhoneNumber())
+                    .orElseThrow(() -> {
+                        logger.warn("User not found with phone number: {}", verifyRequest.getPhoneNumber());
+                        return new UserNotFoundException("User not found with phone number: " + verifyRequest.getPhoneNumber());
+                    });
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+            List<String> roles = user.getRoles().stream()
+                    .map(Role::getRoleName)
+                    .filter(role -> role.equals("ADMIN") || role.equals("USER"))
+                    .collect(Collectors.toList());
+
+            if (roles.isEmpty()) {
+                logger.warn("No valid roles for user with phone: {}", verifyRequest.getPhoneNumber());
+                throw new InvalidRoleException("No valid roles (ADMIN or USER) assigned to user with phone: " + verifyRequest.getPhoneNumber());
+            }
+
+            String accessToken = jwtUtil.generateToken(userDetails.getUsername(), roles);
+            String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), roles);
+            String responseRole = "USER";
+
+            response.put("status", "Success");
+            response.put("accessToken", accessToken);
+            response.put("refreshToken", refreshToken);
+            response.put("role", responseRole);
+            response.put("user_id", user.getUserId());
+            response.put("userDetails", new HashMap<String, Object>() {{
+                put("activation_date", user.getActivationDate().toString());
+                put("address", user.getAddress());
+                put("email", user.getEmail());
+                put("first_name", user.getFirstName());
+                put("last_name", user.getLastName());
+                put("phone_number", formatPhoneNumber(user.getPhoneNumber()));
+                put("status", user.getStatus());
+                put("username", user.getUsername());
+            }});
+
+            logger.info("OTP verified successfully for phone: {}", verifyRequest.getPhoneNumber());
+            return ResponseEntity.ok(response);
+
+        } catch (InvalidOtpException | UserNotFoundException | InvalidRoleException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Failed to verify OTP for phone number: {}: {}", verifyRequest.getPhoneNumber(), e.getMessage(), e);
+            throw new RuntimeException("Failed to verify OTP: " + e.getMessage(), e);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(@RequestHeader(value = "Authorization", required = false) String token) {
+        logger.info("Logout request with token: {}", token);
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (token == null || !token.startsWith("Bearer ")) {
+                logger.warn("Invalid or missing Authorization header");
+                throw new IllegalArgumentException("Invalid or missing Authorization header");
+            }
+
+            String jwtToken = token.substring(7); 
+            jwtUtil.invalidateToken(jwtToken);
+
+            response.put("status", "Success");
+            response.put("message", "Logged out successfully");
+            logger.info("Logout successful");
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            throw e; 
+        } catch (Exception e) {
+            logger.error("Failed to process logout: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to process logout: " + e.getMessage(), e);
+        }
     }
 
     private String formatPhoneNumber(String phoneNumber) {
+        logger.debug("Formatting phone number: {}", phoneNumber);
+        if (phoneNumber == null) {
+            logger.warn("Phone number is null, returning empty string");
+            return "";
+        }
         if (!phoneNumber.startsWith("+")) {
             return "+91" + phoneNumber;
         }
         return phoneNumber;
-    }
-    
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-        jwtUtil.invalidateToken(token);
-        return ResponseEntity.ok("Logged out successfully");
     }
 }

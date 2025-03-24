@@ -32,27 +32,22 @@ public class UserService {
     }
 
     public User updateUser(UpdateUserRequest updateRequest) {
-        // Get the authenticated user's identifier from the SecurityContext
         String subject = SecurityContextHolder.getContext().getAuthentication().getName();
 
         if (subject == null) {
             throw new RuntimeException("No authenticated user found in SecurityContext");
         }
 
-        // Determine if the subject is a phone number or username based on its format
         User user;
         if (isPhoneNumber(subject)) {
-            // Subject is a phone number (for users)
         	
             user = userRepository.findByPhoneNumber("+91"+ subject)
                     .orElseThrow(() -> new RuntimeException("User not found with phone number: " + subject));
         } else {
-            // Subject is a username (for admins)
             user = userRepository.findByUsername(subject)
                     .orElseThrow(() -> new RuntimeException("User not found with username: " + subject));
         }
 
-        // Validate email uniqueness (if email is being updated)
         if (updateRequest.getEmail() != null && !updateRequest.getEmail().equals(user.getEmail())) {
             Optional<User> existingUserWithEmail = userRepository.findByEmail(updateRequest.getEmail());
             if (existingUserWithEmail.isPresent()) {
@@ -60,8 +55,6 @@ public class UserService {
             }
             user.setEmail(updateRequest.getEmail());
         }
-
-        // Save the updated user
         return userRepository.save(user);
     }
 
@@ -76,8 +69,6 @@ public class UserService {
         userDetails.setStatus(user.getStatus());
         return userDetails;
     }
-
-    // Helper method to determine if the subject is a phone number
     private boolean isPhoneNumber(String subject) {
         // A simple check: phone numbers typically contain digits and may start with +
         return subject.matches("\\+?\\d+");

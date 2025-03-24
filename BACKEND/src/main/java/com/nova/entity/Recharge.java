@@ -37,7 +37,6 @@ public class Recharge {
     @Column(name = "transaction_id")
     private Long transactionId;
 
-    // Getters and Setters
     public Long getRechargeId() { return rechargeId; }
     public void setRechargeId(Long rechargeId) { this.rechargeId = rechargeId; }
     public User getUser() { return user; }

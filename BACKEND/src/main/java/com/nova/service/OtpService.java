@@ -33,6 +33,9 @@ public class OtpService {
     @Value("${twilio.phone.number:}")
     private String twilioPhoneNumber;
 
+    @Value("${twilio.default.country.code:+91}")
+    private String defaultCountryCode;
+
     private final OtpRepository otpRepository;
     
     private boolean isTwilioInitialized = false;
@@ -44,7 +47,9 @@ public class OtpService {
     @PostConstruct
     public void initTwilio() {
         try {
-            if (accountSid == null || accountSid.isEmpty() || authToken == null || authToken.isEmpty()) {
+            logger.info("Twilio credentials - Account SID: {}, Auth Token: {}, Phone Number: {}", 
+                        accountSid, authToken, twilioPhoneNumber);
+            if (accountSid.isEmpty() || authToken.isEmpty()) {
                 logger.error("Twilio credentials are not set. Account SID: {}, Auth Token: {}", accountSid, authToken);
                 throw new IllegalStateException("Twilio Account SID and Auth Token must be set in application.properties");
             }
@@ -70,13 +75,14 @@ public class OtpService {
         String otp = String.format("%06d", new Random().nextInt(999999));
 
         Optional<Otp> existingOtp = otpRepository.findByPhoneNumber(formattedPhoneNumber);
+        Otp otpEntity;
         if (existingOtp.isPresent()) {
-            logger.debug("Deleting existing OTP for phone number: {}", formattedPhoneNumber);
-            otpRepository.deleteByPhoneNumber(formattedPhoneNumber);
+            logger.debug("Updating existing OTP for phone number: {}", formattedPhoneNumber);
+            otpEntity = existingOtp.get();
+        } else {
+            otpEntity = new Otp();
+            otpEntity.setPhoneNumber(formattedPhoneNumber);
         }
-
-        Otp otpEntity = new Otp();
-        otpEntity.setPhoneNumber(formattedPhoneNumber);
         otpEntity.setOtp(otp);
         otpEntity.setCreatedAt(LocalDateTime.now());
         otpEntity.setExpiresAt(LocalDateTime.now().plusMinutes(5));
@@ -126,9 +132,9 @@ public class OtpService {
 
     public void sendSms(String phoneNumber, String message) {
         try {
-            ensureTwilioInitialized(); // Ensure Twilio is initialized before sending SMS
+            ensureTwilioInitialized();
 
-            if (twilioPhoneNumber == null || twilioPhoneNumber.isEmpty()) {
+            if (twilioPhoneNumber.isEmpty()) {
                 logger.error("Twilio phone number is not set.");
                 throw new IllegalStateException("Twilio phone number must be set in application.properties");
             }
@@ -158,12 +164,13 @@ public class OtpService {
             logger.error("Phone number is null or empty");
             throw new IllegalArgumentException("Phone number cannot be null or empty");
         }
-        if (!phoneNumber.startsWith("+")) {
-            String formatted = "+91" + phoneNumber;
+        String cleanedPhoneNumber = phoneNumber.replaceAll("[^0-9+]", "");
+        if (!cleanedPhoneNumber.startsWith("+")) {
+            String formatted = defaultCountryCode + cleanedPhoneNumber;
             logger.debug("Formatted phone number: {} to {}", phoneNumber, formatted);
             return formatted;
         }
         logger.debug("Phone number already formatted: {}", phoneNumber);
-        return phoneNumber;
+        return cleanedPhoneNumber;
     }
 }

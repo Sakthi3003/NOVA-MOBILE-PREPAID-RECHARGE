@@ -32,7 +32,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "OR LOWER(COALESCE(u.firstName, '')) LIKE LOWER(CONCAT('%', :search, '%')) " +
             "OR LOWER(COALESCE(u.lastName, '')) LIKE LOWER(CONCAT('%', :search, '%')) " +
             "OR LOWER(COALESCE(u.email, '')) LIKE LOWER(CONCAT('%', :search, '%')) " +
-            "OR LOWER(COALESCE(u.phoneNumber, '')) LIKE LOWER(CONCAT('%', :search, '%')))")
+            "OR LOWER(COALESCE(u.phoneNumber, '')) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+            "AND NOT EXISTS (SELECT r FROM u.roles r WHERE r.name = 'ADMIN')")
      Page<User> findBySearchAndStatus(
              @Param("search") String search,
              @Param("status") String status,

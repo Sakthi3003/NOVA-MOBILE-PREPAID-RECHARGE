@@ -1,7 +1,12 @@
 package com.nova.DTO;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class AuthRequest {
+    @NotBlank(message = "Username cannot be blank")
     private String username;
+
+    @NotBlank(message = "Password cannot be blank")
     private String password;
 
     public String getUsername() { return username; }
