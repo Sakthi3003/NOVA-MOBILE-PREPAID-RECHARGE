@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="icon" href="../assets/images/logo.webp" type="image/x-icon">
     <style>
         :root {
             --primary: #0a21c0;
@@ -1507,7 +1508,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
         let token = sessionStorage.getItem('accessToken');
-        let refreshToken =sessionStorage.getItem('refreshToken');
+        let refreshToken = sessionStorage.getItem('refreshToken');
         let categories = [];
         let currentPage = 0;
         let pageSize = 10;
@@ -1705,10 +1706,10 @@
                 token = data.accessToken;
                 refreshToken = data.refreshToken;
                 
-                localStorage.setItem('accessToken', token);
-                localStorage.setItem('refreshToken', refreshToken);
-                localStorage.setItem('role', data.role);
-                localStorage.setItem('username', data.username || username);
+                sessionStorage.setItem('accessToken', token);
+                sessionStorage.setItem('refreshToken', refreshToken);
+                sessionStorage.setItem('role', data.role);
+                sessionStorage.setItem('username', data.username || username);
                 
                 document.querySelector('.user-name').textContent = data.username || username;
                 document.querySelector('.user-role').textContent = data.role || 'Admin';
@@ -1723,10 +1724,10 @@
         }
 
         function handleLogout() {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('role');
-            localStorage.removeItem('username');
+            sessionStorage.removeItem('accessToken');
+            sessionStorage.removeItem('refreshToken');
+            sessionStorage.removeItem('role');
+            sessionStorage.removeItem('username');
             token = null;
             refreshToken = null;
             window.location.href = 'login.html';
@@ -1750,8 +1751,8 @@
                 token = data.accessToken;
                 refreshToken = data.refreshToken;
                 
-                localStorage.setItem('accessToken', token);
-                localStorage.setItem('refreshToken', refreshToken);
+                sessionStorage.setItem('accessToken', token);
+                sessionStorage.setItem('refreshToken', refreshToken);
                 
                 return token;
             } catch (error) {
@@ -1858,11 +1859,11 @@
                     <td>${plan.category ? plan.category.name : 'N/A'}</td>
                     <td>₹${plan.price}</td>
                     <td>${plan.validity}</td>
-                    <td>${plan.data}</td>
-                    <td>${plan.sms}</td>
-                    <td>${plan.calls}</td>
-                    <td>${plan.benefit1}</td>
-                    <td>${plan.benefit2}</td>
+                    <td>${plan.data || 'N/A'}</td>
+                    <td>${plan.sms || 'N/A'}</td>
+                    <td>${plan.calls || 'N/A'}</td>
+                    <td>${plan.benefit1 || 'N/A'}</td>
+                    <td>${plan.benefit2 || 'N/A'}</td>
                     <td><span class="status-badge ${plan.status === 'active' ? 'status-active' : 'status-inactive'}">${plan.status}</span></td>
                     <td>
                         <button class="action-btn btn-primary edit-plan" data-id="${plan.id}" title="Edit">
@@ -2025,11 +2026,11 @@
                 document.getElementById('plan-category').value = plan.category ? plan.category.id : '';
                 document.getElementById('plan-price').value = plan.price;
                 document.getElementById('plan-validity').value = plan.validity;
-                document.getElementById('plan-data').value = plan.data;
-                document.getElementById('plan-sms').value = plan.sms;
-                document.getElementById('plan-calls').value = plan.calls;
-                document.getElementById('plan-benefit1').value = plan.benefit1;
-                document.getElementById('plan-benefit2').value = plan.benefit2;
+                document.getElementById('plan-data').value = plan.data || '';
+                document.getElementById('plan-sms').value = plan.sms || '';
+                document.getElementById('plan-calls').value = plan.calls || '';
+                document.getElementById('plan-benefit1').value = plan.benefit1 || '';
+                document.getElementById('plan-benefit2').value = plan.benefit2 || '';
                 document.getElementById('plan-status').value = plan.status;
                 
                 document.getElementById('planModalLabel').textContent = 'Edit Plan';
@@ -2063,70 +2064,113 @@
         }
 
         async function savePlan() {
-    const id = document.getElementById('plan-id').value;
-    const name = document.getElementById('plan-name').value.trim();
-    const categoryId = document.getElementById('plan-category').value;
-    const price = document.getElementById('plan-price').value.trim();
-    const validity = document.getElementById('plan-validity').value.trim();
-    const data = document.getElementById('plan-data').value.trim();
-    const sms = document.getElementById('plan-sms').value.trim();
-    const calls = document.getElementById('plan-calls').value.trim();
-    const benefit1 = document.getElementById('plan-benefit1').value.trim();
-    const benefit2 = document.getElementById('plan-benefit2').value.trim();
-    const status = document.getElementById('plan-status').value;
+            const id = document.getElementById('plan-id').value;
+            const name = document.getElementById('plan-name').value.trim();
+            const categoryId = document.getElementById('plan-category').value;
+            const price = document.getElementById('plan-price').value.trim();
+            const validity = document.getElementById('plan-validity').value.trim();
+            const data = document.getElementById('plan-data').value.trim();
+            const sms = document.getElementById('plan-sms').value.trim();
+            const calls = document.getElementById('plan-calls').value.trim();
+            const benefit1 = document.getElementById('plan-benefit1').value.trim();
+            const benefit2 = document.getElementById('plan-benefit2').value.trim();
+            const status = document.getElementById('plan-status').value;
 
-    const plan = {
-        name,
-        categoryId: parseInt(categoryId),
-        price: parseFloat(price),
-        validity,
-        data,
-        sms,
-        calls,
-        benefit1,
-        benefit2,
-    };
+            // Client-side validation
+            if (!name) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Plan Name cannot be empty!'
+                });
+                return;
+            }
+            if (!categoryId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select a Category!'
+                });
+                return;
+            }
+            if (!price || isNaN(price) || parseFloat(price) <= 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Price must be a valid positive number!'
+                });
+                return;
+            }
+            if (!validity) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Validity cannot be empty!'
+                });
+                return;
+            }
 
-    // Include status only when updating (i.e., when id exists)
-    if (id) {
-        plan.status = status;
-    }
+            const plan = {
+                name,
+                categoryId: parseInt(categoryId),
+                price: parseFloat(price),
+                validity,
+                data,
+                sms,
+                calls,
+                benefit1,
+                benefit2
+            };
 
-    try {
-        const method = id ? 'PUT' : 'POST';
-        const url = id ? `http://localhost:8080/api/plans/${id}` : 'http://localhost:8080/api/plans/add';
-        
-        const response = await apiRequest(url, {
-            method,
-            body: JSON.stringify(plan)
-        });
-        
-        if (!response || !response.ok) {
-            throw new Error(id ? 'Failed to update plan' : 'Failed to create plan');
+            if (id) {
+                plan.status = status;
+            }
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const url = id ? `http://localhost:8080/api/plans/${id}` : 'http://localhost:8080/api/plans/add';
+                
+                const response = await apiRequest(url, {
+                    method,
+                    body: JSON.stringify(plan)
+                });
+                
+                if (!response || !response.ok) {
+                    throw new Error(id ? 'Failed to update plan' : 'Failed to create plan');
+                }
+                
+                planModal.classList.remove('show');
+                loadPlans();
+                Swal.fire({
+                    icon: 'success',
+                    title: id ? 'Plan Updated' : 'Plan Created',
+                    text: `The plan has been ${id ? 'updated' : 'created'} successfully!`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } catch (error) {
+                console.error('Error saving plan:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Failed to ${id ? 'update' : 'create'} plan: ${error.message}`
+                });
+            }
         }
-        
-        planModal.classList.remove('show');
-        loadPlans();
-        Swal.fire({
-            icon: 'success',
-            title: id ? 'Plan Updated' : 'Plan Created',
-            text: `The plan has been ${id ? 'updated' : 'created'} successfully!`,
-            timer: 2000,
-            showConfirmButton: false
-        });
-    } catch (error) {
-        console.error('Error saving plan:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: `Failed to ${id ? 'update' : 'create'} plan: ${error.message}`
-        });
-    }
-}
 
         async function saveCategory() {
             const id = document.getElementById('category-id').value;
             const name = document.getElementById('category-name').value.trim();
+
+            // Client-side validation
+            if (!name) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Category Name cannot be empty!'
+                });
+                return;
+            }
 
             const category = { name };
 

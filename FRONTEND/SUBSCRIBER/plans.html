@@ -964,6 +964,7 @@
     <script>
         // Pages configuration (consistent with index.html)
         const guestPages = [
+
             { id: "home", label: "Home", url: "../index.html" },
             { id: "plans", label: "Plans", url: "./plans.html" },
             { id: "support", label: "Support", url: "./support.html" },
@@ -973,7 +974,7 @@
         const loggedInDropdownPages = [
             { id: "myplans", label: "My Plans", url: "./myplans.html" },
             { id: "transactions", label: "Transactions", url: "./transaction.html" },
-            { id: "profile", label: "Profile", url: "./profile.html" },
+            { id: "profile", label: "Profile", url: "./profilef.html" },
         ];
 
         let currentPage = "plans";
@@ -1057,9 +1058,9 @@
         // Map API response to the frontend expected structure
         function mapApiPlansToFrontend(apiPlans) {
             return apiPlans
-                .filter(plan => plan.status === "active") // Only show active plans
+                .filter(plan => plan.status === "active") 
                 .map(plan => ({
-                    id: plan.id, // Include planId
+                    id: plan.id, 
                     category: plan.category.name.toLowerCase().replace(/\s+/g, '-'),
                     name: plan.name,
                     price: plan.price,
@@ -1187,16 +1188,34 @@
             });
         }
 
-        // Generate navigation
+        // Generate navigation (aligned with index.html)
         function generateNavigation() {
             const navLinks = document.getElementById("nav-links");
             navLinks.innerHTML = "";
 
+            // Check both localStorage and sessionStorage for logged-in state
             const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-            isLoggedIn = !!loggedInUser;
+            const userDetailsString = sessionStorage.getItem('userDetails');
+            const accessToken = sessionStorage.getItem('accessToken');
+            let userDetails = null;
+
+            if (userDetailsString) {
+                try {
+                    userDetails = JSON.parse(userDetailsString);
+                } catch (error) {
+                    console.error('Error parsing userDetails:', error);
+                    sessionStorage.removeItem('userDetails');
+                }
+            }
+
+            // User is considered logged in if either loggedInUser or (userDetails and accessToken) exist
+            isLoggedIn = !!(loggedInUser || (userDetails && accessToken));
 
             if (isLoggedIn) {
-                userInitials = loggedInUser?.simHolderName?.charAt(0).toUpperCase() || 'U';
+                // Use first_name for initials (consistent with index.html)
+                userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || 'U';
+
+                // Add guest pages (Admin, Home, Plans, Support, About Us)
                 guestPages.forEach(page => {
                     const link = document.createElement("a");
                     link.href = page.url;
@@ -1209,6 +1228,7 @@
                     navLinks.appendChild(link);
                 });
 
+                // Add dropdown for logged-in user
                 const dropdownDiv = document.createElement('div');
                 dropdownDiv.className = 'dropdown';
 
@@ -1247,6 +1267,7 @@
                 dropdownDiv.appendChild(dropdownMenu);
                 navLinks.appendChild(dropdownDiv);
             } else {
+                // Guest view: Admin, Home, Plans, Support, About Us, Login
                 guestPages.forEach(page => {
                     const link = document.createElement("a");
                     link.href = page.url;
@@ -1280,19 +1301,23 @@
             generateNavigation();
         }
 
-        // Logout function with SweetAlert2 and loading overlay
+        // Logout function with SweetAlert2 and loading overlay (aligned with index.html)
         function logout() {
             const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Show the loading overlay
             loadingOverlay.style.display = 'flex';
 
-            localStorage.removeItem('loggedInUser');
-            localStorage.removeItem('profileSetup');
-            sessionStorage.removeItem('phoneNumber');
+            // Clear all storage
+            localStorage.clear();
             sessionStorage.clear();
             isLoggedIn = false;
             currentPage = 'home';
+
+            // Update navigation immediately
             generateNavigation();
 
+            // Show SweetAlert2 success message and redirect
             Swal.fire({
                 icon: 'success',
                 title: 'Logged Out',
@@ -1419,7 +1444,7 @@
                 }
             } catch (error) {
                 console.error('Error validating phone number dynamically:', error);
-                errorMessage.textContent = 'An error occurred while validating the phone number. Please try again.';
+                errorMessage.textContent = 'Phone number not registered';
                 errorMessage.style.display = "block";
                 return false;
             }
@@ -1463,7 +1488,7 @@
                 }
             } catch (error) {
                 console.error('Error in validateModalNumber:', error);
-                errorMessage.textContent = 'An error occurred while processing the phone number. Please try again.';
+                errorMessage.textContent = 'Phone number not registered';
                 errorMessage.style.display = "block";
             }
         }

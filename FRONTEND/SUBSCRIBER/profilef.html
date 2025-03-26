@@ -12,8 +12,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Font Awesome for Dropdown Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <!-- SweetAlert2 CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         * {
             margin: 0;
@@ -139,6 +137,17 @@
 
         .dropdown-item.active {
             background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Add missing login-btn styles */
+        .login-btn {
+            background-color: white;
+            color: black;
+        }
+
+        .login-btn:hover {
+            background-color: #0a21c0;
             color: white;
         }
 
@@ -421,6 +430,40 @@
             border-right-color: transparent;
         }
 
+        /* Success and Session Messages */
+        .success-message {
+            color: #28a745;
+            font-size: 14px;
+            margin-bottom: 1rem;
+            padding: 10px 15px;
+            border-radius: 4px;
+            background-color: #e6f4ea;
+            border-left: 3px solid #28a745;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-message:before {
+            content: "✅ ";
+        }
+
+        .session-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-bottom: 1rem;
+            padding: 10px 15px;
+            border-radius: 4px;
+            background-color: #fff2f2;
+            border-left: 3px solid #dc3545;
+            display: none;
+            animation: fadeIn 0.3s ease;
+            text-align: center;
+        }
+
+        .session-message:before {
+            content: "⚠️ ";
+        }
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .navbar {
@@ -548,27 +591,19 @@
 
     <!-- Navigation Bar (Updated to Match Screenshot) -->
     <nav class="navbar" id="navbar">
-        <a href="./indexu.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40px" width="100px"></a>
+        <a href="../index.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40px" width="100px"></a>
         <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
         <div class="nav-links" id="nav-links">
-            <a href="./index.html" class="nav-link" id="home-link">Home</a>
-            <a href="./plans.html" class="nav-link" id="plans-link">Plans</a>
-            <a href="./support.html" class="nav-link" id="support-link">Support</a>
-            <a href="./about.html" class="nav-link" id="about-link">About Us</a>
-            <!-- Dropdown with Circular Avatar -->
-            <div class="dropdown">
-                <div class="user-avatar" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span id="dropdown-initial">U</span>
-                </div>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item active" href="./profile.html">Profile</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
-                </ul>
-            </div>
+            <!-- Navigation links will be dynamically generated -->
         </div>
     </nav>
     
     <div id="profile-container" class="container">
+        <!-- Session Expiration Message -->
+        <div class="session-message" id="sessionMessage"></div>
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage"></div>
+
         <h1 class="page-title">My Profile</h1>
         
         <div class="profile-card">
@@ -698,7 +733,7 @@
                             <span class="validation-indicator invalid">✗</span>
                         </div>
                         <div class="email-validation-message" id="email-validation-message">Enter your email address</div>
-                        <div class="error-message" id="email-error">Please enter a valid email address (e.g., john@example.com)</div>
+                        <div class="error-message" id="email-error"></div>
                     </div>
                 </div>
                 
@@ -718,28 +753,159 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap JS (required for dropdown) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-        // profile.js
+        // Pages configuration (consistent with myplans.html)
+        const guestPages = [
+            { id: "home", label: "Home", url: "../index.html" },
+            { id: "plans", label: "Plans", url: "./plans.html" },
+            { id: "support", label: "Support", url: "./support.html" },
+            { id: "about", label: "About Us", url: "./about.html" }
+        ];
+
+        const loggedInDropdownPages = [
+            { id: "myplans", label: "My Plans", url: "./myplans.html" },
+            { id: "transactions", label: "Transactions", url: "./transaction.html" },
+            { id: "profile", label: "Profile", url: "./profilef.html" },
+        ];
+
+        let currentPage = "profile";
+        let isLoggedIn = false;
+        let userInitials = "U";
+        let isLoggingOut = false;
+
+        // Generate navigation (aligned with myplans.html)
+        function generateNavigation() {
+            const navLinks = document.getElementById("nav-links");
+            navLinks.innerHTML = "";
+
+            // Check both localStorage and sessionStorage for logged-in state
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            const userDetailsString = sessionStorage.getItem('userDetails');
+            const accessToken = sessionStorage.getItem('accessToken');
+            let userDetails = null;
+
+            if (userDetailsString) {
+                try {
+                    userDetails = JSON.parse(userDetailsString);
+                } catch (error) {
+                    console.error('Error parsing userDetails:', error);
+                    sessionStorage.removeItem('userDetails');
+                }
+            }
+
+            // User is considered logged in if either loggedInUser or (userDetails and accessToken) exist
+            isLoggedIn = !!(loggedInUser || (userDetails && accessToken));
+
+            if (isLoggedIn) {
+                // Use first_name for initials (consistent with myplans.html)
+                userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || 'U';
+
+                // Add guest pages (Home, Plans, Support, About Us)
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
+                });
+
+                // Add dropdown for logged-in user
+                const dropdownDiv = document.createElement('div');
+                dropdownDiv.className = 'dropdown';
+
+                const avatar = document.createElement('div');
+                avatar.className = 'user-avatar dropdown-toggle';
+                avatar.id = 'profileDropdown';
+                avatar.setAttribute('data-bs-toggle', 'dropdown');
+                avatar.textContent = userInitials;
+                dropdownDiv.appendChild(avatar);
+
+                const dropdownMenu = document.createElement('div');
+                dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
+
+                loggedInDropdownPages.forEach(page => {
+                    const link = document.createElement('a');
+                    link.href = page.url;
+                    link.className = `dropdown-item ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = (e) => {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    dropdownMenu.appendChild(link);
+                });
+
+                const logoutLink = document.createElement('a');
+                logoutLink.href = '#';
+                logoutLink.className = 'dropdown-item';
+                logoutLink.textContent = 'Logout';
+                logoutLink.onclick = (e) => {
+                    e.preventDefault();
+                    logout();
+                };
+                dropdownMenu.appendChild(logoutLink);
+
+                dropdownDiv.appendChild(dropdownMenu);
+                navLinks.appendChild(dropdownDiv);
+            } else {
+                // Guest view: Home, Plans, Support, About Us, Login
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
+                });
+
+                const loginBtn = document.createElement("a");
+                loginBtn.href = "../login.html";
+                loginBtn.className = "btn login-btn";
+                loginBtn.textContent = "Login";
+                navLinks.appendChild(loginBtn);
+            }
+        }
+
+        // Set current page and navigate
+        function setCurrentPage(pageId) {
+            currentPage = pageId;
+            const guestPage = guestPages.find(p => p.id === pageId);
+            const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
+            if (guestPage) {
+                $('#loadingOverlay').css('display', 'flex');
+                setTimeout(() => {
+                    window.location.href = guestPage.url;
+                }, 1000);
+            } else if (loggedInPage) {
+                $('#loadingOverlay').css('display', 'flex');
+                setTimeout(() => {
+                    window.location.href = loggedInPage.url;
+                }, 1000);
+            }
+            generateNavigation();
+        }
 
         // On page load, populate the profile fields with data from sessionStorage
         document.addEventListener('DOMContentLoaded', () => {
+            generateNavigation();
+
             // Get userDetails and accessToken from sessionStorage
             const userDetailsString = sessionStorage.getItem('userDetails');
             const accessToken = sessionStorage.getItem('accessToken');
 
             if (!userDetailsString || !accessToken) {
-                // If no user details or access token are found, redirect to login page
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Session Expired',
-                    text: 'Please log in to view your profile.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                }).then(() => {
-                    window.location.href = './login.html';
-                });
+                // If no user details or access token are found, show session expiration message
+                showSessionMessage('Session expired. Redirecting to login...');
+                setTimeout(() => {
+                    window.location.href = '../login.html';
+                }, 2000);
                 return;
             }
 
@@ -748,15 +914,10 @@
                 userDetails = JSON.parse(userDetailsString);
             } catch (error) {
                 console.error('Error parsing userDetails:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to load user data. Please log in again.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                }).then(() => {
-                    window.location.href = './login.html';
-                });
+                showSessionMessage('Failed to load user data. Redirecting to login...');
+                setTimeout(() => {
+                    window.location.href = '../login.html';
+                }, 2000);
                 return;
             }
 
@@ -776,11 +937,6 @@
                 document.getElementById('email-value').style.color = 'var(--text-color)';
                 document.getElementById('email-value').style.fontStyle = 'normal';
             }
-
-            // Populate dropdown with the initial of the first name
-            const firstName = userDetails.first_name || '';
-            const initial = firstName ? firstName.charAt(0).toUpperCase() : 'U'; // Default to 'U' if first name is not set
-            document.getElementById('dropdown-initial').textContent = initial;
 
             // Ensure .info-grid uses grid layout
             const infoGrids = document.querySelectorAll('.info-grid');
@@ -854,6 +1010,7 @@
 
                 if (!isValid) {
                     emailInput.classList.add('error');
+                    emailError.textContent = 'Please enter a valid email address (e.g., john@example.com)';
                     emailError.style.display = 'block';
                     emailValidIndicator.style.display = 'none';
                     emailInvalidIndicator.style.display = 'block';
@@ -893,6 +1050,8 @@
                     emailInvalidIndicator.style.display = 'none';
                     emailValidationMsg.style.color = '#666';
                     emailValidationMsg.textContent = 'Enter your email address';
+                    emailError.style.display = 'none';
+                    emailInput.classList.remove('error');
                 }
             });
         }
@@ -908,15 +1067,10 @@
 
             if (!accessToken) {
                 hideLoadingOverlay();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Session Expired',
-                    text: 'Access token is missing. Please log in again.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                }).then(() => {
+                showSessionMessage('Session expired. Redirecting to login...');
+                setTimeout(() => {
                     logout();
-                });
+                }, 2000);
                 return;
             }
 
@@ -926,15 +1080,10 @@
             } catch (error) {
                 console.error('Error parsing userDetails:', error);
                 hideLoadingOverlay();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to load user data. Please log in again.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                }).then(() => {
+                showSessionMessage('Failed to load user data. Redirecting to login...');
+                setTimeout(() => {
                     logout();
-                });
+                }, 2000);
                 return;
             }
 
@@ -998,61 +1147,48 @@
 
                 hideLoadingOverlay();
 
-                // Show SweetAlert2 success message
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Email updated successfully!',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                });
+                // Show success message in the UI
+                showSuccessMessage('Email updated successfully!');
             } catch (error) {
                 console.error('Error updating email:', error);
                 hideLoadingOverlay();
-                const errorMessage = error.message || 'Failed to update email. Please try again.';
-                if (error.message.includes('401')) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Session Expired',
-                        text: 'Your session has expired. Please log in again.',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#0a21c0'
-                    }).then(() => {
+                let errorMessage = 'Email already exist. Try different email';
+                if (error.message.toLowerCase().includes('email already exists')) {
+                    errorMessage = 'Email already exists.';
+                } else if (error.message.includes('401')) {
+                    showSessionMessage('Session expired. Redirecting to login...');
+                    setTimeout(() => {
                         logout();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: errorMessage,
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#0a21c0'
-                    });
+                    }, 2000);
+                    return;
+                } else if (error.message.includes('Network')) {
+                    errorMessage = 'Network error. Please check your connection and try again.';
                 }
+                emailInput.classList.add('error');
+                emailError.textContent = errorMessage;
+                emailError.style.display = 'block';
             }
         }
 
         // Logout function with loading overlay
         function logout() {
             console.log('Logout initiated');
+            isLoggingOut = true;
             showLoadingOverlay();
 
-            // Simulate a delay for the logout process (e.g., 1.5 seconds)
-            setTimeout(() => {
-                // Clear sessionStorage
-                sessionStorage.clear();
-                hideLoadingOverlay();
+            // Clear all storage
+            localStorage.clear();
+            sessionStorage.clear();
+            isLoggedIn = false;
+            currentPage = 'home';
 
-                // Show SweetAlert2 success message for logout
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Logged Out',
-                    text: 'You have been logged out successfully.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                }).then(() => {
-                    window.location.href = './login.html';
-                });
+            // Update navigation immediately
+            generateNavigation();
+
+            // Redirect after a brief delay with loading overlay
+            setTimeout(() => {
+                hideLoadingOverlay();
+                window.location.href = '../index.html';
             }, 1500);
         }
 
@@ -1069,6 +1205,27 @@
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
                 overlay.style.display = 'none';
+            }
+        }
+
+        // Show success message
+        function showSuccessMessage(message) {
+            const successMessage = document.getElementById('successMessage');
+            if (successMessage) {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Show session expiration message
+        function showSessionMessage(message) {
+            const sessionMessage = document.getElementById('sessionMessage');
+            if (sessionMessage) {
+                sessionMessage.textContent = message;
+                sessionMessage.style.display = 'block';
             }
         }
     </script>

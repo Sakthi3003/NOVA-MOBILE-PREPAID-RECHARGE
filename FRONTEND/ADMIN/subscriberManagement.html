@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
+    <link rel="icon" href="../assets/images/logo.webp" type="image/x-icon">
+    
     <style>
         :root {
             --primary: #0a21c0;
@@ -195,7 +195,7 @@
             border-radius: 50%;
             display: flex;
             align-items: center;
-  justify-content: center;
+            justify-content: center;
             transition: all 0.2s ease;
         }
 
@@ -294,6 +294,29 @@
             height: 3px;
             background-color: var(--primary);
             border-radius: 2px;
+        }
+
+        /* Error Message */
+        .error-message {
+            color: var(--danger);
+            font-size: 14px;
+            margin-bottom: 1rem;
+            padding: 10px 15px;
+            border-radius: 4px;
+            background-color: #fff2f2;
+            border-left: 3px solid var(--danger);
+            display: none;
+            animation: fadeIn 0.3s ease;
+            text-align: center;
+        }
+
+        .error-message:before {
+            content: "⚠️ ";
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Filter Section */
@@ -816,42 +839,42 @@
             </button>
         </div>
         <ul class="nav-list">
-          <li class="nav-item">
-            <a href="./analytics.html" class="nav-link">
-                <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                <span class="nav-text">Analytics</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="./expiringplans.html" class="nav-link">
-                <span class="nav-icon"><i class="fas fa-clock"></i></span>
-                <span class="nav-text">Expiring Plans</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="./manageplans.html" class="nav-link">
-                <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
-                <span class="nav-text">Manage Plans</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="./subscriberManagement.html" class="nav-link active">
-                <span class="nav-icon"><i class="fas fa-users"></i></span>
-                <span class="nav-text">Manage Users</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="./profile.html" class="nav-link">
-                <span class="nav-icon"><i class="fas fa-user"></i></span>
-                <span class="nav-text">Profile</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="../index.html" class="nav-link logout-btn">
-                <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
-                <span class="nav-text">Logout</span>
-            </a>
-        </li>
+            <li class="nav-item">
+                <a href="./analytics.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./expiringplans.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-clock"></i></span>
+                    <span class="nav-text">Expiring Plans</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./manageplans.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                    <span class="nav-text">Manage Plans</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./subscriberManagement.html" class="nav-link active">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    <span class="nav-text">Manage Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="./profile.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-user"></i></span>
+                    <span class="nav-text">Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link logout-btn" id="logoutBtn">
+                    <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -868,10 +891,10 @@
                     <span class="notification-badge">4</span>
                 </button>
                 <div class="user-profile" id="userProfile">
-                    <div class="avatar">A</div>
+                    <div class="avatar" id="avatar"></div>
                     <div class="user-info">
-                        <div class="user-name">Admin</div>
-                        <div class="user-role"></div>
+                        <div class="user-name" id="userName"></div>
+                        <div class="user-role" id="userRole"></div>
                     </div>
                 </div>
             </div>
@@ -883,6 +906,9 @@
             </div>
 
             <div class="subscriber-container">
+                <!-- Error Message -->
+                <div class="error-message" id="errorMessage"></div>
+
                 <div class="filter-section">
                     <div class="filter-row">
                         <div class="filter-left">
@@ -1016,7 +1042,6 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
         let token = sessionStorage.getItem('accessToken');
         let refreshToken = sessionStorage.getItem('refreshToken');
@@ -1029,16 +1054,7 @@
         let sort = 'userId,asc';
 
         const profileModal = document.getElementById('profileModal');
-
-        const customers = [
-            { id: "john", name: "John Smith", email: "john.smith@example.com", phone: "9876543210", plan: "Validity", expiry: "2025-03-04", amount: "₹299", transactions: [
-                { date: "2025-02-01", plan: "Validity", amount: "₹299", status: "Completed" },
-                { date: "2025-01-01", plan: "Entertainment", amount: "₹299", status: "Completed" }
-            ]},
-            { id: "jane", name: "Jane Doe", email: "jane.doe@example.com", phone: "8124477033", plan: "Validity", expiry: "2025-03-04", amount: "₹499", transactions: [
-                { date: "2025-02-28", plan: "Validity", amount: "₹499", status: "Completed" }
-            ]},
-        ];
+        const errorMessage = document.getElementById('errorMessage');
 
         function debounce(func, wait) {
             let timeout;
@@ -1049,30 +1065,33 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (!token) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Session Expired',
-                    text: 'Please log in again.',
-                    timer: 2000,
-                    showConfirmButton: false
-                }).then(() => {
-                    window.location.href = 'login.html';
-                });
-                return;
+            // Authentication Check
+            function checkAuth() {
+                const accessToken = sessionStorage.getItem('accessToken');
+                if (!accessToken) {
+                    window.location.href = '../index.html'; // Adjust path as per your structure
+                }
             }
 
-            setupEventListeners();
-            fetchSubscribers();
-            checkRechargeStatus();
-        });
+            // Run auth check on load
+            checkAuth();
 
-        function setupEventListeners() {
+            // Display Username and Role from sessionStorage
+            const userDetails = JSON.parse(sessionStorage.getItem('userDetails')) || {};
+            const username = userDetails.username || 'Admin'; // Fallback to 'Admin' if not found
+            const role = sessionStorage.getItem('role') || '';
+            const userNameElement = document.getElementById('userName');
+            const userRoleElement = document.getElementById('userRole');
+            const avatarElement = document.getElementById('avatar');
+
+            userNameElement.textContent = username;
+            userRoleElement.textContent = role;
+            avatarElement.textContent = username.charAt(0).toUpperCase(); // Set avatar to first letter
+
+            // Sidebar Toggle
             const sidebar = document.getElementById('sidebar');
             const content = document.getElementById('content');
             const toggleBtn = document.getElementById('toggleSidebar');
-            const userProfile = document.getElementById('userProfile');
-            const subscriberSearchInput = document.getElementById('subscriberSearchInput');
 
             function isMobile() {
                 return window.innerWidth <= 992;
@@ -1083,7 +1102,7 @@
                 content.classList.add('expanded');
             }
 
-            toggleBtn.addEventListener('click', () => {
+            toggleBtn.addEventListener('click', function() {
                 if (isMobile()) {
                     sidebar.classList.toggle('expanded');
                 } else {
@@ -1092,39 +1111,7 @@
                 }
             });
 
-            userProfile.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const customer = customers[0];
-                document.getElementById('custName').textContent = customer.name;
-                document.getElementById('custEmail').textContent = customer.email;
-                document.getElementById('custPhone').textContent = customer.phone;
-                document.getElementById('custUsername').textContent = customer.id;
-                document.getElementById('custAddress').textContent = 'N/A';
-                document.getElementById('custActivationDate').textContent = customer.expiry;
-                document.getElementById('custLastRecharge').textContent = 'N/A';
-                document.getElementById('custStatus').textContent = 'Active';
-                const transactionBody = document.getElementById('transactionBody');
-                transactionBody.innerHTML = '';
-                customer.transactions.forEach(tx => {
-                    transactionBody.innerHTML += `
-                        <tr>
-                            <td>${tx.date}</td>
-                            <td>${tx.plan}</td>
-                            <td>${tx.amount}</td>
-                            <td>${tx.status}</td>
-                        </tr>
-                    `;
-                });
-                profileModal.classList.add('show');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!userProfile.contains(e.target) && !profileModal.contains(e.target)) {
-                    profileModal.classList.remove('show');
-                }
-            });
-
-            window.addEventListener('resize', () => {
+            window.addEventListener('resize', function() {
                 if (isMobile()) {
                     if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
                         sidebar.classList.add('collapsed');
@@ -1138,20 +1125,52 @@
                 }
             });
 
+            // Setup other event listeners
+            setupEventListeners();
+            fetchSubscribers();
+            checkRechargeStatus();
+
+            // Prevent back button access
+            window.addEventListener('popstate', () => {
+                checkAuth();
+            });
+
+            // Push initial state to history
+            history.pushState(null, null, window.location.href);
+        });
+
+        function setupEventListeners() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const userProfile = document.getElementById('userProfile');
+            const subscriberSearchInput = document.getElementById('subscriberSearchInput');
+
+            userProfile.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Add admin profile details here if needed
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!userProfile.contains(e.target) && !profileModal.contains(e.target)) {
+                    profileModal.classList.remove('show');
+                }
+            });
+
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', function(e) {
-                    if (this.classList.contains('logout-btn')) return;
-                    e.preventDefault();
-                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                    if (isMobile() && sidebar.classList.contains('expanded')) {
-                        sidebar.classList.remove('expanded');
-                    }
-                    const href = this.getAttribute('href');
-                    if (href && href !== '#') {
-                        setTimeout(() => {
-                            window.location.href = href;
-                        }, 300);
+                    if (!this.classList.contains('logout-btn')) {
+                        e.preventDefault();
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                        if (isMobile() && sidebar.classList.contains('expanded')) {
+                            sidebar.classList.remove('expanded');
+                        }
+                        const href = this.getAttribute('href');
+                        if (href && href !== '#') {
+                            setTimeout(() => {
+                                window.location.href = href;
+                            }, 300);
+                        }
                     }
                 });
             });
@@ -1209,18 +1228,30 @@
                 showToast('Loading page ' + (currentPage + 1));
             });
 
-            const logoutBtn = document.querySelector('.logout-btn');
+            // Logout Functionality
+            const logoutBtn = document.getElementById('logoutBtn');
             const loadingOverlay = document.getElementById('loadingOverlay');
-            
+
             logoutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                loadingOverlay.classList.add('active');
-                setTimeout(() => {
+                loadingOverlay.style.display = 'flex';
+                fetch('http://localhost:8080/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}` }
+                })
+                .then(() => {
                     sessionStorage.clear();
-                    token = null;
-                    refreshToken = null;
-                    window.location.href = 'index.html';
-                }, 1500);
+                    setTimeout(() => {
+                        window.location.href = '../index.html'; // Adjust path as per your structure
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Logout Error:', error);
+                    sessionStorage.clear();
+                    setTimeout(() => {
+                        window.location.href = '../index.html'; // Adjust path as per your structure
+                    }, 1500);
+                });
             });
         }
 
@@ -1233,18 +1264,18 @@
                     },
                     body: JSON.stringify({ refreshToken })
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('Token refresh failed');
                 }
-                
+
                 const data = await response.json();
                 token = data.accessToken;
                 refreshToken = data.refreshToken;
-                
+
                 sessionStorage.setItem('accessToken', token);
                 sessionStorage.setItem('refreshToken', refreshToken);
-                
+
                 return token;
             } catch (error) {
                 handleLogout();
@@ -1279,15 +1310,10 @@
                     }
                     return null;
                 } else if (response.status === 403) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Permission Denied',
-                        text: 'You do not have permission to access this resource.',
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
+                    showErrorMessage('Permission Denied. You do not have permission to access this resource. Redirecting to login...');
+                    setTimeout(() => {
                         handleLogout();
-                    });
+                    }, 2000);
                     return null;
                 }
 
@@ -1302,7 +1328,7 @@
             sessionStorage.clear();
             token = null;
             refreshToken = null;
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         }
 
         function showToast(message, type = 'success') {
@@ -1325,17 +1351,27 @@
             toast.show();
         }
 
+        function showErrorMessage(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+
         async function checkRechargeStatus() {
             const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.classList.add('active');
+            loadingOverlay.style.display = 'flex';
 
             try {
                 const response = await apiRequest('http://localhost:8080/api/admin/check-recharge-status', {
-                    method: 'POST'
+                    method: 'POST',
+                    body: JSON.stringify({})
                 });
 
                 if (!response || !response.ok) {
-                    throw new Error('Failed to check recharge status');
+                    const errorData = await response?.json();
+                    throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
                 }
 
                 const result = await response.json();
@@ -1349,19 +1385,28 @@
                 }
             } catch (error) {
                 console.error('Error checking recharge status:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to check recharge status'
-                });
+                let errorMsg = 'Failed to check recharge status. Please try again.';
+                if (error.message.includes('401')) {
+                    showErrorMessage('Session expired. Redirecting to login...');
+                    setTimeout(() => {
+                        handleLogout();
+                    }, 2000);
+                } else if (error.message.includes('403')) {
+                    showErrorMessage('Permission denied. Redirecting to login...');
+                    setTimeout(() => {
+                        handleLogout();
+                    }, 2000);
+                } else {
+                    showErrorMessage(errorMsg);
+                }
             } finally {
-                loadingOverlay.classList.remove('active');
+                loadingOverlay.style.display = 'none';
             }
         }
 
         async function fetchSubscribers() {
             const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.classList.add('active');
+            loadingOverlay.style.display = 'flex';
 
             try {
                 let url = `http://localhost:8080/api/admin/subscribers?page=${currentPage}&size=${pageSize}&sort=${sort}`;
@@ -1372,12 +1417,15 @@
                     url += `&status=${subscriberCurrentFilter}`;
                 }
 
-                const response = await apiRequest(url);
-                
+                const response = await apiRequest(url, {
+                    method: 'GET'
+                });
+
                 if (!response || !response.ok) {
-                    throw new Error('Failed to load subscribers');
+                    const errorData = await response?.json();
+                    throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
                 }
-                
+
                 const apiResponse = await response.json();
                 const pageData = apiResponse.data || apiResponse;
                 const subscribers = pageData.content || [];
@@ -1386,14 +1434,23 @@
                 updatePagination(pageData);
             } catch (error) {
                 console.error('Error loading subscribers:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to load subscribers: ' + error.message
-                });
+                let errorMsg = 'Failed to load subscribers. Please try again.';
+                if (error.message.includes('401')) {
+                    showErrorMessage('Session expired. Redirecting to login...');
+                    setTimeout(() => {
+                        handleLogout();
+                    }, 2000);
+                } else if (error.message.includes('403')) {
+                    showErrorMessage('Permission denied. Redirecting to login...');
+                    setTimeout(() => {
+                        handleLogout();
+                    }, 2000);
+                } else {
+                    showErrorMessage(errorMsg);
+                }
                 renderSubscribersTable([]);
             } finally {
-                loadingOverlay.classList.remove('active');
+                loadingOverlay.style.display = 'none';
             }
         }
 
@@ -1450,7 +1507,7 @@
             const userId = row.getAttribute('data-user-id');
             const statusCell = row.querySelector('td:nth-child(9) .status-badge');
             const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.classList.add('active');
+            loadingOverlay.style.display = 'flex';
 
             try {
                 const response = await apiRequest(`http://localhost:8080/api/admin/user/${userId}/activate`, {
@@ -1458,7 +1515,8 @@
                 });
 
                 if (!response || !response.ok) {
-                    throw new Error('Failed to activate user');
+                    const errorData = await response?.json();
+                    throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
                 }
 
                 const result = await response.json();
@@ -1484,13 +1542,9 @@
                 }
             } catch (error) {
                 console.error('Error activating user:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to activate user'
-                });
+                showErrorMessage(error.message || 'Failed to activate user');
             } finally {
-                loadingOverlay.classList.remove('active');
+                loadingOverlay.style.display = 'none';
             }
         }
 
@@ -1499,7 +1553,7 @@
             const userId = row.getAttribute('data-user-id');
             const statusCell = row.querySelector('td:nth-child(9) .status-badge');
             const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.classList.add('active');
+            loadingOverlay.style.display = 'flex';
 
             try {
                 const response = await apiRequest(`http://localhost:8080/api/admin/user/${userId}/deactivate`, {
@@ -1507,7 +1561,8 @@
                 });
 
                 if (!response || !response.ok) {
-                    throw new Error('Failed to deactivate user');
+                    const errorData = await response?.json();
+                    throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
                 }
 
                 const result = await response.json();
@@ -1529,13 +1584,9 @@
                 }
             } catch (error) {
                 console.error('Error deactivating user:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to deactivate user'
-                });
+                showErrorMessage(error.message || 'Failed to deactivate user');
             } finally {
-                loadingOverlay.classList.remove('active');
+                loadingOverlay.style.display = 'none';
             }
         }
 
@@ -1544,7 +1595,7 @@
             const userId = row.getAttribute('data-user-id');
             const statusCell = row.querySelector('td:nth-child(9) .status-badge');
             const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.classList.add('active');
+            loadingOverlay.style.display = 'flex';
 
             try {
                 const response = await apiRequest(`http://localhost:8080/api/admin/user/${userId}/suspend`, {
@@ -1552,7 +1603,8 @@
                 });
 
                 if (!response || !response.ok) {
-                    throw new Error('Failed to suspend user');
+                    const errorData = await response?.json();
+                    throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
                 }
 
                 const result = await response.json();
@@ -1576,13 +1628,9 @@
                 }
             } catch (error) {
                 console.error('Error suspending user:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to suspend user'
-                });
+                showErrorMessage(error.message || 'Failed to suspend user');
             } finally {
-                loadingOverlay.classList.remove('active');
+                loadingOverlay.style.display = 'none';
             }
         }
 

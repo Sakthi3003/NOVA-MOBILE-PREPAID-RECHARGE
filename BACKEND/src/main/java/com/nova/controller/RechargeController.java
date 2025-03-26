@@ -41,7 +41,10 @@ public class RechargeController {
 
             response.put("status", "Success");
             response.put("transactionId", recharge.getTransactionId());
-            response.put("message", "Recharge successful");
+            response.put("rechargeStatus", recharge.getStatus()); // Include recharge status
+            response.put("message", "Recharge " + (recharge.getStatus().equals("Active") ? "successful" : "queued"));
+            response.put("startDate", recharge.getStartDate().toString());
+            response.put("endDate", recharge.getEndDate().toString());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("status", "Error");

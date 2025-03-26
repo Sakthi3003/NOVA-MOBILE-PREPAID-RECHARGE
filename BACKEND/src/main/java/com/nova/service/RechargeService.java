@@ -3,7 +3,9 @@ package com.nova.service;
 import com.nova.entity.*;
 import com.nova.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
@@ -35,10 +37,10 @@ public class RechargeService {
     private OtpService otpService;
 
     @Autowired
-    private PdfGeneratorService pdfGeneratorService; 
+    private PdfGeneratorService pdfGeneratorService;
 
     @Autowired
-    private EmailService emailService; 
+    private EmailService emailService;
 
     public Recharge rechargeUser(Long userId, Long planId, String phoneNumber, String paymentMethod) throws Exception {
         // Fetch user
@@ -55,12 +57,6 @@ public class RechargeService {
         }
         Plan plan = planOptional.get();
 
-        // Removed the active plan check to allow multiple recharges
-        // Optional<Recharge> activeRechargeOptional = rechargeRepository.findActiveRechargeByUserId(userId);
-        // if (activeRechargeOptional.isPresent()) {
-        //     throw new Exception("You already have an active plan");
-        // }
-
         // Simulate payment processing
         boolean paymentSuccessful = simulatePayment(userId, plan.getPrice(), paymentMethod);
         if (!paymentSuccessful) {
@@ -76,14 +72,43 @@ public class RechargeService {
         transaction.setCreatedAt(LocalDateTime.now());
         transaction = transactionRepository.save(transaction);
 
+        // Determine recharge status based on category and existing plans
+        String rechargeStatus;
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(Long.parseLong(plan.getValidity().split(" ")[0]));
+
+        // Fetch all active recharges for the user (excluding expired ones)
+        List<Recharge> activeRecharges = rechargeRepository.findByUserId(userId)
+                .stream()
+                .filter(r -> "Active".equals(r.getStatus()) && r.getEndDate().isAfter(LocalDate.now()))
+                .toList();
+
+        if ("data".equalsIgnoreCase(plan.getCategory().getName())) {
+            // Data plans are activated immediately, even with other active plans
+            rechargeStatus = "Active";
+        } else if (activeRecharges.isEmpty()) {
+            // No active plans, activate immediately
+            rechargeStatus = "Active";
+        } else {
+            // Non-data plan with active plans, set as Pending
+            rechargeStatus = "Pending";
+            // Set start date to the day after the latest active plan expires
+            LocalDate latestEndDate = activeRecharges.stream()
+                    .map(Recharge::getEndDate)
+                    .max(LocalDate::compareTo)
+                    .orElse(LocalDate.now());
+            startDate = latestEndDate.plusDays(1);
+            endDate = startDate.plusDays(Long.parseLong(plan.getValidity().split(" ")[0]));
+        }
+
         // Create recharge
         Recharge recharge = new Recharge();
         recharge.setUser(user);
         recharge.setPlan(plan);
         recharge.setPhoneNumber(phoneNumber);
-        recharge.setStartDate(LocalDate.now());
-        recharge.setEndDate(LocalDate.now().plusDays(Long.parseLong(plan.getValidity().split(" ")[0])));
-        recharge.setStatus("Active");
+        recharge.setStartDate(startDate);
+        recharge.setEndDate(endDate);
+        recharge.setStatus(rechargeStatus);
         recharge.setTransactionId(transaction.getTransactionId());
         recharge = rechargeRepository.save(recharge);
 
@@ -97,14 +122,16 @@ public class RechargeService {
         invoice.setPaymentMode(paymentMethod);
         invoice = invoiceRepository.save(invoice);
 
-        // Send SMS notification after successful recharge
+        // Send SMS notification
         String smsMessage = String.format(
-            "Dear %s, your recharge of ₹%.2f for plan '%s' on number %s has been successful. Transaction ID: %d. Valid until: %s. Thank you for choosing Nova!",
+            "Dear %s, your recharge of ₹%.2f for plan '%s' on number %s has been %s. Transaction ID: %d. Valid from: %s to %s. Thank you for choosing Nova!",
             user.getFirstName() + " " + user.getLastName(),
             plan.getPrice(),
             plan.getName(),
             phoneNumber,
+            rechargeStatus.equals("Active") ? "successful" : "queued",
             transaction.getTransactionId(),
+            recharge.getStartDate().toString(),
             recharge.getEndDate().toString()
         );
         try {
@@ -125,36 +152,41 @@ public class RechargeService {
         invoiceData.put("totalAmount", invoice.getTotalAmount());
         invoiceData.put("transactionDate", invoice.getTransactionDate().toString());
         invoiceData.put("paymentMode", invoice.getPaymentMode());
+        invoiceData.put("status", rechargeStatus);
+        invoiceData.put("startDate", recharge.getStartDate().toString());
+        invoiceData.put("endDate", recharge.getEndDate().toString());
 
         try {
-            // Generate PDF
             ByteArrayOutputStream pdfStream = pdfGeneratorService.generateInvoice(invoiceData);
             byte[] pdfBytes = pdfStream.toByteArray();
 
-            // Prepare email content
             String emailSubject = "Your Nova Recharge Invoice - Transaction ID: " + transaction.getTransactionId();
             String emailBody = String.format(
                 "<h2>Dear %s,</h2>" +
-                "<p>Thank you for recharging with Nova! Your recharge has been successfully processed. Below are the details:</p>" +
+                "<p>Thank you for recharging with Nova! Your recharge has been %s. Below are the details:</p>" +
                 "<ul>" +
                 "<li><strong>Transaction ID:</strong> %d</li>" +
                 "<li><strong>Plan:</strong> %s</li>" +
                 "<li><strong>Amount:</strong> ₹%.2f (including GST)</li>" +
                 "<li><strong>Phone Number:</strong> %s</li>" +
+                "<li><strong>Status:</strong> %s</li>" +
+                "<li><strong>Valid From:</strong> %s</li>" +
                 "<li><strong>Valid Until:</strong> %s</li>" +
                 "</ul>" +
                 "<p>Please find the invoice attached for your records.</p>" +
                 "<p>For any assistance, feel free to contact us at support@nova.com or +91 9876543210.</p>" +
                 "<p>Best regards,<br>The Nova Team</p>",
                 user.getFirstName() + " " + user.getLastName(),
+                rechargeStatus.equals("Active") ? "successfully processed" : "queued for activation",
                 transaction.getTransactionId(),
                 plan.getName(),
                 invoice.getTotalAmount(),
                 phoneNumber,
+                rechargeStatus,
+                recharge.getStartDate().toString(),
                 recharge.getEndDate().toString()
             );
 
-            // Send email with PDF attachment
             emailService.sendEmailWithAttachment(
                 user.getEmail(),
                 emailSubject,
@@ -170,8 +202,81 @@ public class RechargeService {
     }
 
     private boolean simulatePayment(Long userId, double amount, String paymentMethod) {
-        // Simulate payment success/failure (e.g., 90% success rate)
         return Math.random() > 0.1;
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *") // Run at midnight every day
+    public void updateRechargeStatuses() {
+        LocalDate today = LocalDate.now();
+        System.out.println("Running updateRechargeStatuses task at " + LocalDateTime.now() + " for date: " + today);
+
+        // Step 1: Mark expired recharges
+        List<Recharge> activeRecharges = rechargeRepository.findAll();
+        System.out.println("Total recharges found: " + activeRecharges.size());
+
+        List<Recharge> toBeExpired = activeRecharges.stream()
+                .filter(r -> "Active".equals(r.getStatus()) && r.getEndDate().isBefore(today))
+                .toList();
+
+        System.out.println("Recharges to be marked as Expired: " + toBeExpired.size());
+        for (Recharge recharge : toBeExpired) {
+            System.out.println("Marking recharge " + recharge.getRechargeId() + " as Expired (endDate: " + recharge.getEndDate() + ")");
+            recharge.setStatus("Expired");
+            rechargeRepository.save(recharge);
+            notifyUserAboutExpiration(recharge);
+        }
+
+        // Step 2: Activate pending recharges if no active plans remain
+        List<Recharge> pendingRecharges = activeRecharges.stream()
+                .filter(r -> "Pending".equals(r.getStatus()) && !r.getStartDate().isAfter(today))
+                .toList();
+
+        System.out.println("Pending recharges to check: " + pendingRecharges.size());
+        for (Recharge recharge : pendingRecharges) {
+            List<Recharge> activeForUser = rechargeRepository.findByUserId(recharge.getUser().getUserId())
+                    .stream()
+                    .filter(r -> "Active".equals(r.getStatus()) && r.getEndDate().isAfter(today))
+                    .toList();
+
+            System.out.println("Active recharges for user " + recharge.getUser().getUserId() + ": " + activeForUser.size());
+            if (activeForUser.isEmpty()) {
+                System.out.println("Activating pending recharge " + recharge.getRechargeId() + " for user " + recharge.getUser().getUserId());
+                recharge.setStatus("Active");
+                rechargeRepository.save(recharge);
+                notifyUserAboutActivation(recharge);
+            }
+        }
+    }
+
+    private void notifyUserAboutExpiration(Recharge recharge) {
+        String smsMessage = String.format(
+            "Dear %s, your plan '%s' for number %s has expired on %s. Recharge now to stay connected!",
+            recharge.getUser().getFirstName() + " " + recharge.getUser().getLastName(),
+            recharge.getPlan().getName(),
+            recharge.getPhoneNumber(),
+            recharge.getEndDate().toString()
+        );
+        try {
+            otpService.sendSms(recharge.getPhoneNumber(), smsMessage);
+        } catch (Exception e) {
+            System.err.println("Failed to send expiration SMS: " + e.getMessage());
+        }
+    }
+
+    private void notifyUserAboutActivation(Recharge recharge) {
+        String smsMessage = String.format(
+            "Dear %s, your queued plan '%s' for number %s is now active. Valid until %s. Enjoy!",
+            recharge.getUser().getFirstName() + " " + recharge.getUser().getLastName(),
+            recharge.getPlan().getName(),
+            recharge.getPhoneNumber(),
+            recharge.getEndDate().toString()
+        );
+        try {
+            otpService.sendSms(recharge.getPhoneNumber(), smsMessage);
+        } catch (Exception e) {
+            System.err.println("Failed to send activation SMS: " + e.getMessage());
+        }
     }
 
     public Optional<Recharge> findActiveRechargeByUserId(Long userId) {
@@ -201,4 +306,6 @@ public class RechargeService {
     public Optional<Invoice> findInvoiceByTransactionId(Long transactionId) {
         return invoiceRepository.findByTransactionId(transactionId);
     }
+    
+    
 }

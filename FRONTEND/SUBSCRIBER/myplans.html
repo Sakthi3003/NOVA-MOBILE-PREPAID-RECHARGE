@@ -29,6 +29,7 @@
             --bg-color: #fff;
             --error-color: #dc3545;
             --success-color: #34c759;
+            --pending-color: #ffc107; /* Color for Pending status */
             --light-bg: #f6f7f9;
             --border-color: #e1e5eb;
             --hover-color: #081b9e;
@@ -139,6 +140,17 @@
 
         .dropdown-item.active {
             background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Add missing login-btn styles */
+        .login-btn {
+            background-color: white;
+            color: black;
+        }
+
+        .login-btn:hover {
+            background-color: #0a21c0;
             color: white;
         }
 
@@ -346,6 +358,11 @@
 
         .status-active {
             color: var(--success-color);
+            font-weight: 500;
+        }
+
+        .status-pending {
+            color: var(--pending-color);
             font-weight: 500;
         }
 
@@ -608,25 +625,54 @@
         <a href="./indexu.html" class="logo"><img src="../assets/images/logo.webp" alt="" height="40px" width="100px"></a>
         <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
         <div class="nav-links" id="nav-links">
-            <a href="./indexu.html" class="nav-link" id="home-link">Home</a>
-            <a href="./plansu.html" class="nav-link" id="plans-link">Plans</a>
-            <a href="./support.html" class="nav-link" id="support-link">Support</a>
-            <a href="./about.html" class="nav-link" id="about-link">About Us</a>
+            <!-- Navigation links will be dynamically generated -->
         </div>
     </nav>
 
     <div class="container">
-        <div class="section-title">Current Plan</div>
+        <!-- Active Plans Section -->
+        <div class="section-title">Current Plans</div>
         <div id="currentPlanSection">
-            <!-- Current plan will be populated dynamically -->
+            <!-- Current plans will be populated dynamically -->
         </div>
-        
-        <div class="section-title">Previous Plans</div>
+
+        <!-- Pending Plans Section -->
+        <div class="section-title">Pending Plans</div>
         <div class="filters">
-            <input type="text" class="search-input" placeholder="Search plans..." id="planSearch">
+            <input type="text" class="search-input" placeholder="Search plans..." id="pendingPlanSearch">
             <div class="filter-group">
                 <label class="filter-label">Category:</label>
-                <select class="filter-select" id="categoryFilter">
+                <select class="filter-select" id="pendingCategoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="entertainment-plans">Entertainment</option>
+                    <option value="5g-plans">5G</option>
+                    <option value="data-plans">Data</option>
+                    <option value="voice-plans">Voice</option>
+                </select>
+            </div>
+        </div>
+        <table class="plans-table">
+            <thead>
+                <tr>
+                    <th>Plan Name</th>
+                    <th>Price</th>
+                    <th>Start Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="pendingPlansTableBody">
+                <!-- Pending plans will be populated dynamically -->
+            </tbody>
+        </table>
+
+        <!-- Expired Plans Section -->
+        <div class="section-title">Expired Plans</div>
+        <div class="filters">
+            <input type="text" class="search-input" placeholder="Search plans..." id="expiredPlanSearch">
+            <div class="filter-group">
+                <label class="filter-label">Category:</label>
+                <select class="filter-select" id="expiredCategoryFilter">
                     <option value="">All Categories</option>
                     <option value="entertainment-plans">Entertainment</option>
                     <option value="5g-plans">5G</option>
@@ -645,8 +691,8 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="plansTableBody">
-                <!-- Previous plans will be populated dynamically -->
+            <tbody id="expiredPlansTableBody">
+                <!-- Expired plans will be populated dynamically -->
             </tbody>
         </table>
     </div>
@@ -656,7 +702,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Plan Details</h3>
-                <button class="modal-close" id="modalClose">&times;</button>
+                <button class="modal-close" id="modalClose">×</button>
             </div>
             <div class="modal-body" id="modalBody">
                 <!-- Plan details will be populated dynamically -->
@@ -674,41 +720,62 @@
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-        const loggedInDropdownPages = [
-            { id: "myplans", label: "My Plans", url: "myplans.html" },
-            { id: "transactions", label: "Transactions", url: "transaction.html" },
-            { id: "profile", label: "Profile", url: "profilef.html" },
+        // Pages configuration (consistent with plans.html)
+        const guestPages = [
+            { id: "home", label: "Home", url: "../index.html" },
+            { id: "plans", label: "Plans", url: "./plans.html" },
+            { id: "support", label: "Support", url: "./support.html" },
+            { id: "about", label: "About Us", url: "./about.html" }
         ];
 
-        const mainPages = [
-            { id: "home", label: "Home", url: "./indexu.html" },
-            { id: "plans", label: "Plans", url: "plansu.html" },
-            { id: "support", label: "Support", url: "support.html" },
-            { id: "about", label: "About Us", url: "about.html" }
+        const loggedInDropdownPages = [
+            { id: "myplans", label: "My Plans", url: "./myplans.html" },
+            { id: "transactions", label: "Transactions", url: "./transaction.html" },
+            { id: "profile", label: "Profile", url: "./profilef.html" },
         ];
 
         let currentPage = "myplans";
-        let plansData = [];
+        let plansData = { activePlans: [], pendingPlans: [], expiredPlans: [] };
+        let isLoggedIn = false;
+        let userInitials = "U";
+        let isLoggingOut = false;
 
+        // Generate navigation
         function generateNavigation() {
             const navLinks = document.getElementById("nav-links");
-            const homeLink = document.getElementById("home-link");
-            const plansLink = document.getElementById("plans-link");
-            const supportLink = document.getElementById("support-link");
-            const aboutLink = document.getElementById("about-link");
+            navLinks.innerHTML = "";
 
-            homeLink.className = `nav-link ${currentPage === 'home' ? 'active' : ''}`;
-            plansLink.className = `nav-link ${currentPage === 'plans' ? 'active' : ''}`;
-            supportLink.className = `nav-link ${currentPage === 'support' ? 'active' : ''}`;
-            aboutLink.className = `nav-link ${currentPage === 'about' ? 'active' : ''}`;
-
-            const existingDropdown = navLinks.querySelector('.dropdown');
-            if (existingDropdown) existingDropdown.remove();
-
-            const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            const userDetailsString = sessionStorage.getItem('userDetails');
             const accessToken = sessionStorage.getItem('accessToken');
+            let userDetails = null;
 
-            if (userDetails && accessToken) {
+            if (userDetailsString) {
+                try {
+                    userDetails = JSON.parse(userDetailsString);
+                } catch (error) {
+                    console.error('Error parsing userDetails:', error);
+                    sessionStorage.removeItem('userDetails');
+                }
+            }
+
+            isLoggedIn = !!(loggedInUser || (userDetails && accessToken));
+
+            if (isLoggedIn) {
+                userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || 'U';
+
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
+                });
+
                 const dropdownDiv = document.createElement('div');
                 dropdownDiv.className = 'dropdown';
 
@@ -716,7 +783,7 @@
                 avatar.className = 'user-avatar dropdown-toggle';
                 avatar.id = 'profileDropdown';
                 avatar.setAttribute('data-bs-toggle', 'dropdown');
-                avatar.textContent = userDetails.first_name ? userDetails.first_name.charAt(0).toUpperCase() : 'U';
+                avatar.textContent = userInitials;
                 dropdownDiv.appendChild(avatar);
 
                 const dropdownMenu = document.createElement('div');
@@ -747,45 +814,71 @@
                 dropdownDiv.appendChild(dropdownMenu);
                 navLinks.appendChild(dropdownDiv);
             } else {
-                sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Session Expired',
-                    text: 'Please log in to view your plans.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                }).then(() => {
-                    window.location.href = '../login.html';
+                guestPages.forEach(page => {
+                    const link = document.createElement("a");
+                    link.href = page.url;
+                    link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
+                    link.textContent = page.label;
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        setCurrentPage(page.id);
+                    };
+                    navLinks.appendChild(link);
                 });
+
+                const loginBtn = document.createElement("a");
+                loginBtn.href = "../login.html";
+                loginBtn.className = "btn login-btn";
+                loginBtn.textContent = "Login";
+                navLinks.appendChild(loginBtn);
+
+                if (!isLoggingOut) {
+                    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Session Expired',
+                        text: 'Please log in to view your plans.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0a21c0'
+                    }).then(() => {
+                        window.location.href = '../login.html';
+                    });
+                }
             }
         }
 
         function setCurrentPage(pageId) {
             currentPage = pageId;
-            const page = [...mainPages, ...loggedInDropdownPages].find(p => p.id === pageId);
-            if (page) {
+            const guestPage = guestPages.find(p => p.id === pageId);
+            const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
+            if (guestPage) {
                 $('#loadingOverlay').css('display', 'flex');
                 setTimeout(() => {
-                    window.location.href = page.url;
+                    window.location.href = guestPage.url;
+                }, 1000);
+            } else if (loggedInPage) {
+                $('#loadingOverlay').css('display', 'flex');
+                setTimeout(() => {
+                    window.location.href = loggedInPage.url;
                 }, 1000);
             }
             generateNavigation();
         }
 
         function logout() {
+            isLoggingOut = true;
             $('#loadingOverlay').css('display', 'flex');
+            
+            localStorage.clear();
+            sessionStorage.clear();
+            isLoggedIn = false;
+            currentPage = 'home';
+
+            generateNavigation();
+
             setTimeout(() => {
-                sessionStorage.clear();
                 $('#loadingOverlay').css('display', 'none');
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Logged Out',
-                    text: 'You have been logged out successfully.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                }).then(() => {
-                    window.location.href = '../login.html';
-                });
+                window.location.href = '../index.html';
             }, 1500);
         }
 
@@ -797,16 +890,18 @@
         async function fetchUserPlans() {
             const accessToken = sessionStorage.getItem('accessToken');
             if (!accessToken) {
-                sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Session Expired',
-                    text: 'Please log in to view your plans.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                }).then(() => {
-                    window.location.href = '../login.html';
-                });
+                if (!isLoggingOut) {
+                    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Session Expired',
+                        text: 'Please log in to view your plans.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0a21c0'
+                    }).then(() => {
+                        window.location.href = '../login.html';
+                    });
+                }
                 return;
             }
 
@@ -822,7 +917,7 @@
                 });
 
                 if (!response.ok) {
-                    if (response.status === 401) {
+                    if (response.status === 401 && !isLoggingOut) {
                         sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
                         Swal.fire({
                             icon: 'warning',
@@ -839,105 +934,151 @@
                 }
 
                 const data = await response.json();
-                plansData = [...data.activePlans, ...data.previousPlans];
-                renderCurrentPlan(data.activePlans);
-                renderPreviousPlans(data.previousPlans);
+                console.log('Fetched plans data:', data);
+                plansData = {
+                    activePlans: data.activePlans || [],
+                    pendingPlans: data.pendingPlans || [],
+                    expiredPlans: data.expiredPlans || []
+                };
+                console.log('Active plans:', plansData.activePlans);
+                renderCurrentPlan(plansData.activePlans);
+                renderPendingPlans(plansData.pendingPlans);
+                renderExpiredPlans(plansData.expiredPlans);
             } catch (error) {
                 console.error('Error fetching plans:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to load plans. Please try again later.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0a21c0'
-                });
+                if (!isLoggingOut) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load plans. Please try again later.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0a21c0'
+                    });
+                }
                 renderCurrentPlan([]);
-                renderPreviousPlans([]);
+                renderPendingPlans([]);
+                renderExpiredPlans([]);
             } finally {
                 $('#loadingOverlay').css('display', 'none');
             }
         }
 
         function renderCurrentPlan(activePlans) {
+            console.log('Rendering active plans:', activePlans);
             const currentPlanSection = $('#currentPlanSection');
             currentPlanSection.empty();
 
             if (activePlans.length === 0) {
+                console.log('No active plans to render');
                 currentPlanSection.html('<div class="no-plan-message">No active plan found.</div>');
                 return;
             }
 
-            const plan = activePlans[0];
-            const startDate = new Date(plan.startDate);
-            const endDate = new Date(plan.endDate);
-            const today = new Date();
-            const daysRemaining = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+            // Sort by startDate (newest first) and prioritize data plans
+            activePlans.sort((a, b) => {
+                if (a.category.toLowerCase() === 'data' && b.category.toLowerCase() !== 'data') return -1;
+                if (a.category.toLowerCase() !== 'data' && b.category.toLowerCase() === 'data') return 1;
+                return new Date(b.startDate) - new Date(a.startDate);
+            });
 
-            currentPlanSection.html(`
-                <div class="current-plan-card">
-                    <div class="current-plan-header">
-                        <div class="plan-name">${plan.name}</div>
-                        <div class="plan-badge">${plan.status}</div>
+            activePlans.forEach(plan => {
+                const startDate = new Date(plan.startDate);
+                const endDate = new Date(plan.endDate);
+                const today = new Date();
+                const daysRemaining = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+
+                currentPlanSection.append(`
+                    <div class="current-plan-card">
+                        <div class="current-plan-header">
+                            <div class="plan-name">${plan.name}</div>
+                            <div class="plan-badge">${plan.status}</div>
+                        </div>
+                        <div class="plan-details">
+                            <div class="plan-detail">
+                                <div class="detail-label">Subscription Fee</div>
+                                <div class="detail-value price-value">₹${plan.price.toLocaleString()}/month</div>
+                            </div>
+                            <div class="plan-detail">
+                                <div class="detail-label">Start Date</div>
+                                <div class="detail-value">${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                            </div>
+                            <div class="plan-detail">
+                                <div class="detail-label">End Date</div>
+                                <div class="detail-value">${endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                            </div>
+                            <div class="plan-detail">
+                                <div class="detail-label">Days Remaining</div>
+                                <div class="detail-value">${daysRemaining} days</div>
+                            </div>
+                        </div>
+                        <div class="usage-info">
+                            <div class="usage-item">
+                                <div class="usage-label">Data</div>
+                                <div class="usage-value">${plan.data}</div>
+                            </div>
+                            <div class="usage-item">
+                                <div class="usage-label">SMS</div>
+                                <div class="usage-value">${plan.sms}</div>
+                            </div>
+                            <div class="usage-item">
+                                <div class="usage-label">Voice Minutes</div>
+                                <div class="usage-value">${plan.calls}</div>
+                            </div>
+                        </div>
+                        <div class="plan-actions">
+                            <button class="button button-secondary view-details" data-plan-id="${plan.id}" data-plan-type="active">View Details</button>
+                            <button class="button">Renew Plan</button>
+                        </div>
                     </div>
-                    <div class="plan-details">
-                        <div class="plan-detail">
-                            <div class="detail-label">Subscription Fee</div>
-                            <div class="detail-value price-value">₹${plan.price.toLocaleString()}/month</div>
-                        </div>
-                        <div class="plan-detail">
-                            <div class="detail-label">Start Date</div>
-                            <div class="detail-value">${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
-                        </div>
-                        <div class="plan-detail">
-                            <div class="detail-label">End Date</div>
-                            <div class="detail-value">${endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
-                        </div>
-                        <div class="plan-detail">
-                            <div class="detail-label">Days Remaining</div>
-                            <div class="detail-value">${daysRemaining} days</div>
-                        </div>
-                    </div>
-                    <div class="usage-info">
-                        <div class="usage-item">
-                            <div class="usage-label">Data Balance</div>
-                            <div class="usage-value">${plan.data}</div>
-                        </div>
-                        <div class="usage-item">
-                            <div class="usage-label">SMS Balance</div>
-                            <div class="usage-value">${plan.sms}</div>
-                        </div>
-                        <div class="usage-item">
-                            <div class="usage-label">Voice Minutes</div>
-                            <div class="usage-value">${plan.calls}</div>
-                        </div>
-                    </div>
-                    <div class="plan-actions">
-                        <button class="button button-secondary view-details" data-plan-id="${plan.id}">View Details</button>
-                        <button class="button">Renew Plan</button>
-                    </div>
-                </div>
-            `);
+                `);
+            });
         }
 
-        function renderPreviousPlans(previousPlans) {
-            const plansTableBody = $('#plansTableBody');
-            plansTableBody.empty();
+        function renderPendingPlans(pendingPlans) {
+            const pendingPlansTableBody = $('#pendingPlansTableBody');
+            pendingPlansTableBody.empty();
 
-            if (previousPlans.length === 0) {
-                plansTableBody.html('<tr><td colspan="5" class="no-plan-message">No previous plans found.</td></tr>');
+            if (pendingPlans.length === 0) {
+                pendingPlansTableBody.html('<tr><td colspan="5" class="no-plan-message">No pending plans found.</td></tr>');
                 return;
             }
 
-            previousPlans.forEach(plan => {
+            pendingPlans.forEach(plan => {
+                const startDate = new Date(plan.startDate);
+                pendingPlansTableBody.append(`
+                    <tr>
+                        <td data-label="Plan Name">${plan.name}</td>
+                        <td data-label="Price">₹${plan.price.toLocaleString()}</td>
+                        <td data-label="Start Date">${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                        <td data-label="Status" class="status-${plan.status.toLowerCase()}">${plan.status}</td>
+                        <td data-label="Action">
+                            <button class="table-button view-details" data-plan-id="${plan.id}" data-plan-type="pending">View</button>
+                            <button class="table-button">Recharge</button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        function renderExpiredPlans(expiredPlans) {
+            const expiredPlansTableBody = $('#expiredPlansTableBody');
+            expiredPlansTableBody.empty();
+
+            if (expiredPlans.length === 0) {
+                expiredPlansTableBody.html('<tr><td colspan="5" class="no-plan-message">No expired plans found.</td></tr>');
+                return;
+            }
+
+            expiredPlans.forEach(plan => {
                 const endDate = new Date(plan.endDate);
-                plansTableBody.append(`
+                expiredPlansTableBody.append(`
                     <tr>
                         <td data-label="Plan Name">${plan.name}</td>
                         <td data-label="Price">₹${plan.price.toLocaleString()}</td>
                         <td data-label="End Date">${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                         <td data-label="Status" class="status-${plan.status.toLowerCase()}">${plan.status}</td>
                         <td data-label="Action">
-                            <button class="table-button view-details" data-plan-id="${plan.id}">View</button>
+                            <button class="table-button view-details" data-plan-id="${plan.id}" data-plan-type="expired">View</button>
                             <button class="table-button">Recharge</button>
                         </td>
                     </tr>
@@ -953,14 +1094,26 @@
             const modalBody = $('#modalBody');
             const modalClose = $('#modalClose');
             const modalCancel = $('#modalCancel');
-            const planSearch = $('#planSearch');
-            const categoryFilter = $('#categoryFilter');
-            const plansTableBody = $('#plansTableBody');
+            const pendingPlanSearch = $('#pendingPlanSearch');
+            const pendingCategoryFilter = $('#pendingCategoryFilter');
+            const expiredPlanSearch = $('#expiredPlanSearch');
+            const expiredCategoryFilter = $('#expiredCategoryFilter');
+            const pendingPlansTableBody = $('#pendingPlansTableBody');
+            const expiredPlansTableBody = $('#expiredPlansTableBody');
 
             $(document).on('click', '.view-details', function() {
                 $('#loadingOverlay').css('display', 'flex');
                 const planId = $(this).data('plan-id');
-                const plan = plansData.find(p => p.id === planId);
+                const planType = $(this).data('plan-type');
+                let plan;
+
+                if (planType === 'active') {
+                    plan = plansData.activePlans.find(p => p.id === planId);
+                } else if (planType === 'pending') {
+                    plan = plansData.pendingPlans.find(p => p.id === planId);
+                } else if (planType === 'expired') {
+                    plan = plansData.expiredPlans.find(p => p.id === planId);
+                }
 
                 if (plan) {
                     modalBody.html(`
@@ -996,14 +1149,14 @@
                 }
             });
 
-            function filterPlans() {
-                const searchText = planSearch.val().toLowerCase();
+            function filterPlans(tableBody, plans, searchInput, categoryFilter) {
+                const searchText = searchInput.val().toLowerCase();
                 const selectedCategory = categoryFilter.val().toLowerCase();
 
-                plansTableBody.find('tr').each(function() {
+                tableBody.find('tr').each(function() {
                     const row = $(this);
                     const planName = row.find('td:first-child').text().toLowerCase();
-                    const plan = plansData.find(p => p.name.toLowerCase() === planName);
+                    const plan = plans.find(p => p.name.toLowerCase() === planName);
                     if (!plan) return;
 
                     const matchesSearch = planName.includes(searchText);
@@ -1017,8 +1170,19 @@
                 });
             }
 
-            planSearch.on('input', filterPlans);
-            categoryFilter.on('change', filterPlans);
+            pendingPlanSearch.on('input', function() {
+                filterPlans(pendingPlansTableBody, plansData.pendingPlans, pendingPlanSearch, pendingCategoryFilter);
+            });
+            pendingCategoryFilter.on('change', function() {
+                filterPlans(pendingPlansTableBody, plansData.pendingPlans, pendingPlanSearch, pendingCategoryFilter);
+            });
+
+            expiredPlanSearch.on('input', function() {
+                filterPlans(expiredPlansTableBody, plansData.expiredPlans, expiredPlanSearch, expiredCategoryFilter);
+            });
+            expiredCategoryFilter.on('change', function() {
+                filterPlans(expiredPlansTableBody, plansData.expiredPlans, expiredPlanSearch, expiredCategoryFilter);
+            });
         });
     </script>
 </body>

@@ -22,13 +22,12 @@ public class JwtUtil {
     @Value("${jwt.refresh.expiration}")
     private Long refreshExpiration;
 
-    // Inject the secret as a String and convert to SecretKey
     public JwtUtil(@Value("${jwt.secret}") String secret) {
         if (secret.length() < 32) {
             throw new IllegalArgumentException("JWT secret must be at least 32 characters (256 bits) for HS256");
         }
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        System.out.println("JWT Secret Length: " + secret.length() + " bytes"); // Debug
+        System.out.println("JWT Secret Length: " + secret.length() + " bytes");
     }
 
     public String generateToken(String username, List<String> roles) {

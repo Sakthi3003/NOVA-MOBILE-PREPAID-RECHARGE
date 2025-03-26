@@ -1,5 +1,4 @@
 const guestPages = [
-    { id: "admin", label: "Admin", url: "./ADMIN/login.html" },
     { id: "home", label: "Home", url: "index.html" },
     { id: "plans", label: "Plans", url: "./subscriber/plans.html" },
     { id: "support", label: "Support", url: "./subscriber/support.html" },
@@ -21,19 +20,33 @@ function generateNavigation() {
     const navLinks = document.getElementById("nav-links");
     navLinks.innerHTML = "";
 
+    // Check localStorage for logged-in state
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    const userDetailsString = sessionStorage.getItem('userDetails');
+    let userDetails = null;
+
+    if (userDetailsString) {
+        try {
+            userDetails = JSON.parse(userDetailsString);
+            console.log('Parsed userDetails:', userDetails); // Debugging
+        } catch (error) {
+            console.error('Error parsing userDetails:', error);
+            sessionStorage.removeItem('userDetails');
+        }
+    } else {
+        console.log('userDetails not found in sessionStorage'); // Debugging
+    }
+
+    // User is considered logged in if loggedInUser exists in localStorage
     isLoggedIn = !!loggedInUser;
+    console.log('isLoggedIn:', isLoggedIn, 'loggedInUser:', loggedInUser); // Debugging
 
-    if (isLoggedIn && userDetails) {
-        userInitials = userDetails.username?.charAt(0).toUpperCase() || '';
+    if (isLoggedIn) {
+        // Use first_name for initials (matches backend response)
+        userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || 'U';
+        console.log('userInitials:', userInitials); // Debugging
 
-        // Add user initials display
-        const initialsDisplay = document.createElement("div");
-        initialsDisplay.className = "user-initials-display";
-        initialsDisplay.textContent = userInitials;
-        navLinks.appendChild(initialsDisplay);
-
+        // Add guest pages (Home, Plans, Support, About Us)
         guestPages.forEach(page => {
             const link = document.createElement("a");
             link.href = page.url;
@@ -46,6 +59,7 @@ function generateNavigation() {
             navLinks.appendChild(link);
         });
 
+        // Add dropdown for logged-in user
         const dropdownDiv = document.createElement('div');
         dropdownDiv.className = 'dropdown';
 
@@ -84,6 +98,7 @@ function generateNavigation() {
         dropdownDiv.appendChild(dropdownMenu);
         navLinks.appendChild(dropdownDiv);
     } else {
+        // Guest view: Home, Plans, Support, About Us, Login
         guestPages.forEach(page => {
             const link = document.createElement("a");
             link.href = page.url;
@@ -97,7 +112,7 @@ function generateNavigation() {
         });
 
         const loginBtn = document.createElement("a");
-        loginBtn.href = "./SUBSCRIBER/login.html";
+        loginBtn.href = "../subscriber/login.html"; 
         loginBtn.className = "btn login-btn";
         loginBtn.textContent = "Login";
         navLinks.appendChild(loginBtn);
@@ -124,23 +139,20 @@ function logout() {
     // Show the loading overlay
     loadingOverlay.style.display = 'flex';
 
-    // Clear local and session storage
-    localStorage.removeItem('loggedInUser');
-    localStorage.removeItem('profileSetup');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('role');
-    sessionStorage.removeItem('phoneNumber');
-    sessionStorage.removeItem('userDetails');
+    // Clear all storage
+    localStorage.clear();
+    sessionStorage.clear();
     isLoggedIn = false;
     currentPage = 'home';
+
+    // Update navigation immediately
     generateNavigation();
 
-    // Add a delay to show the loading spinner, then redirect
+    // Show success message without SweetAlert2
     setTimeout(() => {
         loadingOverlay.style.display = 'none';
         window.location.href = 'index.html';
-    }, 1000); // 1-second delay to show the loading spinner
+    }, 1500);
 }
 
 // Toggle mobile menu
@@ -149,35 +161,42 @@ function toggleMenu() {
     navLinks.classList.toggle("active");
 }
 
-// Phone number validation (matching login.html)
+// Utility function to show error messages
+function showError(element, message) {
+    element.textContent = message;
+    element.style.display = 'block';
+}
+
+// Utility function to hide error messages
+function hideError(element) {
+    element.style.display = 'none';
+}
+
+// Phone number validation
 function validatePhoneNumber(value) {
     const phoneError = document.getElementById('phoneError');
 
-    if (value.length === 0) {
-        phoneError.textContent = 'Phone number is required';
-        phoneError.style.display = 'block';
+    if (!value) {
+        showError(phoneError, 'Please enter a 10-digit number');
         return false;
     }
 
     if (/^[0-5]/.test(value)) {
-        phoneError.textContent = 'Number cannot start with 0, 1, 2, 3, 4, or 5';
-        phoneError.style.display = 'block';
+        showError(phoneError, 'Number cannot start with 0-5');
         return false;
     }
 
     if (value.length < 10) {
-        phoneError.textContent = 'Please enter a 10-digit number';
-        phoneError.style.display = 'block';
+        showError(phoneError, 'Please enter a 10-digit number');
         return false;
     }
 
     if (!/^\d{10}$/.test(value)) {
-        phoneError.textContent = 'Enter a valid 10-digit number';
-        phoneError.style.display = 'block';
+        showError(phoneError, 'Enter a valid 10-digit number');
         return false;
     }
 
-    phoneError.style.display = 'none';
+    hideError(phoneError);
     return true;
 }
 
@@ -207,11 +226,20 @@ async function fetchUserDetails(phoneNumber) {
         setTimeout(() => {
             loadingOverlay.style.display = 'none';
             setCurrentPage('plans');
-        }, 500); // Small delay to show loading spinner
+        }, 500);
     } catch (error) {
         console.error('Error fetching user details:', error);
-        phoneError.textContent = error.message || 'This number is not registered';
-        phoneError.style.display = 'block';
+        let errorMessage = 'Phone number not registered.';
+        if (error.message.toLowerCase().includes('not found')) {
+            errorMessage = 'Phone number not registered. Please sign up.';
+        } else if (error.message.toLowerCase().includes('invalid')) {
+            errorMessage = 'Invalid phone number format.';
+        } else if (error.message.includes('Network')) {
+            errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.message.toLowerCase().includes('failed to fetch user details')) {
+            errorMessage = 'Unable to verify the phone number. Please try again later.';
+        }
+        showError(phoneError, errorMessage);
         loadingOverlay.style.display = 'none';
     }
 }
@@ -223,23 +251,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingOverlay = document.getElementById('loadingOverlay');
     const phoneInput = document.getElementById('phoneNumber');
 
-    // Dynamic phone number input validation (matching login.html)
+    // Update "Get Started" button immediately after generating navigation
+    if (isLoggedIn) {
+        const getStartedButton = document.querySelector('.features-section .btn-primary');
+        if (getStartedButton) {
+            getStartedButton.href = './subscriber/profilef.html';
+            getStartedButton.textContent = 'Go to Profile';
+        }
+    }
+
+    // Dynamic phone number input validation
     phoneInput.addEventListener('input', (e) => {
         let value = e.target.value.replace(/[^0-9]/g, '');
         e.target.value = value.slice(0, 10);
 
         if (value.length > 0) {
-            validatePhoneNumber(value);
-            if (value.length === 10 && validatePhoneNumber(value)) {
+            if (validatePhoneNumber(value) && value.length === 10) {
                 fetchUserDetails(value);
             }
         } else {
-            document.getElementById('phoneError').textContent = 'Phone number is required';
-            document.getElementById('phoneError').style.display = 'block';
+            showError(document.getElementById('phoneError'), 'Please enter a 10-digit number');
         }
     });
 
-    // Handle Buy SIM and Track Order buttons
+    // Handle Buy SIM and Port Now buttons
     document.querySelectorAll('.btn-primary, .btn-track').forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();

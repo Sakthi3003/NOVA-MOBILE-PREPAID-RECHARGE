@@ -16,25 +16,49 @@
     <!-- Existing CSS -->
     <link rel="stylesheet" href="../assets/css/success.css">
     <style>
-        /* Ensure long text wraps in the invoice table */
         .invoice-table td {
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
-        /* Style the breadcrumb */
         .breadcrumb {
-            background-color: #f8f9fa; /* Light background */
+            background-color: #f8f9fa;
             padding: 10px 20px;
             margin-bottom: 20px;
             border-radius: 5px;
         }
+        .notification-message {
+            color: #28a745;
+            font-size: 1rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .notification-message i {
+            margin-right: 8px;
+        }
+        .btn-loading::after {
+            content: "";
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .swal2-container {
+            z-index: 3001 !important;
+        }
     </style>
 </head>
 <body>
-    <!-- Success Content -->
     <div class="success-container">
         <a href="javascript:history.back()" class="logo" style="color: blue; padding: 20px;"><i class="fas fa-arrow-left"></i></a>
-        <!-- Breadcrumb Navigation -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="../index.html">Plans</a></li>
@@ -60,122 +84,8 @@
         </div>
 
         <div class="button-group">
-            <button class="btn btn-secondary" id="downloadInvoiceBtn">Download Invoice</button>
             <button class="btn btn-secondary" id="shareEmailBtn"><i class="fas fa-envelope"></i> Share via Email</button>
             <button class="btn btn-primary" id="goToHomeBtn">Go to Home</button>
-        </div>
-    </div>
-
-    <div id="invoice">
-        <!-- Invoice Header -->
-        <div class="invoice-header">
-            <div class="invoice-logo">
-                <img src="../assets/images/logo.webp" alt="Nova SIM Logo" width="190" height="60">
-            </div>
-            <div class="invoice-title">PAYMENT RECEIPT</div>
-        </div>
-        
-        <!-- Invoice Body -->
-        <div class="invoice-body">
-            <!-- Invoice Meta Information -->
-            <div class="invoice-meta">
-                <div class="invoice-meta-item">
-                    <div class="invoice-meta-label">Receipt No.</div>
-                    <div class="invoice-meta-value" id="invoiceRefNo"></div>
-                </div>
-                <div class="invoice-meta-item">
-                    <div class="invoice-meta-label">Transaction Date</div>
-                    <div class="invoice-meta-value" id="invoiceDateTime"></div>
-                </div>
-                <div class="invoice-meta-item">
-                    <div class="invoice-meta-label">Payment Mode</div>
-                    <div class="invoice-meta-value" id="invoicePaymentMethod"></div>
-                </div>
-            </div>
-            
-            <!-- Customer Details Section -->
-            <div class="invoice-section">
-                <div class="invoice-section-title">CUSTOMER DETAILS</div>
-                <table class="invoice-table">
-                    <tr>
-                        <td width="30%"><strong>Customer Name</strong></td>
-                        <td width="70%" id="invoiceCustomerName"></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Mobile Number</strong></td>
-                        <td id="invoiceMobileNumber"></td>
-                    </tr>
-                </table>
-            </div>
-            
-            <!-- Plan Details Section -->
-            <div class="invoice-section">
-                <div class="invoice-section-title">PLAN DETAILS</div>
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th>Pack Description</th>
-                            <th>Data</th>
-                            <th>Validity</th>
-                            <th>Voice</th>
-                            <th>SMS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td id="invoicePlanName"></td>
-                            <td id="invoiceData"></td>
-                            <td id="invoiceValidity"></td>
-                            <td id="invoiceCalls"></td>
-                            <td id="invoiceSMS"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Payment Details Section -->
-            <div class="invoice-section">
-                <div class="invoice-section-title">PAYMENT DETAILS</div>
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Amount (₹)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Base Pack Amount</td>
-                            <td id="invoiceBaseAmount"></td>
-                        </tr>
-                        <tr>
-                            <td>GST (18%)</td>
-                            <td id="invoiceGST"></td>
-                        </tr>
-                        <tr class="total-row">
-                            <td><strong>Total Amount</strong></td>
-                            <td id="invoiceTotalAmount"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Footer with Signature -->
-            <div class="invoice-footer">
-                <div class="signature-container">
-                    <div class="signature-box">
-                        <div class="signature-text">
-                            <p>Digitally signed by Mobi Comm Service Limited</p>
-                            <p>Date: 2025.02.27</p>
-                            <p>Reason: Invoice</p>
-                            <p class="dynamic-time"></p>
-                        </div>
-                    </div>
-                </div>
-                <p>Thank you for choosing Nova. For any assistance, please contact our customer support.</p>
-                <p>Email: support@nova.com | Helpline: +91 987654321</p>
-                <p>© 2025 Mobi Comm Service Limited. All rights reserved.</p>
-            </div>
         </div>
     </div>
 
@@ -183,14 +93,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- html2pdf.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Utility function for fetching with timeout
-            async function fetchWithTimeout(url, options, timeout = 10000) {
+            async function fetchWithTimeout(url, options, timeout = 30000) {
                 const controller = new AbortController();
                 const id = setTimeout(() => controller.abort(), timeout);
                 try {
@@ -209,7 +116,6 @@
                 }
             }
 
-            // Retrieve transaction details from sessionStorage
             const transactionDetails = JSON.parse(sessionStorage.getItem('transactionDetails'));
             const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
             const selectedPlan = JSON.parse(sessionStorage.getItem('selectedPlan'));
@@ -220,15 +126,45 @@
                     title: 'Oops...',
                     text: 'Transaction details not found. Please try again.',
                     confirmButtonColor: '#0a21c0',
-                    position: 'center',
-                    zIndex: 3001
+                    position: 'center'
                 }).then(() => {
                     window.location.href = 'plans.html';
                 });
                 return;
             }
 
-            // Display transaction details on the success page
+            // Fetch the latest recharge details using the transactionId
+            async function fetchRechargeDetails() {
+                try {
+                    const response = await fetchWithTimeout(`http://localhost:8080/api/recharge/recharge-by-transaction/${transactionDetails.refNo}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const recharge = await response.json();
+                    if (response.ok) {
+                        $('#rechargeStatus').text(recharge.status || 'Unknown');
+                        $('#startDate').text(recharge.startDate || 'N/A');
+                        $('#endDate').text(recharge.endDate || 'N/A');
+                        // Update sessionStorage with the latest details
+                        sessionStorage.setItem('rechargeDetails', JSON.stringify({
+                            rechargeStatus: recharge.status,
+                            startDate: recharge.startDate,
+                            endDate: recharge.endDate
+                        }));
+                    } else {
+                        throw new Error('Failed to fetch recharge details');
+                    }
+                } catch (error) {
+                    console.error('Error fetching recharge details:', error);
+                    $('#rechargeStatus').text('Error');
+                    $('#startDate').text('N/A');
+                    $('#endDate').text('N/A');
+                }
+            }
+
+            // Populate transaction details
             $('#customerName').text(transactionDetails.customerName || 'Unknown');
             $('#mobileNumber').text(transactionDetails.mobileNumber || 'N/A');
             $('#amount').text(transactionDetails.amount || '₹0.00');
@@ -237,62 +173,43 @@
             $('#time').text(transactionDetails.time || 'N/A');
             $('#paymentMethod').text(transactionDetails.paymentMode || 'Unknown');
 
-            // Populate invoice template
-            $('#invoiceCustomerName').text(`${userDetails.firstName || ''} ${userDetails.lastName || ''}`.trim() || 'Unknown');
-            $('#invoiceMobileNumber').text(userDetails.phone_number ? `+91 ${userDetails.phone_number}` : 'N/A');
-            $('#invoiceRefNo').text(transactionDetails.refNo || 'N/A');
-            $('#invoiceDateTime').text(`${transactionDetails.date} ${transactionDetails.time}` || 'N/A');
-            $('#invoicePaymentMethod').text(transactionDetails.paymentMode || 'Unknown');
-            $('#invoicePlanName').text(selectedPlan.name || 'N/A');
-            $('#invoiceData').text(selectedPlan.data || 'N/A');
-            $('#invoiceValidity').text(selectedPlan.validity || 'N/A');
-            $('#invoiceCalls').text(selectedPlan.calls || 'N/A');
-            $('#invoiceSMS').text(selectedPlan.sms || 'N/A');
+            // Fetch and display the latest recharge status on page load
+            fetchRechargeDetails();
 
-            const planPrice = parseFloat(selectedPlan.price || 0);
-            const gstRate = 0.18;
-            const gstAmount = planPrice * gstRate;
-            const totalAmount = planPrice + gstAmount;
+            // Periodically refresh the status every 5 minutes (300,000 ms)
+            setInterval(fetchRechargeDetails, 300000);
 
-            $('#invoiceBaseAmount').text(`${planPrice.toFixed(2)}`);
-            $('#invoiceGST').text(`${gstAmount.toFixed(2)}`);
-            $('#invoiceTotalAmount').text(`${totalAmount.toFixed(2)}`);
-
-            // Go to Home button
             $('#goToHomeBtn').on('click', function() {
-                // Clear sessionStorage to prevent stale data
                 sessionStorage.removeItem('selectedPlan');
                 sessionStorage.removeItem('userDetails');
                 sessionStorage.removeItem('phoneNumber');
                 sessionStorage.removeItem('transactionDetails');
+                sessionStorage.removeItem('rechargeDetails');
                 sessionStorage.removeItem('fromQuickRecharge');
                 window.location.href = '../index.html';
             });
 
-            // Download Invoice button
-            $('#downloadInvoiceBtn').on('click', function() {
-                generateInvoice();
-            });
-
-            // Share via Email button
             $('#shareEmailBtn').on('click', async function() {
+                const $btn = $(this);
+                $btn.addClass('btn-loading').prop('disabled', true).html('<i class="fas fa-envelope"></i> Sending...');
+
                 const invoiceData = {
-                    email: userDetails.email || prompt('Please enter your email address:'),
-                    customerName: transactionDetails.customerName,
-                    mobileNumber: transactionDetails.mobileNumber,
-                    amount: transactionDetails.amount,
-                    refNo: transactionDetails.refNo,
-                    date: transactionDetails.date,
-                    time: transactionDetails.time,
-                    paymentMode: transactionDetails.paymentMode,
-                    planName: selectedPlan.name,
-                    data: selectedPlan.data,
-                    validity: selectedPlan.validity,
-                    calls: selectedPlan.calls,
-                    sms: selectedPlan.sms,
-                    baseAmount: planPrice.toFixed(2),
-                    gst: gstAmount.toFixed(2),
-                    totalAmount: totalAmount.toFixed(2)
+                    email: userDetails.email || prompt('Please enter your email address:') || '',
+                    customerName: transactionDetails.customerName || 'Unknown',
+                    mobileNumber: transactionDetails.mobileNumber || 'N/A',
+                    amount: transactionDetails.amount || '₹0.00',
+                    refNo: transactionDetails.refNo || 'N/A',
+                    date: transactionDetails.date || new Date().toLocaleDateString(),
+                    time: transactionDetails.time || new Date().toLocaleTimeString(),
+                    paymentMode: transactionDetails.paymentMode || 'Unknown',
+                    planName: selectedPlan.name || 'N/A',
+                    data: selectedPlan.data || 'N/A',
+                    validity: selectedPlan.validity || 'N/A',
+                    calls: selectedPlan.calls || 'N/A',
+                    sms: selectedPlan.sms || 'N/A',
+                    baseAmount: parseFloat(selectedPlan.price || 0).toFixed(2),
+                    gst: (parseFloat(selectedPlan.price || 0) * 0.18).toFixed(2),
+                    totalAmount: (parseFloat(selectedPlan.price || 0) * 1.18).toFixed(2)
                 };
 
                 if (!invoiceData.email) {
@@ -301,97 +218,84 @@
                         title: 'Email Required',
                         text: 'Please provide an email address to share the invoice.',
                         confirmButtonColor: '#0a21c0',
-                        position: 'center',
-                        zIndex: 3001
+                        position: 'center'
+                    }).then(() => {
+                        $btn.removeClass('btn-loading').prop('disabled', false).html('<i class="fas fa-envelope"></i> Share via Email');
                     });
                     return;
                 }
 
-                try {
-                    const response = await fetchWithTimeout('http://localhost:8080/api/invoice/email', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            // 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                        },
-                        body: JSON.stringify(invoiceData)
-                    });
+                console.log('Sending invoiceData:', invoiceData);
 
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Failed to send invoice via email');
-                    }
+                const maxRetries = 3;
+                let attempt = 0;
 
-                    const result = await response.json();
-                    if (result.status !== 'SUCCESS') {
-                        throw new Error(result.message || 'Failed to send invoice via email');
-                    }
+                async function trySendInvoice() {
+                    try {
+                        const response = await fetchWithTimeout('http://localhost:8080/api/recharge/invoice/email', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(invoiceData)
+                        });
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Invoice Sent',
-                        text: `The invoice has been sent to ${invoiceData.email}.`,
-                        confirmButtonColor: '#0a21c0',
-                        position: 'center',
-                        zIndex: 3001
-                    });
-                } catch (error) {
-                    console.error('Error sending invoice via email:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.message || 'Failed to send invoice via email. Please try again.',
-                        confirmButtonColor: '#0a21c0',
-                        position: 'center',
-                        zIndex: 3001
-                    });
-                }
-            });
+                        const result = await response.json();
+                        if (!response.ok) {
+                            throw new Error(result.message || 'Failed to send invoice');
+                        }
 
-            // Invoice generation function
-            function generateInvoice() {
-                $('#invoice').css('display', 'block');
-                
-                const element = document.getElementById('invoice');
-                // Sanitize mobile number for filename
-                const mobileNumber = transactionDetails.mobileNumber.replace(/[^0-9]/g, ''); // e.g., "+91 9487381354" -> "919487381354"
-                const opt = {
-                    margin: 10,
-                    filename: `Nova_SIM_Invoice_${mobileNumber}.pdf`, // Updated to use mobile number
-                    image: { type: 'jpeg', quality: 1 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
+                        if (result.status === 'SUCCESS') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Invoice Sent',
+                                text: `The invoice has been sent to ${invoiceData.email}.`,
+                                confirmButtonColor: '#0a21c0',
+                                position: 'center'
+                            });
+                        } else {
+                            throw new Error(result.message || 'Unknown error occurred');
+                        }
+                    } catch (error) {
+                        attempt++;
+                        if (attempt < maxRetries) {
+                            const delay = Math.pow(2, attempt) * 1000;
+                            console.log(`Retrying (${attempt}/${maxRetries}) after ${delay}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            return trySendInvoice();
+                        }
 
-                html2pdf().from(element).set(opt).save()
-                    .then(() => {
-                        console.log('Invoice generated and downloaded successfully.');
-                        $('#invoice').css('display', 'none');
-                    })
-                    .catch((error) => {
-                        console.error('Error generating invoice:', error);
+                        console.error('Error sending invoice via email:', error);
+                        let errorMessage = 'Failed to send invoice. Please try again later.';
+                        if (error.message.includes('Missing required field')) {
+                            errorMessage = `Missing required information: ${error.message.split(': ')[1]}. Please contact support.`;
+                        } else if (error.message.includes('Invalid email format')) {
+                            errorMessage = 'Invalid email address. Please provide a valid email.';
+                        } else if (error.message.includes('timed out')) {
+                            errorMessage = 'Network error: Request timed out. Please check your connection and try again.';
+                        }
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: `Failed to generate invoice. Details: ${error.message}`,
+                            html: `${errorMessage} <br><a href="#" id="retryEmail">Retry</a>`,
                             confirmButtonColor: '#0a21c0',
                             position: 'center',
-                            zIndex: 3001
+                            didOpen: () => {
+                                $('#retryEmail').on('click', function(e) {
+                                    e.preventDefault();
+                                    Swal.close();
+                                    $('#shareEmailBtn').click();
+                                });
+                            }
                         });
-                        $('#invoice').css('display', 'none');
-                    });
-            }
+                    } finally {
+                        $btn.removeClass('btn-loading').prop('disabled', false).html('<i class="fas fa-envelope"></i> Share via Email');
+                    }
+                }
 
-            // Dynamic time update
-            function updateDynamicTime() {
-                const now = new Date('2025-03-05T' + new Date().toTimeString().split(' ')[0]); // Use March 5, 2025, with current time
-                const timeString = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata' });
-                $('.dynamic-time').text(`Time: ${timeString} IST`);
-            }
-
-            // Call the function when the page loads and update every second
-            updateDynamicTime();
-            setInterval(updateDynamicTime, 1000);
+                await trySendInvoice();
+            });
         });
     </script>
 </body>

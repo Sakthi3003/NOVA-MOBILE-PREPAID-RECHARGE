@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="../assets/images/logo.webp" type="image/x-icon">
     <style>
         :root {
             --primary: #0a21c0;
@@ -42,7 +43,6 @@
             overflow-x: hidden;
         }
 
-        /* Sidebar from Admin Dashboard */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--dark);
@@ -133,7 +133,6 @@
             overflow: hidden;
         }
 
-        /* Content */
         .content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -145,7 +144,6 @@
             margin-left: var(--sidebar-collapsed-width);
         }
 
-        /* Top Bar from Admin Dashboard */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -266,7 +264,6 @@
             color: #6b7280;
         }
 
-        /* Analytics Cards */
         .page-container {
             padding: 20px;
             max-width: 1400px;
@@ -316,7 +313,6 @@
             color: var(--primary);
         }
 
-        /* Analytics Charts */
         .analytics-charts {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -349,7 +345,6 @@
             max-width: 100%;
         }
 
-        /* Table Styles from Admin Dashboard */
         .expiring-table {
             background-color: var(--light);
             border-radius: 12px;
@@ -437,7 +432,6 @@
             background-color: var(--table-row-hover);
         }
 
-        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -465,7 +459,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Responsive Adjustments */
         @media (max-width: 992px) {
             .sidebar {
                 width: var(--sidebar-collapsed-width);
@@ -561,7 +554,6 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar from Admin Dashboard -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo"></div>
@@ -601,7 +593,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="../index.html" class="nav-link logout-btn">
+                <a href="#" class="nav-link logout-btn" id="logoutBtn">
                     <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
                     <span class="nav-text">Logout</span>
                 </a>
@@ -609,7 +601,6 @@
         </ul>
     </div>
 
-    <!-- Content with Top Bar -->
     <div class="content" id="content">
         <div class="top-bar">
             <div class="top-logo">
@@ -624,10 +615,10 @@
                     </button>
                 </div>
                 <div class="user-profile" id="userProfile">
-                    <div class="avatar">A</div>
+                    <div class="avatar" id="avatar"></div>
                     <div class="user-info">
-                        <div class="user-name">Admin</div>
-                        <div class="user-role"></div>
+                        <div class="user-name" id="userName"></div>
+                        <div class="user-role" id="userRole"></div>
                     </div>
                 </div>
             </div>
@@ -749,6 +740,29 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Authentication Check
+            function checkAuth() {
+                const accessToken = sessionStorage.getItem('accessToken');
+                if (!accessToken) {
+                    window.location.href = '../index.html'; // Adjust path as per your structure
+                }
+            }
+
+            // Run auth check on load
+            checkAuth();
+
+            // Display Username and Role from sessionStorage
+            const userDetails = JSON.parse(sessionStorage.getItem('userDetails')) || {};
+            const username = userDetails.username || 'Admin'; // Fallback to 'Admin' if not found
+            const role = sessionStorage.getItem('role') || '';
+            const userNameElement = document.getElementById('userName');
+            const userRoleElement = document.getElementById('userRole');
+            const avatarElement = document.getElementById('avatar');
+
+            userNameElement.textContent = username;
+            userRoleElement.textContent = role;
+            avatarElement.textContent = username.charAt(0).toUpperCase(); // Set avatar to first letter
+
             // Sidebar Toggle
             const sidebar = document.getElementById('sidebar');
             const content = document.getElementById('content');
@@ -929,17 +943,39 @@
                 }
             });
 
-            // Logout with Loading
-            const logoutBtn = document.querySelector('.logout-btn');
+            // Logout Functionality
+            const logoutBtn = document.getElementById('logoutBtn');
             const loadingOverlay = document.getElementById('loadingOverlay');
-            
+
             logoutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 loadingOverlay.style.display = 'flex';
-                setTimeout(() => {
-                    window.location.href = logoutBtn.href;
-                }, 1500);
+                fetch('http://localhost:8080/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}` }
+                })
+                .then(() => {
+                    sessionStorage.clear();
+                    setTimeout(() => {
+                        window.location.href = '../index.html'; // Adjust path as per your structure
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Logout Error:', error);
+                    sessionStorage.clear();
+                    setTimeout(() => {
+                        window.location.href = '../index.html'; // Adjust path as per your structure
+                    }, 1500);
+                });
             });
+
+            // Prevent back button access
+            window.addEventListener('popstate', () => {
+                checkAuth();
+            });
+
+            // Push initial state to history
+            history.pushState(null, null, window.location.href);
         });
     </script>
 </body>
