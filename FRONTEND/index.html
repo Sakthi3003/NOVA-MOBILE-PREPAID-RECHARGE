@@ -323,7 +323,7 @@ const loggedInDropdownPages = [
 
 let currentPage = "home";
 let isLoggedIn = false;
-let userInitials = "U";
+let userInitials = "S";
 
 // Generate navigation
 function generateNavigation() {
@@ -353,7 +353,7 @@ function generateNavigation() {
 
     if (isLoggedIn) {
         // Use first_name for initials (matches backend response)
-        userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || 'U';
+        userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || 'S';
         console.log('userInitials:', userInitials); // Debugging
 
         // Add guest pages (Home, Plans, Support, About Us)

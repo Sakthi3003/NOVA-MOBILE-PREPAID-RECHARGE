@@ -728,7 +728,7 @@
 
         let currentPage = "about";
         let isLoggedIn = false;
-        let userInitials = "U";
+        let userInitials = "S";
 
         // Generate navigation (consistent with support.html)
         function generateNavigation() {
@@ -753,7 +753,7 @@
             isLoggedIn = !!(loggedInUser || (userDetails && accessToken));
 
             if (isLoggedIn) {
-                userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || loggedInUser?.simHolderName?.charAt(0)?.toUpperCase() || 'U';
+                userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || loggedInUser?.simHolderName?.charAt(0)?.toUpperCase() || 'S';
                 guestPages.forEach(page => {
                     const link = document.createElement("a");
                     link.href = page.url;
