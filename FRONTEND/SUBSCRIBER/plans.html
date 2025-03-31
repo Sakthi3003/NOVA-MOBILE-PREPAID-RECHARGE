@@ -980,7 +980,7 @@
         let currentPage = "plans";
         let selectedPlan = null;
         let isLoggedIn = false;
-        let userInitials = "U";
+        let userInitials = "S";
 
         // Fetch categories from the backend API
         async function fetchCategories() {
@@ -1213,7 +1213,7 @@
 
             if (isLoggedIn) {
                 // Use first_name for initials (consistent with index.html)
-                userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || 'U';
+                userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || 'S';
 
                 // Add guest pages (Admin, Home, Plans, Support, About Us)
                 guestPages.forEach(page => {

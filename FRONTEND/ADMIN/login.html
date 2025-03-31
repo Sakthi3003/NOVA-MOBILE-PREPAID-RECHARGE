@@ -6,238 +6,35 @@
     <title>Admin Login - Nova SIM</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Add Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>   
+    <link rel="stylesheet" href="../assets/css/login.css">
     <link rel="icon" href="../assets/images/logo.webp" type="image/x-icon">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background-color: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .container {
-            max-width: 450px;
-            width: 100%;
-            margin: 20px;
-        }
-
-        .card {
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            padding: 30px;
-        }
-
-        .logo-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .form-title {
-            color: #0a21c0;
-            font-size: 24px;
-            margin-bottom: 20px;
-            position: relative;
-            text-align: center;
-        }
-
-        .form-title:after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 3px;
-            background-color: #0a21c0;
-            border-radius: 2px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #e1e4ed;
-            border-radius: 6px;
-            font-size: 14px;
-            background-color: #FAFAFA;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #0a21c0;
-            box-shadow: 0 0 0 2px rgba(10, 33, 192, 0.1);
-            background-color: white;
-        }
-
-        .input-with-validation {
-            position: relative;
-        }
-
-        .validation-indicator {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: none;
-            font-size: 14px;
-        }
-
-        .validation-indicator.valid {
-            color: #28a745;
-            display: block;
-        }
-
-        .validation-indicator.invalid {
-            color: #dc3545;
-            display: block;
-        }
-
-        .btn {
-            background-color: #0a21c0;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 5px rgba(10, 33, 192, 0.2);
-        }
-
-        .btn:hover {
-            background-color: #081899;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(10, 33, 192, 0.25);
-        }
-
-        .error-message {
-            color: #dc3545;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            background-color: #fff2f2;
-            border-left: 2px solid #dc3545;
-        }
-
-        .error-message:before {
-            content: "⚠️ ";
-        }
-
-        .form-control.error {
-            border-color: #dc3545;
-            background-color: #fff2f2;
-        }
-
-        .form-footer {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .form-footer a {
-            color: #0a21c0;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .form-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .alert-success {
-            background-color: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-            padding: 15px;
-            border-radius: 6px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .password-requirements {
-            margin-top: 10px;
-            font-size: 12px;
-        }
-
-        .requirement {
-            display: flex;
-            align-items: center;
-            margin: 5px 0;
-            color: #666;
-        }
-
-        .requirement-icon {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .requirement.valid .requirement-icon {
-            background-color: #28a745;
-        }
-
-        .requirement.invalid .requirement-icon {
-            background-color: #dc3545;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <div class="logo-container">
-                <img src="./assets/images/logo.webp" alt="Nova SIM" height="75" width="180">
+                <img src="../assets/images/logo.webp" alt="Nova SIM" height="75" width="180">
             </div>
 
             <!-- Login Form -->
             <div class="card-body" id="loginForm">
                 <h2 class="form-title">Admin Login</h2>
                 <form id="adminLoginForm">
-                    <div class="form-group input-with-validation">
+                    <div class="form-group">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username">
-                        <span class="validation-indicator valid">✓</span>
-                        <span class="validation-indicator invalid">✗</span>
                         <div class="error-message" id="username-error"></div>
                     </div>
-                    <div class="form-group input-with-validation">
+                    <div class="form-group">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password">
-                        <span class="validation-indicator valid">✓</span>
-                        <span class="validation-indicator invalid">✗</span>
+                        <div class="input-group">
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password">
+                            <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                        </div>
                         <div class="error-message" id="password-error"></div>
                     </div>
                     <button type="submit" class="btn">Login</button>
@@ -252,11 +49,9 @@
                 <h2 class="form-title">Reset Password</h2>
                 <p style="text-align: center; margin-bottom: 20px; font-size: 14px;">Enter your email address to receive a password reset link.</p>
                 <form id="requestResetForm">
-                    <div class="form-group input-with-validation">
+                    <div class="form-group">
                         <label for="email" class="form-label">Email Address</label>
                         <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email">
-                        <span class="validation-indicator valid">✓</span>
-                        <span class="validation-indicator invalid">✗</span>
                         <div class="error-message" id="email-error"></div>
                     </div>
                     <button type="submit" class="btn">Send Reset Link</button>
@@ -282,11 +77,12 @@
             <div class="card-body hidden" id="newPasswordForm">
                 <h2 class="form-title">Create New Password</h2>
                 <form id="resetPasswordForm">
-                    <div class="form-group input-with-validation">
+                    <div class="form-group">
                         <label for="newPassword" class="form-label">New Password</label>
-                        <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="Enter new password">
-                        <span class="validation-indicator valid">✓</span>
-                        <span class="validation-indicator invalid">✗</span>
+                        <div class="input-group">
+                            <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="Enter new password">
+                            <i class="fas fa-eye password-toggle" id="toggleNewPassword"></i>
+                        </div>
                         <div class="error-message" id="newPassword-error"></div>
                         <div class="password-requirements">
                             <div class="requirement invalid" id="length">
@@ -307,11 +103,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group input-with-validation">
+                    <div class="form-group">
                         <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
-                        <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="form-control" placeholder="Confirm new password">
-                        <span class="validation-indicator valid">✓</span>
-                        <span class="validation-indicator invalid">✗</span>
+                        <div class="input-group">
+                            <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="form-control" placeholder="Confirm new password">
+                            <i class="fas fa-eye password-toggle" id="toggleConfirmPassword"></i>
+                        </div>
                         <div class="error-message" id="confirmNewPassword-error"></div>
                     </div>
                     <button type="submit" class="btn">Reset Password</button>
@@ -320,248 +117,6 @@
         </div>
     </div>
 
-    <script>
-        $(document).ready(function() {
-            $("#adminLoginForm").validate({
-                rules: {
-                    username: { required: true, minlength: 3 },
-                    password: { required: true, minlength: 6 }
-                },
-                messages: {
-                    username: {
-                        required: "Please enter your username",
-                        minlength: "Username must be at least 3 characters long"
-                    },
-                    password: {
-                        required: "Please enter your password",
-                        minlength: "Password must be at least 6 characters long"
-                    }
-                },
-                errorPlacement: function(error, element) {
-                    element.nextAll('.error-message').html(error).show();
-                    element.addClass('error');
-                    element.next('.validation-indicator.valid').hide();
-                    element.next('.validation-indicator.invalid').show();
-                },
-                success: function(label, element) {
-                    $(element).removeClass('error');
-                    $(element).next('.validation-indicator.valid').show();
-                    $(element).next('.validation-indicator.invalid').hide();
-                    $(element).nextAll('.error-message').hide();
-                }
-            });
-
-            $("#requestResetForm").validate({
-                rules: { email: { required: true, email: true } },
-                messages: {
-                    email: {
-                        required: "Please enter your email",
-                        email: "Please enter a valid email address"
-                    }
-                },
-                errorPlacement: function(error, element) {
-                    element.nextAll('.error-message').html(error).show();
-                    element.addClass('error');
-                    element.next('.validation-indicator.valid').hide();
-                    element.next('.validation-indicator.invalid').show();
-                },
-                success: function(label, element) {
-                    $(element).removeClass('error');
-                    $(element).next('.validation-indicator.valid').show();
-                    $(element).next('.validation-indicator.invalid').hide();
-                    $(element).nextAll('.error-message').hide();
-                }
-            });
-
-            $("#resetPasswordForm").validate({
-                rules: {
-                    newPassword: {
-                        required: true,
-                        minlength: 8,
-                        pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
-                    },
-                    confirmNewPassword: { required: true, equalTo: "#newPassword" }
-                },
-                messages: {
-                    newPassword: {
-                        required: "Please enter a new password",
-                        minlength: "Password must be at least 8 characters long",
-                        pattern: "Password must contain uppercase, number, and special character"
-                    },
-                    confirmNewPassword: {
-                        required: "Please confirm your new password",
-                        equalTo: "Passwords do not match"
-                    }
-                },
-                errorPlacement: function(error, element) {
-                    element.nextAll('.error-message').html(error).show();
-                    element.addClass('error');
-                    element.next('.validation-indicator.valid').hide();
-                    element.next('.validation-indicator.invalid').show();
-                },
-                success: function(label, element) {
-                    $(element).removeClass('error');
-                    $(element).next('.validation-indicator.valid').show();
-                    $(element).next('.validation-indicator.invalid').hide();
-                    $(element).nextAll('.error-message').hide();
-                }
-            });
-
-            $("#newPassword").on("input", function() {
-                const password = $(this).val();
-                $("#length").toggleClass("valid", password.length >= 8).toggleClass("invalid", password.length < 8);
-                $("#uppercase").toggleClass("valid", /[A-Z]/.test(password)).toggleClass("invalid", !/[A-Z]/.test(password));
-                $("#number").toggleClass("valid", /\d/.test(password)).toggleClass("invalid", !/\d/.test(password));
-                $("#special").toggleClass("valid", /[!@#$%^&*]/.test(password)).toggleClass("invalid", !/[!@#$%^&*]/.test(password));
-            });
-        });
-
-        const adminLoginForm = document.getElementById('adminLoginForm');
-        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-        const backToLoginLink = document.getElementById('backToLoginLink');
-        const requestResetForm = document.getElementById('requestResetForm');
-        const backToLoginFromConfirm = document.getElementById('backToLoginFromConfirm');
-        const resetPasswordForm = document.getElementById('resetPasswordForm');
-
-        adminLoginForm.addEventListener('submit', handleAdminLogin);
-        forgotPasswordLink.addEventListener('click', showForgotPasswordForm);
-        backToLoginLink.addEventListener('click', showLoginForm);
-        requestResetForm.addEventListener('submit', handleRequestReset);
-        backToLoginFromConfirm.addEventListener('click', showLoginForm);
-        resetPasswordForm.addEventListener('submit', handleResetPassword);
-
-        function logout() {
-            fetch('http://localhost:8080/api/auth/logout', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}` }
-            })
-            .then(() => {
-                sessionStorage.clear();
-                window.location.href = 'login.html';
-            })
-            .catch(error => {
-                console.error('Logout Error:', error);
-                sessionStorage.clear();
-                window.location.href = 'login.html';
-            });
-        }
-
-        if (sessionStorage.getItem('accessToken')) {
-            window.location.href = 'manageplans.html';
-        }
-
-        function handleAdminLogin(event) {
-            event.preventDefault();
-            if (!$("#adminLoginForm").valid()) return;
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            fetch('http://localhost:8080/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Login failed');
-                return response.json();
-            })
-            .then(data => {
-                // Store all data in sessionStorage
-                sessionStorage.setItem('accessToken', data.accessToken);
-                sessionStorage.setItem('refreshToken', data.refreshToken);
-                sessionStorage.setItem('role', data.role);
-                sessionStorage.setItem('user_id', data.user_id);
-                sessionStorage.setItem('userDetails', JSON.stringify(data.userDetails));
-
-                console.log('Stored in sessionStorage:', {
-                    accessToken: data.accessToken,
-                    refreshToken: data.refreshToken,
-                    role: data.role,
-                    user_id: data.user_id,
-                    userDetails: data.userDetails
-                });
-
-                window.location.href = 'analytics.html';
-            })
-            .catch(error => {
-                console.error('Login Error:', error);
-                $('#username-error').text('Invalid username or password').show();
-                $('#username').addClass('error');
-                $('#password').addClass('error');
-            });
-        }
-
-        function showForgotPasswordForm(event) {
-            event.preventDefault();
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('forgotPasswordForm').classList.remove('hidden');
-            document.getElementById('resetConfirmation').classList.add('hidden');
-            document.getElementById('newPasswordForm').classList.add('hidden');
-        }
-
-        function showLoginForm(event) {
-            event.preventDefault();
-            document.getElementById('forgotPasswordForm').classList.add('hidden');
-            document.getElementById('resetConfirmation').classList.add('hidden');
-            document.getElementById('newPasswordForm').classList.add('hidden');
-            document.getElementById('loginForm').classList.remove('hidden');
-        }
-
-        function handleRequestReset(event) {
-            event.preventDefault();
-            if (!$("#requestResetForm").valid()) return;
-
-            const email = document.getElementById('email').value;
-
-            fetch('http://localhost:8080/api/auth/request-reset', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to send reset link');
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById('forgotPasswordForm').classList.add('hidden');
-                document.getElementById('resetConfirmation').classList.remove('hidden');
-            })
-            .catch(error => {
-                console.error('Request Reset Error:', error);
-                $('#email-error').text('Failed to send reset link').show();
-                $('#email').addClass('error');
-            });
-        }
-
-        function handleResetPassword(event) {
-            event.preventDefault();
-            if (!$("#resetPasswordForm").valid()) return;
-
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-
-            fetch('http://localhost:8080/api/auth/reset-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ newPassword, confirmNewPassword })
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to reset password');
-                return response.json();
-            })
-            .then(data => {
-                alert('Password reset successfully! Please login with your new password.');
-                showLoginForm(event);
-            })
-            .catch(error => {
-                console.error('Reset Password Error:', error);
-                $('#newPassword-error').text('Failed to reset password').show();
-                $('#newPassword').addClass('error');
-            });
-        }
-
-        window.logout = logout;
-    </script>
+    <script src="../assets/js/login.js"></script>
 </body>
 </html>

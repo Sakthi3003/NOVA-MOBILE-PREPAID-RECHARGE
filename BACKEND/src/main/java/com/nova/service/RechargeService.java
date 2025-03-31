@@ -42,6 +42,10 @@ public class RechargeService {
     @Autowired
     private EmailService emailService;
 
+    /**
+     * Processes a new recharge for a user, setting the activation date of pending plans
+     * sequentially based on the end date of the last active or pending plan.
+     */
     public Recharge rechargeUser(Long userId, Long planId, String phoneNumber, String paymentMethod) throws Exception {
         // Fetch user
         Optional<User> userOptional = userRepository.findById(userId);
@@ -72,34 +76,37 @@ public class RechargeService {
         transaction.setCreatedAt(LocalDateTime.now());
         transaction = transactionRepository.save(transaction);
 
-        // Determine recharge status based on category and existing plans
+        // Determine recharge status and start date
         String rechargeStatus;
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = startDate.plusDays(Long.parseLong(plan.getValidity().split(" ")[0]));
+        LocalDate startDate;
+        LocalDate endDate;
 
-        // Fetch all active recharges for the user (excluding expired ones)
-        List<Recharge> activeRecharges = rechargeRepository.findByUserId(userId)
+        // Fetch all relevant recharges (Active with end date after today or Pending)
+        List<Recharge> relevantRecharges = rechargeRepository.findByUserId(userId)
                 .stream()
-                .filter(r -> "Active".equals(r.getStatus()) && r.getEndDate().isAfter(LocalDate.now()))
+                .filter(r -> ("Active".equals(r.getStatus()) && r.getEndDate().isAfter(LocalDate.now())) ||
+                             "Pending".equals(r.getStatus()))
                 .toList();
 
         if ("data".equalsIgnoreCase(plan.getCategory().getName())) {
-            // Data plans are activated immediately, even with other active plans
+            // Data plans are activated immediately
             rechargeStatus = "Active";
-        } else if (activeRecharges.isEmpty()) {
-            // No active plans, activate immediately
+            startDate = LocalDate.now();
+        } else if (relevantRecharges.isEmpty()) {
+            // No active or pending recharges, activate immediately
             rechargeStatus = "Active";
+            startDate = LocalDate.now();
         } else {
-            // Non-data plan with active plans, set as Pending
+            // Set as Pending and calculate start date as the day after the latest end date
             rechargeStatus = "Pending";
-            // Set start date to the day after the latest active plan expires
-            LocalDate latestEndDate = activeRecharges.stream()
+            LocalDate latestEndDate = relevantRecharges.stream()
                     .map(Recharge::getEndDate)
                     .max(LocalDate::compareTo)
                     .orElse(LocalDate.now());
             startDate = latestEndDate.plusDays(1);
-            endDate = startDate.plusDays(Long.parseLong(plan.getValidity().split(" ")[0]));
         }
+        // Calculate end date based on start date and plan validity
+        endDate = startDate.plusDays(Long.parseLong(plan.getValidity().split(" ")[0]));
 
         // Create recharge
         Recharge recharge = new Recharge();
@@ -201,10 +208,16 @@ public class RechargeService {
         return recharge;
     }
 
+    /**
+     * Simulates payment processing (for demonstration purposes).
+     */
     private boolean simulatePayment(Long userId, double amount, String paymentMethod) {
-        return Math.random() > 0.1;
+        return Math.random() > 0.1; // 90% success rate
     }
 
+    /**
+     * Scheduled task to update recharge statuses daily at midnight.
+     */
     @Transactional
     @Scheduled(cron = "0 0 0 * * *") // Run at midnight every day
     public void updateRechargeStatuses() {
@@ -249,10 +262,13 @@ public class RechargeService {
         }
     }
 
+    /**
+     * Notifies the user when a recharge expires.
+     */
     private void notifyUserAboutExpiration(Recharge recharge) {
         String smsMessage = String.format(
             "Dear %s, your plan '%s' for number %s has expired on %s. Recharge now to stay connected!",
-            recharge.getUser().getFirstName() + " " + recharge.getUser().getLastName(),
+            recharge.getUser().getFirstName(),
             recharge.getPlan().getName(),
             recharge.getPhoneNumber(),
             recharge.getEndDate().toString()
@@ -264,10 +280,13 @@ public class RechargeService {
         }
     }
 
+    /**
+     * Notifies the user when a pending recharge is activated.
+     */
     private void notifyUserAboutActivation(Recharge recharge) {
         String smsMessage = String.format(
             "Dear %s, your queued plan '%s' for number %s is now active. Valid until %s. Enjoy!",
-            recharge.getUser().getFirstName() + " " + recharge.getUser().getLastName(),
+            recharge.getUser().getFirstName(),
             recharge.getPlan().getName(),
             recharge.getPhoneNumber(),
             recharge.getEndDate().toString()
@@ -306,6 +325,4 @@ public class RechargeService {
     public Optional<Invoice> findInvoiceByTransactionId(Long transactionId) {
         return invoiceRepository.findByTransactionId(transactionId);
     }
-    
-    
 }
