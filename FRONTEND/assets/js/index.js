@@ -13,40 +13,24 @@ const loggedInDropdownPages = [
 
 let currentPage = "home";
 let isLoggedIn = false;
-let userInitials = "U";
+let userInitials = "S";
 
 // Generate navigation
 function generateNavigation() {
     const navLinks = document.getElementById("nav-links");
     navLinks.innerHTML = "";
 
-    // Check localStorage for logged-in state
+    // Check storage for user data
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    const userDetailsString = sessionStorage.getItem('userDetails');
-    let userDetails = null;
+    const loggedInUserDetails = JSON.parse(sessionStorage.getItem('session_loggedInUserDetails')) || null;
 
-    if (userDetailsString) {
-        try {
-            userDetails = JSON.parse(userDetailsString);
-            console.log('Parsed userDetails:', userDetails); // Debugging
-        } catch (error) {
-            console.error('Error parsing userDetails:', error);
-            sessionStorage.removeItem('userDetails');
-        }
-    } else {
-        console.log('userDetails not found in sessionStorage'); // Debugging
-    }
-
-    // User is considered logged in if loggedInUser exists in localStorage
     isLoggedIn = !!loggedInUser;
-    console.log('isLoggedIn:', isLoggedIn, 'loggedInUser:', loggedInUser); // Debugging
+    console.log('isLoggedIn:', isLoggedIn, 'loggedInUser:', loggedInUser);
 
     if (isLoggedIn) {
-        // Use first_name for initials (matches backend response)
-        userInitials = userDetails?.first_name?.charAt(0)?.toUpperCase() || 'U';
-        console.log('userInitials:', userInitials); // Debugging
+        userInitials = loggedInUserDetails?.firstName?.charAt(0)?.toUpperCase() || 'S';
+        console.log('userInitials:', userInitials);
 
-        // Add guest pages (Home, Plans, Support, About Us)
         guestPages.forEach(page => {
             const link = document.createElement("a");
             link.href = page.url;
@@ -59,7 +43,6 @@ function generateNavigation() {
             navLinks.appendChild(link);
         });
 
-        // Add dropdown for logged-in user
         const dropdownDiv = document.createElement('div');
         dropdownDiv.className = 'dropdown';
 
@@ -98,7 +81,6 @@ function generateNavigation() {
         dropdownDiv.appendChild(dropdownMenu);
         navLinks.appendChild(dropdownDiv);
     } else {
-        // Guest view: Home, Plans, Support, About Us, Login
         guestPages.forEach(page => {
             const link = document.createElement("a");
             link.href = page.url;
@@ -112,7 +94,7 @@ function generateNavigation() {
         });
 
         const loginBtn = document.createElement("a");
-        loginBtn.href = "../subscriber/login.html"; 
+        loginBtn.href = "./SUBSCRIBER/login.html";
         loginBtn.className = "btn login-btn";
         loginBtn.textContent = "Login";
         navLinks.appendChild(loginBtn);
@@ -132,23 +114,18 @@ function setCurrentPage(pageId) {
     generateNavigation();
 }
 
-// Logout function with loading overlay
+// Logout function
 function logout() {
     const loadingOverlay = document.getElementById('loadingOverlay');
-    
-    // Show the loading overlay
     loadingOverlay.style.display = 'flex';
 
-    // Clear all storage
     localStorage.clear();
     sessionStorage.clear();
     isLoggedIn = false;
     currentPage = 'home';
 
-    // Update navigation immediately
     generateNavigation();
 
-    // Show success message without SweetAlert2
     setTimeout(() => {
         loadingOverlay.style.display = 'none';
         window.location.href = 'index.html';
@@ -200,7 +177,7 @@ function validatePhoneNumber(value) {
     return true;
 }
 
-// Fetch user details from backend API
+// Fetch user details from backend API for quick recharge
 async function fetchUserDetails(phoneNumber) {
     const loadingOverlay = document.getElementById('loadingOverlay');
     const phoneError = document.getElementById('phoneError');
@@ -220,9 +197,19 @@ async function fetchUserDetails(phoneNumber) {
         }
 
         const userData = await response.json();
-        sessionStorage.setItem('userDetails', JSON.stringify(userData));
-        sessionStorage.setItem('phoneNumber', phoneNumber);
-        sessionStorage.setItem('fromQuickRecharge', 'true');
+
+        // Store quick recharge data with specific prefix
+        sessionStorage.setItem('session_quickRechargeData', JSON.stringify({
+            phoneNumber: phoneNumber,
+            userDetails: userData,
+            timestamp: new Date().toISOString(),
+            isQuickRecharge: true
+        }));
+
+        // Store phone number separately
+        sessionStorage.setItem('session_phoneNumber', phoneNumber);
+        sessionStorage.setItem('session_fromQuickRecharge', 'true');
+
         setTimeout(() => {
             loadingOverlay.style.display = 'none';
             setCurrentPage('plans');
@@ -251,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingOverlay = document.getElementById('loadingOverlay');
     const phoneInput = document.getElementById('phoneNumber');
 
-    // Update "Get Started" button immediately after generating navigation
     if (isLoggedIn) {
         const getStartedButton = document.querySelector('.features-section .btn-primary');
         if (getStartedButton) {
@@ -260,7 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Dynamic phone number input validation
     phoneInput.addEventListener('input', (e) => {
         let value = e.target.value.replace(/[^0-9]/g, '');
         e.target.value = value.slice(0, 10);
@@ -274,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle Buy SIM and Port Now buttons
     document.querySelectorAll('.btn-primary, .btn-track').forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
@@ -285,4 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1000);
         });
     });
+
+    // Store logged-in user data if available (typically set during login)
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    if (loggedInUser && !sessionStorage.getItem('session_loggedInUserDetails')) {
+        sessionStorage.setItem('session_loggedInUserDetails', JSON.stringify(loggedInUser));
+    }
 });

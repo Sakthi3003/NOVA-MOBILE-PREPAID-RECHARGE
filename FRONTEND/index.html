@@ -3,43 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova SIM - Prepaid Recharge App</title>
+
+    <title>Nova | Prepaid Recharge App</title>
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
     <!-- Google Font: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="./assets/css/index.css">
+
+    <!-- favicon -->
     <link rel="icon" href="./assets/images/logo.webp" type="image/x-icon">
-    <style>
-        /* Add error message styling for Quick Recharge section */
-        .quick-recharge .error-message {
-            color: #dc3545;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            background-color: #fff2f2;
-            border-left: 2px solid #dc3545;
-            animation: shake 0.5s ease-in-out;
-        }
-
-        .quick-recharge .error-message:before {
-            content: "⚠️ ";
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-3px); }
-            40%, 80% { transform: translateX(3px); }
-        }
-    </style>
 </head>
+
 <body>
+    
     <!-- Loading Spinner -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner-border" role="status">
@@ -150,7 +137,7 @@
                 <div class="col d-flex flex-column align-items-start gap-3">
                     <h2 class="fw-bold">The Ultimate SIM & Recharge Experience</h2>
                     <p>NOVA delivers a seamless mobile recharge and SIM management experience, providing ultra-fast network connectivity and flexible data plans to suit your needs. Log in to track your transactions and stay connected effortlessly.</p>
-                    <a href="./login.html" class="btn btn-primary btn-lg" id="getStartedBtn">Get Started</a>
+                    <a href="./login.html" class="btn btn-primary btn-lg">Get Started</a>
                 </div>
                 <div class="col">
                     <div class="row row-cols-1 row-cols-sm-2 g-4">
@@ -192,7 +179,7 @@
     <section class="buy-sim-section">
         <div class="container">
             <h2>Your Perfect SIM, Ready in a Flash!</h2>
-            <p class="lead">We gather your details upfront, so when your SIM lands in your hands, it's already primed for action. Just pop it in, power up, and dive into seamless connectivity</p>
+            <p class="lead">We gather your details upfront, so when your SIM lands in your hands, it’s already primed for action. Just pop it in, power up, and dive into seamless connectivity</p>
             <div class="row justify-content-center mb-4">
                 <div class="col-md-8 d-flex justify-content-center gap-3">
                     <a href="buy-sim.html" class="btn btn-primary">Buy SIM Now</a>
@@ -305,384 +292,8 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
+   <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Define navigation pages
-        const guestPages = [
-            { id: "home", label: "Home", url: "index.html" },
-            { id: "plans", label: "Plans", url: "./subscriber/plans.html" },
-            { id: "support", label: "Support", url: "./subscriber/support.html" },
-            { id: "About", label: "About Us", url: "./subscriber/about.html" }
-        ];
-
-        const loggedInDropdownPages = [
-            { id: "myplans", label: "My Plans", url: "./subscriber/myplans.html" },
-            { id: "transactions", label: "Transactions", url: "./subscriber/transaction.html" },
-            { id: "profile", label: "Profile", url: "./subscriber/profilef.html" },
-        ];
-
-        let currentPage = "home";
-
-        // User data storage functions
-        // ===========================
-
-        // Function to store logged-in user data (call this after successful login)
-        function storeLoggedInUser(userData) {
-            localStorage.setItem('loggedInUser', JSON.stringify(userData));
-        }
-
-        // Function to store quick recharge user data (temporary user)
-        function storeQuickRechargeUser(userData) {
-            sessionStorage.setItem('quickRechargeUser', JSON.stringify(userData));
-            sessionStorage.setItem('fromQuickRecharge', 'true');
-        }
-
-        // Function to get logged-in user data
-        function getLoggedInUser() {
-            const userData = localStorage.getItem('loggedInUser');
-            return userData ? JSON.parse(userData) : null;
-        }
-
-        // Function to get quick recharge user data
-        function getQuickRechargeUser() {
-            const userData = sessionStorage.getItem('quickRechargeUser');
-            return userData ? JSON.parse(userData) : null;
-        }
-
-        // Function to check if user is logged in
-        function isUserLoggedIn() {
-            return !!getLoggedInUser();
-        }
-
-        // Function to check if there's a quick recharge in progress
-        function isQuickRechargeInProgress() {
-            return !!getQuickRechargeUser();
-        }
-
-        // Function to get current active user (prioritizes logged-in user)
-        function getCurrentUser() {
-            return getLoggedInUser() || getQuickRechargeUser();
-        }
-
-        // Function to get user display name or initials
-        function getUserDisplayName() {
-            const user = getCurrentUser();
-            if (!user) return null;
-            
-            // First try to get name from current user
-            if (user.first_name) {
-                return user.first_name;
-            } else if (user.name) {
-                return user.name;
-            }
-            
-            return null;
-        }
-
-        // Function to get user initials for avatar
-        function getUserInitials() {
-            const user = getCurrentUser();
-            if (!user) return 'G'; // Guest
-            
-            if (user.first_name) {
-                return user.first_name.charAt(0).toUpperCase();
-            } else if (user.name) {
-                return user.name.charAt(0).toUpperCase();
-            }
-            
-            return 'U'; // Unknown
-        }
-
-        // Function to clear only quick recharge data (not logged-in data)
-        function clearQuickRechargeData() {
-            sessionStorage.removeItem('quickRechargeUser');
-            sessionStorage.removeItem('fromQuickRecharge');
-            sessionStorage.removeItem('phoneNumber');
-        }
-
-        // Generate navigation based on user state
-        function generateNavigation() {
-            const navLinks = document.getElementById("nav-links");
-            navLinks.innerHTML = "";
-
-            const isLoggedIn = isUserLoggedIn();
-            const hasQuickRecharge = isQuickRechargeInProgress();
-            const userInitials = getUserInitials();
-
-            // Add guest pages (Home, Plans, Support, About Us)
-            guestPages.forEach(page => {
-                const link = document.createElement("a");
-                link.href = page.url;
-                link.className = `nav-link ${currentPage === page.id ? 'active' : ''}`;
-                link.textContent = page.label;
-                link.onclick = function(e) {
-                    e.preventDefault();
-                    setCurrentPage(page.id);
-                };
-                navLinks.appendChild(link);
-            });
-
-            if (isLoggedIn) {
-                // Add dropdown for logged-in user
-                const dropdownDiv = document.createElement('div');
-                dropdownDiv.className = 'dropdown';
-
-                const avatar = document.createElement('div');
-                avatar.className = 'user-avatar dropdown-toggle';
-                avatar.id = 'profileDropdown';
-                avatar.setAttribute('data-bs-toggle', 'dropdown');
-                avatar.textContent = userInitials;
-                dropdownDiv.appendChild(avatar);
-
-                const dropdownMenu = document.createElement('div');
-                dropdownMenu.className = 'dropdown-menu dropdown-menu-end';
-
-                loggedInDropdownPages.forEach(page => {
-                    const link = document.createElement('a');
-                    link.href = page.url;
-                    link.className = 'dropdown-item';
-                    link.textContent = page.label;
-                    link.onclick = (e) => {
-                        e.preventDefault();
-                        setCurrentPage(page.id);
-                    };
-                    dropdownMenu.appendChild(link);
-                });
-
-                const logoutLink = document.createElement('a');
-                logoutLink.href = '#';
-                logoutLink.className = 'dropdown-item';
-                logoutLink.textContent = 'Logout';
-                logoutLink.onclick = (e) => {
-                    e.preventDefault();
-                    logout();
-                };
-                dropdownMenu.appendChild(logoutLink);
-
-                dropdownDiv.appendChild(dropdownMenu);
-                navLinks.appendChild(dropdownDiv);
-            } else if (hasQuickRecharge) {
-                // Quick recharge user (show phone number and limited options)
-                const quickUserData = getQuickRechargeUser();
-                const phoneNumber = sessionStorage.getItem('phoneNumber');
-                
-                const quickUserDiv = document.createElement('div');
-                quickUserDiv.className = 'quick-user-info';
-                quickUserDiv.innerHTML = `<span class="phone-label">Quick Recharge: +91 ${phoneNumber}</span>`;
-                navLinks.appendChild(quickUserDiv);
-                
-                const loginBtn = document.createElement("a");
-                loginBtn.href = "./SUBSCRIBER/login.html"; 
-                loginBtn.className = "btn login-btn";
-                loginBtn.textContent = "Login";
-                navLinks.appendChild(loginBtn);
-            } else {
-                // Neither logged in nor quick recharge - show login button
-                const loginBtn = document.createElement("a");
-                loginBtn.href = "./SUBSCRIBER/login.html"; 
-                loginBtn.className = "btn login-btn";
-                loginBtn.textContent = "Login";
-                navLinks.appendChild(loginBtn);
-            }
-        }
-
-        // Set current page and navigate
-        function setCurrentPage(pageId) {
-            currentPage = pageId;
-            const guestPage = guestPages.find(p => p.id === pageId);
-            const loggedInPage = loggedInDropdownPages.find(p => p.id === pageId);
-            if (guestPage) {
-                window.location.href = guestPage.url;
-            } else if (loggedInPage) {
-                window.location.href = loggedInPage.url;
-            }
-            generateNavigation();
-        }
-
-        // Logout function with loading overlay
-        function logout() {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            
-            // Show the loading overlay
-            loadingOverlay.style.display = 'flex';
-
-            // Clear only logged-in user data, keep other storage
-            localStorage.removeItem('loggedInUser');
-            clearQuickRechargeData();
-            
-            currentPage = 'home';
-
-            // Update navigation immediately
-            generateNavigation();
-
-            // Show success message without SweetAlert2
-            setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-                window.location.href = 'index.html';
-            }, 1500);
-        }
-
-        // Toggle mobile menu
-        function toggleMenu() {
-            const navLinks = document.getElementById("nav-links");
-            navLinks.classList.toggle("active");
-        }
-
-        // Utility function to show error messages
-        function showError(element, message) {
-            element.textContent = message;
-            element.style.display = 'block';
-        }
-
-        // Utility function to hide error messages
-        function hideError(element) {
-            element.style.display = 'none';
-        }
-
-        // Phone number validation
-        function validatePhoneNumber(value) {
-            const phoneError = document.getElementById('phoneError');
-
-            if (!value) {
-                showError(phoneError, 'Please enter a 10-digit number');
-                return false;
-            }
-
-            if (/^[0-5]/.test(value)) {
-                showError(phoneError, 'Number cannot start with 0-5');
-                return false;
-            }
-
-            if (value.length < 10) {
-                showError(phoneError, 'Please enter a 10-digit number');
-                return false;
-            }
-
-            if (!/^\d{10}$/.test(value)) {
-                showError(phoneError, 'Enter a valid 10-digit number');
-                return false;
-            }
-
-            hideError(phoneError);
-            return true;
-        }
-
-        // Fetch user details from backend API for quick recharge
-        async function fetchUserDetails(phoneNumber) {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const phoneError = document.getElementById('phoneError');
-
-            try {
-                loadingOverlay.style.display = 'flex';
-                const response = await fetch(`http://localhost:8080/api/user/check-number?number=${phoneNumber}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Failed to fetch user details');
-                }
-
-                const userData = await response.json();
-                
-                // Store as quick recharge user
-                storeQuickRechargeUser(userData);
-                sessionStorage.setItem('phoneNumber', phoneNumber);
-                
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                    setCurrentPage('plans');
-                }, 500);
-            } catch (error) {
-                console.error('Error fetching user details:', error);
-                let errorMessage = 'Phone number not registered.';
-                if (error.message.toLowerCase().includes('not found')) {
-                    errorMessage = 'Phone number not registered. Please sign up.';
-                } else if (error.message.toLowerCase().includes('invalid')) {
-                    errorMessage = 'Invalid phone number format.';
-                } else if (error.message.includes('Network')) {
-                    errorMessage = 'Network error. Please check your connection and try again.';
-                } else if (error.message.toLowerCase().includes('failed to fetch user details')) {
-                    errorMessage = 'Unable to verify the phone number. Please try again later.';
-                }
-                showError(phoneError, errorMessage);
-                loadingOverlay.style.display = 'none';
-            }
-        }
-
-        // Function to ensure data persistence before navigation
-        function beforePageNavigation() {
-            // If we have a logged-in user, make sure it's preserved
-            const loggedInUser = getLoggedInUser();
-            if (loggedInUser) {
-                localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-            }
-            
-            // If we have a quick recharge user, preserve it in session storage
-            const quickRechargeUser = getQuickRechargeUser();
-            if (quickRechargeUser) {
-                sessionStorage.setItem('quickRechargeUser', JSON.stringify(quickRechargeUser));
-            }
-        }
-
-        // Initialize and set up event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            // Generate navigation based on current user state
-            generateNavigation();
-
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const phoneInput = document.getElementById('phoneNumber');
-            const getStartedButton = document.getElementById('getStartedBtn');
-
-            // Update "Get Started" button based on login state
-            if (isUserLoggedIn()) {
-                if (getStartedButton) {
-                    getStartedButton.href = './subscriber/profilef.html';
-                    getStartedButton.textContent = 'Go to Profile';
-                }
-            }
-
-            // Dynamic phone number input validation
-            if (phoneInput) {
-                phoneInput.addEventListener('input', (e) => {
-                    let value = e.target.value.replace(/[^0-9]/g, '');
-                    e.target.value = value.slice(0, 10);
-
-                    if (value.length > 0) {
-                        if (validatePhoneNumber(value) && value.length === 10) {
-                            fetchUserDetails(value);
-                        }
-                    } else {
-                        hideError(document.getElementById('phoneError'));
-                    }
-                });
-            }
-
-            // Handle Buy SIM and Port Now buttons
-            document.querySelectorAll('.btn-primary, .btn-track').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    
-                    // Ensure data persistence before navigation
-                    beforePageNavigation();
-                    
-                    loadingOverlay.style.display = 'flex';
-                    const url = button.getAttribute('href');
-                    setTimeout(() => {
-                        window.location.href = url;
-                    }, 1000);
-                });
-            });
-            
-            // Add event listener for beforeunload to ensure data preservation
-            window.addEventListener('beforeunload', () => {
-                beforePageNavigation();
-            });
-        });
-    </script>
+    <script src="./assets/js/index.js"></script>
 </body>
 </html>

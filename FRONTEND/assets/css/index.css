@@ -951,3 +951,26 @@ footer {
         font-size: 12px;
     }
 }
+
+ /* Add error message styling for Quick Recharge section */
+ .quick-recharge .error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    display: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background-color: #fff2f2;
+    border-left: 2px solid #dc3545;
+    animation: shake 0.5s ease-in-out;
+}
+
+.quick-recharge .error-message:before {
+    content: "⚠️ ";
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-3px); }
+    40%, 80% { transform: translateX(3px); }
+}

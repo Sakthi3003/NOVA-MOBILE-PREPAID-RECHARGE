@@ -1,255 +1,295 @@
-$(document).ready(function() {
-    window.onload = function() {
-        location.reload(true); // true parameter forces reload from server, not cache
-    };  
+document.addEventListener('DOMContentLoaded', function() {
+    const phoneStep = document.getElementById('phoneStep');
+    const otpStep = document.getElementById('otpStep');
+    const phoneNumber = document.getElementById('phoneNumber');
+    const sendOtpBtn = document.getElementById('sendOtpBtn');
+    const phoneError = document.getElementById('phoneError');
+    const displayPhoneNumber = document.getElementById('displayPhoneNumber');
+    const otpInputs = document.querySelectorAll('.otp-input');
+    const otpError = document.getElementById('otpError');
+    const timerDisplay = document.getElementById('timer');
+    const resendBtn = document.getElementById('resendBtn');
+    const backToHomeBtn = document.getElementById('backToHomeBtn');
+    const backToPhoneBtn = document.getElementById('backToPhoneBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
-    $("#adminLoginForm").validate({
-        rules: {
-            username: { required: true, minlength: 3 },
-            password: { required: true, minlength: 6 }
-        },
-        messages: {
-            username: {
-                required: "Please enter your username",
-                minlength: "Username must be at least 3 characters long"
-            },
-            password: {
-                required: "Please enter your password",
-                minlength: "Password must be at least 6 characters long"
-            }
-        },
-        errorPlacement: function(error, element) {
-            element.closest('.form-group').find('.error-message').html(error).show();
-            element.addClass('error');
-        },
-        success: function(label, element) {
-            $(element).removeClass('error');
-            $(element).closest('.form-group').find('.error-message').hide();
+    let timerInterval, countdown = 60;
+    let attemptCount = parseInt(sessionStorage.getItem('otpAttempts')) || 0;
+    let lockoutTime = sessionStorage.getItem('lockoutTime');
+    const apiBaseUrl = 'http://localhost:8080/api';
+
+    // Check for lockout
+    if (lockoutTime) {
+        const now = Date.now();
+        const timeLeft = (parseInt(lockoutTime) + 15 * 60 * 1000) - now;
+        if (timeLeft > 0) {
+            showLoadingAndRedirect();
+            return;
+        } else {
+            resetLockout();
+        }
+    }
+
+    // Utility Functions
+    function showLoadingAndRedirect(redirectUrl = '../index.html') {
+        loadingOverlay.style.display = 'flex';
+        setTimeout(() => window.location.href = redirectUrl, 1500); // Match index.html timing
+    }
+
+    function resetLockout() {
+        sessionStorage.removeItem('lockoutTime');
+        sessionStorage.removeItem('otpAttempts');
+        attemptCount = 0;
+    }
+
+    function nextStep(current, next) {
+        document.getElementById(current).classList.remove('active');
+        document.getElementById(next).classList.add('active');
+    }
+
+    function goToHome() {
+        sessionStorage.removeItem('otpStep');
+        sessionStorage.removeItem('otpAttempts');
+        showLoadingAndRedirect('../index.html');
+    }
+
+    function clearOtpInputs() {
+        otpInputs.forEach(input => input.value = '');
+        otpError.style.display = 'none';
+    }
+
+    function showError(element, message) {
+        element.textContent = message;
+        element.style.display = 'block';
+    }
+
+    function hideError(element) {
+        element.style.display = 'none';
+    }
+
+    function resetLoginState() {
+        sessionStorage.removeItem('otpStep');
+        sessionStorage.removeItem('otpAttempts');
+        nextStep('otpStep', 'phoneStep');
+        clearOtpInputs();
+        phoneNumber.value = '';
+        hideError(phoneError);
+        sendOtpBtn.disabled = true;
+        clearInterval(timerInterval);
+    }
+
+    // Phone Number Validation
+    phoneNumber.addEventListener('input', function() {
+        const value = this.value.replace(/[^0-9]/g, '');
+        this.value = value.slice(0, 10);
+        sendOtpBtn.disabled = true;
+
+        if (!value) {
+            showError(phoneError, 'Please enter a 10-digit number');
+        } else if (/^[0-5]/.test(value)) {
+            showError(phoneError, 'Number cannot start with 0-5');
+        } else if (value.length < 10) {
+            showError(phoneError, 'Please enter a 10-digit number');
+        } else if (!/^\d{10}$/.test(value)) {
+            showError(phoneError, 'Enter a valid 10-digit number');
+        } else {
+            hideError(phoneError);
+            sendOtpBtn.disabled = false;
         }
     });
 
-    $("#requestResetForm").validate({
-        rules: { email: { required: true, email: true } },
-        messages: {
-            email: {
-                required: "Please enter your email",
-                email: "Please enter a valid email address"
+    // Send OTP Request
+    document.getElementById('phoneForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const value = phoneNumber.value.trim();
+        if (!value || phoneError.style.display === 'block') return;
+
+        loadingOverlay.style.display = 'flex';
+        try {
+            const response = await fetch(`${apiBaseUrl}/auth/otp/request`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber: value })
+            });
+            const data = await response.json();
+
+            loadingOverlay.style.display = 'none';
+            if (response.ok && data.status === 'Success') {
+                sessionStorage.setItem('session_otpStep', 'true');
+                sessionStorage.setItem('session_phoneNumber', value);
+                displayPhoneNumber.textContent = '+91 ' + value;
+                nextStep('phoneStep', 'otpStep');
+                otpInputs[0].focus();
+                startTimer();
+            } else {
+                throw new Error(data.message || 'Failed to send OTP');
             }
-        },
-        errorPlacement: function(error, element) {
-            element.closest('.form-group').find('.error-message').html(error).show();
-            element.addClass('error');
-        },
-        success: function(label, element) {
-            $(element).removeClass('error');
-            $(element).closest('.form-group').find('.error-message').hide();
+        } catch (error) {
+            loadingOverlay.style.display = 'none';
+            let errorMessage = 'Failed to send OTP. Please try again.';
+            if (error.message.toLowerCase().includes('not registered')) {
+                errorMessage = 'Phone number not registered.';
+            } else if (error.message.toLowerCase().includes('invalid')) {
+                errorMessage = 'Invalid phone number format.';
+            } else if (error.message.includes('Network')) {
+                errorMessage = 'Network error. Please check your connection.';
+            }
+            showError(phoneError, errorMessage);
         }
     });
 
-    $("#resetPasswordForm").validate({
-        rules: {
-            newPassword: {
-                required: true,
-                minlength: 8,
-                pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
-            },
-            confirmNewPassword: { required: true, equalTo: "#newPassword" }
-        },
-        messages: {
-            newPassword: {
-                required: "Please enter a new password",
-                minlength: "Password must be at least 8 characters long",
-                pattern: "Password must contain uppercase, number, and special character"
-            },
-            confirmNewPassword: {
-                required: "Please confirm your new password",
-                equalTo: "Passwords do not match"
+    // OTP Input Handling
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
             }
-        },
-        errorPlacement: function(error, element) {
-            element.closest('.form-group').find('.error-message').html(error).show();
-            element.addClass('error');
-        },
-        success: function(label, element) {
-            $(element).removeClass('error');
-            $(element).closest('.form-group').find('.error-message').hide();
-        }
-    });
-
-    $("#newPassword").on("input", function() {
-        const password = $(this).val();
-        $("#length").toggleClass("valid", password.length >= 8).toggleClass("invalid", password.length < 8);
-        $("#uppercase").toggleClass("valid", /[A-Z]/.test(password)).toggleClass("invalid", !/[A-Z]/.test(password));
-        $("#number").toggleClass("valid", /\d/.test(password)).toggleClass("invalid", !/\d/.test(password));
-        $("#special").toggleClass("valid", /[!@#$%^&*]/.test(password)).toggleClass("invalid", !/[!@#$%^&*]/.test(password));
-    });
-
-    // Password toggle functionality
-    $("#togglePassword").click(function() {
-        const passwordField = $("#password");
-        const type = passwordField.attr("type") === "password" ? "text" : "password";
-        passwordField.attr("type", type);
-        $(this).toggleClass("fa-eye fa-eye-slash");
-    });
-
-    $("#toggleNewPassword").click(function() {
-        const newPasswordField = $("#newPassword");
-        const type = newPasswordField.attr("type") === "password" ? "text" : "password";
-        newPasswordField.attr("type", type);
-        $(this).toggleClass("fa-eye fa-eye-slash");
-    });
-
-    $("#toggleConfirmPassword").click(function() {
-        const confirmPasswordField = $("#confirmNewPassword");
-        const type = confirmPasswordField.attr("type") === "password" ? "text" : "password";
-        confirmPasswordField.attr("type", type);
-        $(this).toggleClass("fa-eye fa-eye-slash");
-    });
-});
-
-const adminLoginForm = document.getElementById('adminLoginForm');
-const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-const backToLoginLink = document.getElementById('backToLoginLink');
-const requestResetForm = document.getElementById('requestResetForm');
-const backToLoginFromConfirm = document.getElementById('backToLoginFromConfirm');
-const resetPasswordForm = document.getElementById('resetPasswordForm');
-
-adminLoginForm.addEventListener('submit', handleAdminLogin);
-forgotPasswordLink.addEventListener('click', showForgotPasswordForm);
-backToLoginLink.addEventListener('click', showLoginForm);
-requestResetForm.addEventListener('submit', handleRequestReset);
-backToLoginFromConfirm.addEventListener('click', showLoginForm);
-resetPasswordForm.addEventListener('submit', handleResetPassword);
-
-function logout() {
-    fetch('http://localhost:8080/api/auth/logout', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}` }
-    })
-    .then(() => {
-        sessionStorage.clear();
-        window.location.href = 'login.html';
-    })
-    .catch(error => {
-        console.error('Logout Error:', error);
-        sessionStorage.clear();
-        window.location.href = 'login.html';
-    });
-}
-
-if (sessionStorage.getItem('accessToken')) {
-    window.location.href = 'manageplans.html';
-}
-
-function handleAdminLogin(event) {
-    event.preventDefault();
-    if (!$("#adminLoginForm").valid()) return;
-
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Login failed');
-        return response.json();
-    })
-    .then(data => {
-        sessionStorage.setItem('accessToken', data.accessToken);
-        sessionStorage.setItem('refreshToken', data.refreshToken);
-        sessionStorage.setItem('role', data.role);
-        sessionStorage.setItem('user_id', data.user_id);
-        sessionStorage.setItem('userDetails', JSON.stringify(data.userDetails));
-
-        console.log('Stored in sessionStorage:', {
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken,
-            role: data.role,
-            user_id: data.user_id,
-            userDetails: data.userDetails
         });
-
-        window.location.href = 'analytics.html';
-    })
-    .catch(error => {
-        console.error('Login Error:', error);
-        // Display error message below the password field
-        $('#password-error').text('Invalid username or password').show();
-        $('#password').addClass('error');
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && !this.value && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
     });
-}
 
-function showForgotPasswordForm(event) {
-    event.preventDefault();
-    document.getElementById('loginForm').classList.add('hidden');
-    document.getElementById('forgotPasswordForm').classList.remove('hidden');
-    document.getElementById('resetConfirmation').classList.add('hidden');
-    document.getElementById('newPasswordForm').classList.add('hidden');
-}
+    // Verify OTP
+    document.getElementById('otpForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        let otpValue = Array.from(otpInputs).map(input => input.value).join('');
+        if (otpValue.length !== 6) {
+            showError(otpError, 'Enter a valid 6-digit OTP');
+            return;
+        }
 
-function showLoginForm(event) {
-    event.preventDefault();
-    document.getElementById('forgotPasswordForm').classList.add('hidden');
-    document.getElementById('resetConfirmation').classList.add('hidden');
-    document.getElementById('newPasswordForm').classList.add('hidden');
-    document.getElementById('loginForm').classList.remove('hidden');
-}
+        loadingOverlay.style.display = 'flex';
+        try {
+            const response = await fetch(`${apiBaseUrl}/auth/otp/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber: phoneNumber.value, otp: otpValue })
+            });
+            const data = await response.json();
 
-function handleRequestReset(event) {
-    event.preventDefault();
-    if (!$("#requestResetForm").valid()) return;
+            if (response.ok && data.status === 'Success') {
+                // Clear temporary login state
+                sessionStorage.removeItem('session_otpStep');
+                sessionStorage.removeItem('otpAttempts');
 
-    const email = document.getElementById('email').value;
+                // Store minimal persistent data in localStorage
+                const userPersistentData = {
+                    userId: data.user_id,
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                    phoneNumber: phoneNumber.value
+                };
+                localStorage.setItem('loggedInUser', JSON.stringify(userPersistentData));
 
-    fetch('http://localhost:8080/api/auth/request-reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Failed to send reset link');
-        return response.json();
-    })
-    .then(data => {
-        document.getElementById('forgotPasswordForm').classList.add('hidden');
-        document.getElementById('resetConfirmation').classList.remove('hidden');
-    })
-    .catch(error => {
-        console.error('Request Reset Error:', error);
-        $('#email-error').text('Failed to send reset link').show();
-        $('#email').addClass('error');
+                // Store detailed user data in sessionStorage with consistent naming
+                const userDetails = {
+                    ...data.userDetails,
+                    firstName: data.userDetails.first_name || 'User',
+                    lastName: data.userDetails.last_name || '',
+                    email: data.userDetails.email || '',
+                    phoneNumber: phoneNumber.value
+                };
+                sessionStorage.setItem('session_loggedInUserDetails', JSON.stringify(userDetails));
+
+                // Handle redirect based on quick recharge context
+                const fromQuickRecharge = sessionStorage.getItem('session_fromQuickRecharge') === 'true';
+                const redirectUrl = fromQuickRecharge ? './plans.html' : '../index.html';
+
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                    window.location.href = redirectUrl;
+                }, 1500);
+            } else {
+                throw new Error(data.message || 'Invalid OTP');
+            }
+        } catch (error) {
+            loadingOverlay.style.display = 'none';
+            let errorMessage = 'Failed to verify OTP. Please try again.';
+            if (error.message.toLowerCase().includes('invalid')) {
+                errorMessage = 'Invalid OTP. Please try again.';
+            } else if (error.message.includes('Network')) {
+                errorMessage = 'Network error. Please check your connection.';
+            }
+            showError(otpError, errorMessage);
+        }
     });
-}
 
-function handleResetPassword(event) {
-    event.preventDefault();
-    if (!$("#resetPasswordForm").valid()) return;
+    // Timer and Resend Logic
+    function startTimer() {
+        countdown = 60;
+        timerDisplay.textContent = countdown;
+        resendBtn.disabled = true;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            countdown--;
+            timerDisplay.textContent = countdown;
+            if (countdown <= 0) {
+                clearInterval(timerInterval);
+                resendBtn.disabled = attemptCount >= 3;
+                if (attemptCount >= 3) {
+                    showError(otpError, 'Max attempts reached. Try again in 15 minutes.');
+                    resendBtn.style.display = 'none';
+                }
+            }
+        }, 1000);
+    }
 
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+    resendBtn.addEventListener('click', async function() {
+        if (attemptCount >= 3) return;
 
-    fetch('http://localhost:8080/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newPassword, confirmNewPassword })
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Failed to reset password');
-        return response.json();
-    })
-    .then(data => {
-        alert('Password reset successfully! Please login with your new password.');
-        showLoginForm(event);
-    })
-    .catch(error => {
-        console.error('Reset Password Error:', error);
-        $('#newPassword-error').text('Failed to reset password').show();
-        $('#newPassword').addClass('error');
+        attemptCount++;
+        sessionStorage.setItem('otpAttempts', attemptCount);
+        loadingOverlay.style.display = 'flex';
+        try {
+            const response = await fetch(`${apiBaseUrl}/auth/otp/request`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber: phoneNumber.value })
+            });
+            const data = await response.json();
+
+            loadingOverlay.style.display = 'none';
+            if (response.ok && data.status === 'Success') {
+                startTimer();
+                hideError(otpError);
+            } else {
+                throw new Error(data.message || 'Failed to resend OTP');
+            }
+        } catch (error) {
+            loadingOverlay.style.display = 'none';
+            let errorMessage = 'Failed to resend OTP. Please try again.';
+            if (error.message.toLowerCase().includes('not registered')) {
+                errorMessage = 'Phone number not registered.';
+            } else if (error.message.includes('Network')) {
+                errorMessage = 'Network error. Please check your connection.';
+            }
+            showError(otpError, errorMessage);
+        }
+
+        if (attemptCount >= 3) {
+            sessionStorage.setItem('lockoutTime', Date.now());
+            showLoadingAndRedirect();
+        }
     });
-}
 
+    // Navigation Handlers
+    backToHomeBtn.addEventListener('click', goToHome);
+    backToPhoneBtn.addEventListener('click', () => {
+        resetLoginState();
+    });
 
-window.logout = logout;
+    // Initialize the page state
+    if (sessionStorage.getItem('session_otpStep') === 'true' && sessionStorage.getItem('session_phoneNumber')) {
+        const storedPhoneNumber = sessionStorage.getItem('session_phoneNumber');
+        phoneNumber.value = storedPhoneNumber;
+        displayPhoneNumber.textContent = '+91 ' + storedPhoneNumber;
+        nextStep('phoneStep', 'otpStep');
+        startTimer();
+    } else {
+        resetLoginState();
+    }
+});

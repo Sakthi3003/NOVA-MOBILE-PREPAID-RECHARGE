@@ -509,3 +509,42 @@ footer {
     width: 100px;
     height: 100px;
 }
+
+.invoice-table td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+.breadcrumb {
+    background-color: #f8f9fa;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+.notification-message {
+    color: #28a745;
+    font-size: 1rem;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+}
+.notification-message i {
+    margin-right: 8px;
+}
+.btn-loading::after {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+    margin-left: 8px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.swal2-container {
+    z-index: 3001 !important;
+}
