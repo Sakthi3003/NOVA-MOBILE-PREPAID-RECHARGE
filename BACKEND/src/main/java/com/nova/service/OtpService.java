@@ -1,26 +1,23 @@
 package com.nova.service;
 
-import com.nova.entity.Otp;
-import com.nova.repository.OtpRepository;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import com.twilio.exception.ApiException;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@Transactional
 public class OtpService {
     private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
 
@@ -36,12 +33,48 @@ public class OtpService {
     @Value("${twilio.default.country.code:+91}")
     private String defaultCountryCode;
 
-    private final OtpRepository otpRepository;
+    // Nested class to replace Otp entity
+    private static class OtpData {
+        private final String otp;
+        private final LocalDateTime expiresAt;
+
+        public OtpData(String otp, LocalDateTime expiresAt) {
+            this.otp = otp;
+            this.expiresAt = expiresAt;
+        }
+
+        public String getOtp() {
+            return otp;
+        }
+
+        public LocalDateTime getExpiresAt() {
+            return expiresAt;
+        }
+    }
     
+    @Scheduled(fixedRate = 60 * 60 * 1000)  // Every 60 minutes
+    public void cleanupExpiredOtps() {
+        logger.info("Starting OTP store cleanup");
+        int initialSize = otpStore.size();
+        LocalDateTime now = LocalDateTime.now();
+        
+        otpStore.entrySet().removeIf(entry -> {
+            boolean expired = now.isAfter(entry.getValue().getExpiresAt());
+            if (expired) {
+                logger.debug("Removing expired OTP for phone: {}", entry.getKey());
+            }
+            return expired;
+        });
+        
+        logger.info("OTP cleanup completed. Removed {} entries. Current size: {}", 
+                   (initialSize - otpStore.size()), otpStore.size());
+    }
+
+    private final ConcurrentHashMap<String, OtpData> otpStore = new ConcurrentHashMap<>();
     private boolean isTwilioInitialized = false;
 
-    public OtpService(OtpRepository otpRepository) {
-        this.otpRepository = otpRepository;
+    public OtpService() {
+        // No cleanup task needed; expiration handled in verifyOtp
     }
 
     @PostConstruct
@@ -74,45 +107,35 @@ public class OtpService {
         String formattedPhoneNumber = formatPhoneNumber(phoneNumber);
         String otp = String.format("%06d", new Random().nextInt(999999));
 
-        Optional<Otp> existingOtp = otpRepository.findByPhoneNumber(formattedPhoneNumber);
-        Otp otpEntity;
-        if (existingOtp.isPresent()) {
-            logger.debug("Updating existing OTP for phone number: {}", formattedPhoneNumber);
-            otpEntity = existingOtp.get();
-        } else {
-            otpEntity = new Otp();
-            otpEntity.setPhoneNumber(formattedPhoneNumber);
-        }
-        otpEntity.setOtp(otp);
-        otpEntity.setCreatedAt(LocalDateTime.now());
-        otpEntity.setExpiresAt(LocalDateTime.now().plusMinutes(5));
-        otpRepository.save(otpEntity);
-
+        OtpData otpData = new OtpData(otp, LocalDateTime.now().plusMinutes(5));
+        otpStore.put(formattedPhoneNumber, otpData);
         sendOtpSms(formattedPhoneNumber, otp);
-        logger.info("OTP generated and sent for phone number: {}", phoneNumber);
+        logger.info("OTP generated and sent for phone number: {}. Store size: {}", phoneNumber, otpStore.size());
         return otp;
     }
+    
 
     public boolean verifyOtp(String phoneNumber, String otp) {
         logger.info("Verifying OTP for phone number: {}", phoneNumber);
         String formattedPhoneNumber = formatPhoneNumber(phoneNumber);
-        Optional<Otp> otpEntityOptional = otpRepository.findByPhoneNumber(formattedPhoneNumber);
+        OtpData otpData = otpStore.get(formattedPhoneNumber);
 
-        if (otpEntityOptional.isPresent()) {
-            Otp otpEntity = otpEntityOptional.get();
-            LocalDateTime now = LocalDateTime.now();
+        if (otpData == null) {
+            logger.warn("No OTP found for phone number: {}", formattedPhoneNumber);
+            return false;
+        }
 
-            if (now.isAfter(otpEntity.getExpiresAt())) {
-                logger.debug("OTP expired for phone number: {}", formattedPhoneNumber);
-                otpRepository.deleteByPhoneNumber(formattedPhoneNumber);
-                return false;
-            }
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(otpData.getExpiresAt())) {
+            logger.debug("OTP expired for phone number: {}", formattedPhoneNumber);
+            otpStore.remove(formattedPhoneNumber);
+            return false;
+        }
 
-            if (otpEntity.getOtp().equals(otp)) {
-                logger.debug("OTP verified successfully for phone number: {}", formattedPhoneNumber);
-                otpRepository.deleteByPhoneNumber(formattedPhoneNumber);
-                return true;
-            }
+        if (otpData.getOtp().equals(otp)) {
+            logger.debug("OTP verified successfully for phone number: {}", formattedPhoneNumber);
+            otpStore.remove(formattedPhoneNumber);
+            return true;
         }
 
         logger.warn("OTP verification failed for phone number: {}", phoneNumber);

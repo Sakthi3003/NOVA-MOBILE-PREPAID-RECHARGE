@@ -29,8 +29,7 @@ public interface RechargeRepository extends JpaRepository<Recharge, Long> {
     List<Recharge> findByEndDateBetween(LocalDate start, LocalDate end);
     List<Recharge> findByUserUserId(Long userId);
     
-    @Query("SELECT r FROM Recharge r WHERE r.user = :user ORDER BY r.startDate DESC, r.rechargeId DESC")
-    Optional<Recharge> findTopByUserOrderByStartDateDesc(@Param("user") User user);
+    Optional<Recharge> findTopByUserOrderByStartDateDescRechargeIdDesc(User user);
     
     List<Recharge> findByUser(User user);
 }

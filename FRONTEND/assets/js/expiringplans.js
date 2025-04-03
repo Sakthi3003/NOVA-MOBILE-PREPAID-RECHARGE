@@ -86,7 +86,6 @@ function setupEventListeners() {
 
     userProfile.addEventListener('click', (e) => {
         e.stopPropagation();
-        // Add admin profile details here if needed
     });
 
     document.addEventListener('click', (e) => {

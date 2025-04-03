@@ -46,6 +46,10 @@ public class RechargeService {
      * Processes a new recharge for a user, setting the activation date of pending plans
      * sequentially based on the end date of the last active or pending plan.
      */
+    /**
+     * Processes a new recharge for a user, setting the activation date of pending plans
+     * sequentially based on the end date of the last active or pending plan.
+     */
     public Recharge rechargeUser(Long userId, Long planId, String phoneNumber, String paymentMethod) throws Exception {
         // Fetch user
         Optional<User> userOptional = userRepository.findById(userId);
@@ -129,22 +133,23 @@ public class RechargeService {
         invoice.setPaymentMode(paymentMethod);
         invoice = invoiceRepository.save(invoice);
 
-        // Send SMS notification
+        // Send SMS notification with limited plan details immediately after recharge
         String smsMessage = String.format(
-            "Dear %s, your recharge of ₹%.2f for plan '%s' on number %s has been %s. Transaction ID: %d. Valid from: %s to %s. Thank you for choosing Nova!",
-            user.getFirstName() + " " + user.getLastName(),
-            plan.getPrice(),
+            "Dear %s, your recharge for '%s' (₹%.2f) on %s is %s. Valid: %s to %s. Txn ID: %d. Enjoy Nova!",
+            user.getFirstName(),
             plan.getName(),
+            plan.getPrice(),
             phoneNumber,
             rechargeStatus.equals("Active") ? "successful" : "queued",
-            transaction.getTransactionId(),
             recharge.getStartDate().toString(),
-            recharge.getEndDate().toString()
+            recharge.getEndDate().toString(),
+            transaction.getTransactionId()
         );
         try {
             otpService.sendSms(phoneNumber, smsMessage);
         } catch (Exception e) {
             System.err.println("Failed to send SMS: " + e.getMessage());
+            // Log the error but don't throw an exception to avoid rolling back the recharge
         }
 
         // Generate invoice PDF and send via email
@@ -207,7 +212,6 @@ public class RechargeService {
 
         return recharge;
     }
-
     /**
      * Simulates payment processing (for demonstration purposes).
      */

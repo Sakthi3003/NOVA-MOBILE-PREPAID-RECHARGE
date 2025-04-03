@@ -239,7 +239,7 @@ public class AdminService {
 
         for (User user : activeUsers) {
             logger.debug("Checking active user: {}", user.getUserId());
-            Optional<Recharge> latestRechargeOpt = rechargeRepository.findTopByUserOrderByStartDateDesc(user);
+            Optional<Recharge> latestRechargeOpt = rechargeRepository.findTopByUserOrderByStartDateDescRechargeIdDesc(user);
             if (latestRechargeOpt.isPresent()) {
                 LocalDate lastRecharge = latestRechargeOpt.get().getStartDate();
                 long monthsSinceLastRecharge = ChronoUnit.MONTHS.between(lastRecharge, LocalDate.now());
@@ -265,7 +265,7 @@ public class AdminService {
 
         for (User inactiveUser : inactiveUsers) {
             logger.debug("Checking inactive user: {}", inactiveUser.getUserId());
-            Optional<Recharge> latestRechargeOpt = rechargeRepository.findTopByUserOrderByStartDateDesc(inactiveUser);
+            Optional<Recharge> latestRechargeOpt = rechargeRepository.findTopByUserOrderByStartDateDescRechargeIdDesc(inactiveUser);
             LocalDate lastActivityDate;
             if (latestRechargeOpt.isPresent()) {
                 lastActivityDate = latestRechargeOpt.get().getStartDate();
@@ -286,7 +286,6 @@ public class AdminService {
                     inactiveUser.setStatus("deactivated");
                     userRepository.save(inactiveUser);
                     updated = true;
-                    
                 }
             }
         }
@@ -303,7 +302,7 @@ public class AdminService {
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setEmail(user.getEmail());
         dto.setActivationDate(user.getActivationDate());
-        Optional<Recharge> latestRecharge = rechargeRepository.findTopByUserOrderByStartDateDesc(user);
+        Optional<Recharge> latestRecharge = rechargeRepository.findTopByUserOrderByStartDateDescRechargeIdDesc(user);
         dto.setLastRechargeDate(latestRecharge.isPresent() ? latestRecharge.get().getStartDate().toString() : null);
         dto.setStatus(user.getStatus());
         dto.setAddress(user.getAddress());
