@@ -100,7 +100,7 @@ function generateNavigation() {
         });
 
         const loginBtn = document.createElement("a");
-        loginBtn.href = "../login.html";
+        loginBtn.href = "../index.html";
         loginBtn.className = "btn login-btn";
         loginBtn.textContent = "Login";
         navLinks.appendChild(loginBtn);

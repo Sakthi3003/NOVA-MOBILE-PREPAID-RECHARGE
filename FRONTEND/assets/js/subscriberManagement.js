@@ -101,12 +101,12 @@ function setupEventListeners() {
     const subscriberSearchInput = document.getElementById('subscriberSearchInput');
 
     // Set active class based on current page
-    const currentPage = window.location.pathname.split('/').pop();
+    const currentPagePath = window.location.pathname.split('/').pop();
     const navLinks = document.querySelectorAll('.nav-link');
     
     navLinks.forEach(link => {
         const page = link.getAttribute('data-page');
-        if (page && currentPage.includes(page)) {
+        if (page && currentPagePath.includes(page)) {
             link.classList.add('active');
         } else {
             link.classList.remove('active');
@@ -358,7 +358,7 @@ async function checkRechargeStatus() {
         console.error('Error checking recharge status:', error);
         let errorMsg = 'Failed to check recharge status. Please try again.';
         if (error.message.includes('401')) {
-            showErrorMessage('Session expired. Redirecting to login...#pragma once');
+            showErrorMessage('Session expired. Redirecting to login...');
             setTimeout(() => {
                 handleLogout();
             }, 2000);
@@ -664,6 +664,11 @@ function updatePagination(pageData) {
     document.getElementById('pagination-info').textContent = `Showing ${start} to ${end} of ${totalEntries} entries`;
 }
 
-function isMobile() {
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * Checks if the current window is a mobile device or not
+ * @return {boolean} True if the window is a mobile device, false otherwise
+ */
+/*******  ff387eb0-7dba-42b7-8b96-b87641e13146  *******/function isMobile() {
     return window.innerWidth <= 992;
 }
