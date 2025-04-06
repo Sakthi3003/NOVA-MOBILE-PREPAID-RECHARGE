@@ -18,8 +18,8 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class OtpService {
-    private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
+public class TwillioService {
+    private static final Logger logger = LoggerFactory.getLogger(TwillioService.class);
 
     @Value("${twilio.account.sid:}")
     private String accountSid;
@@ -33,7 +33,6 @@ public class OtpService {
     @Value("${twilio.default.country.code:+91}")
     private String defaultCountryCode;
 
-    // Nested class to replace Otp entity
     private static class OtpData {
         private final String otp;
         private final LocalDateTime expiresAt;
@@ -73,8 +72,8 @@ public class OtpService {
     private final ConcurrentHashMap<String, OtpData> otpStore = new ConcurrentHashMap<>();
     private boolean isTwilioInitialized = false;
 
-    public OtpService() {
-        // No cleanup task needed; expiration handled in verifyOtp
+    public TwillioService() {
+
     }
 
     @PostConstruct

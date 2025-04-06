@@ -6,6 +6,7 @@ import com.nova.DTO.PlanDTO;
 import com.nova.DTO.PlanUpdateDTO;
 import com.nova.entity.Category;
 import com.nova.entity.Plan;
+import com.nova.exception.CategoryNotFoundException;
 import com.nova.repository.CategoryRepository;
 import com.nova.repository.PlanRepository;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class PlanService {
         Optional<Plan> plan = planRepository.findById(planId);
         if (plan.isEmpty()) {
             logger.warn("Plan not found with id: {}", planId);
-            throw new RuntimeException("Plan not found with id: " + planId);
+            throw new RuntimeException("Plan not found with id: " + planId); // Kept as RuntimeException
         }
         logger.debug("Found plan: {}", plan.get().getName());
         return plan;
@@ -80,7 +81,7 @@ public class PlanService {
         Plan plan = planRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.warn("Plan not found with id: {}", id);
-                    return new RuntimeException("Plan not found with id: " + id);
+                    return new RuntimeException("Plan not found with id: " + id); // Kept as RuntimeException
                 });
         logger.debug("Found plan: {}", plan.getName());
         return convertToDTO(plan);
@@ -103,7 +104,7 @@ public class PlanService {
         Category category = categoryRepository.findById(planCreateDTO.getCategoryId())
                 .orElseThrow(() -> {
                     logger.warn("Category not found with id: {}", planCreateDTO.getCategoryId());
-                    return new RuntimeException("Category not found with id: " + planCreateDTO.getCategoryId());
+                    return new CategoryNotFoundException("Category not found with id: " + planCreateDTO.getCategoryId());
                 });
         plan.setCategory(category);
 
@@ -118,7 +119,7 @@ public class PlanService {
         Plan plan = planRepository.findById(planUpdateDTO.getId())
                 .orElseThrow(() -> {
                     logger.warn("Plan not found with id: {}", planUpdateDTO.getId());
-                    return new RuntimeException("Plan not found with id: " + planUpdateDTO.getId());
+                    return new RuntimeException("Plan not found with id: " + planUpdateDTO.getId()); // Kept as RuntimeException
                 });
 
         plan.setName(planUpdateDTO.getName());
@@ -134,7 +135,7 @@ public class PlanService {
         Category category = categoryRepository.findById(planUpdateDTO.getCategoryId())
                 .orElseThrow(() -> {
                     logger.warn("Category not found with id: {}", planUpdateDTO.getCategoryId());
-                    return new RuntimeException("Category not found with id: " + planUpdateDTO.getCategoryId());
+                    return new CategoryNotFoundException("Category not found with id: " + planUpdateDTO.getCategoryId());
                 });
         plan.setCategory(category);
 
@@ -143,13 +144,12 @@ public class PlanService {
         return convertToDTO(updatedPlan);
     }
 
-
     public PlanDTO togglePlanStatus(Long id) {
         logger.info("Toggling status for plan with id: {}", id);
         Plan plan = planRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.warn("Plan not found with id: {}", id);
-                    return new RuntimeException("Plan not found with id: " + id);
+                    return new RuntimeException("Plan not found with id: " + id); // Kept as RuntimeException
                 });
         plan.setStatus(plan.getStatus().equals("active") ? "inactive" : "active");
         Plan updatedPlan = save(plan);

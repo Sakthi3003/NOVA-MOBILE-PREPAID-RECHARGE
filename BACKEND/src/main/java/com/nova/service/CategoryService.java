@@ -2,6 +2,7 @@ package com.nova.service;
 
 import com.nova.DTO.CategoryDTO;
 import com.nova.entity.Category;
+import com.nova.exception.CategoryNotFoundException;
 import com.nova.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class CategoryService {
 
     public CategoryDTO getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
         return convertToDTO(category);
     }
 
@@ -35,7 +36,7 @@ public class CategoryService {
 
     public CategoryDTO updateCategory(CategoryDTO categoryDTO) {
         Category category = categoryRepository.findById(categoryDTO.getId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
         category.setName(categoryDTO.getName());
         Category updatedCategory = categoryRepository.save(category);
         return convertToDTO(updatedCategory);

@@ -34,7 +34,7 @@ public class RechargeService {
     private InvoiceRepository invoiceRepository;
 
     @Autowired
-    private OtpService otpService;
+    private TwillioService otpService;
 
     @Autowired
     private PdfGeneratorService pdfGeneratorService;

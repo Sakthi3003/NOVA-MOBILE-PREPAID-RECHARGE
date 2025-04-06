@@ -60,6 +60,15 @@ public class GlobalExceptionHandler {
         logger.warn("Validation failed: {}", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors); // 400
     }
+    
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleCategoryNotFoundException(CategoryNotFoundException ex) {
+        logger.error("CategoryNotFoundException: {}", ex.getMessage());
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "Error");
+        response.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
@@ -76,6 +85,15 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("message", "An unexpected error occurred");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse); 
+    }
+    
+    @ExceptionHandler(PlanNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handlePlanNotFoundException(PlanNotFoundException ex) {
+        logger.error("PlanNotFoundException: {}", ex.getMessage());
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "Error");
+        response.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
     
     @ExceptionHandler(IllegalArgumentException.class)

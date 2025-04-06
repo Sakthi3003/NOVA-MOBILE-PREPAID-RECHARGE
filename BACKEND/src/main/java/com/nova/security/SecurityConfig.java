@@ -43,7 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**","/api/plans","/api/categories").permitAll()
                         .requestMatchers("/api/plans/**","/api/categories/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/plans/add", "/api/plans/edit/**", "/api/plans/delete/**", "/api/plans/**/toggle-status").hasRole("ADMIN")
-                        .requestMatchers("/api/categories/add", "/api/categories/edit/**", "/api/categories/delete/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/categories/add", "/api/categories/edit/**", "/api/categories/delete/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

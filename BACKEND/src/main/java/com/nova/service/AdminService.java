@@ -39,7 +39,7 @@ public class AdminService {
     private UserRepository userRepository;
 
     @Autowired
-    private OtpService otpService;
+    private TwillioService otpService;
 
     public List<RechargeDTO> getExpiringPlans() {
         LocalDate today = LocalDate.now();
