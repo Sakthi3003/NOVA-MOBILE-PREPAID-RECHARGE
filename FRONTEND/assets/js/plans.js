@@ -1,5 +1,5 @@
- // Pages configuration (consistent with index.html)
- const guestPages = [
+// Pages configuration (consistent with index.html)
+const guestPages = [
     { id: "home", label: "Home", url: "../index.html" },
     { id: "plans", label: "Plans", url: "./plans.html" },
     { id: "support", label: "Support", url: "./support.html" },
@@ -16,6 +16,17 @@ let currentPage = "plans";
 let selectedPlan = null;
 let isLoggedIn = false;
 let userInitials = "S";
+
+// Debounce function
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
 
 // Fetch categories from the backend API
 async function fetchCategories() {
@@ -223,7 +234,7 @@ function renderPlans(plans, categories) {
     });
 }
 
-// Generate navigation (aligned with index.html)
+// Generate navigation
 function generateNavigation() {
     const navLinks = document.getElementById("nav-links");
     navLinks.innerHTML = "";
@@ -321,7 +332,7 @@ function setCurrentPage(pageId) {
     generateNavigation();
 }
 
-// Logout function with SweetAlert2 and loading overlay
+// Logout function
 function logout() {
     const loadingOverlay = document.getElementById('loadingOverlay');
     loadingOverlay.style.display = 'flex';
@@ -376,7 +387,7 @@ function showChangeNumberModal(isChangeNumber = false, plan = null) {
     }
 }
 
-// Show confirmation modal with dynamic text
+// Show confirmation modal
 function showConfirmModal(plan) {
     const modal = document.getElementById("confirmModal");
     if (!modal) return;
@@ -492,7 +503,7 @@ async function validateModalNumber() {
     }
 }
 
-// Proceed to payment page with user details and plan
+// Proceed to payment page
 function proceedToPayment(plan) {
     sessionStorage.setItem('selectedPlan', JSON.stringify({
         id: plan.id,
@@ -532,7 +543,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         sessionStorage.setItem('quickRechargeUserDetails', JSON.stringify(quickRechargeData.userDetails));
     }
 
-    // Only show number display if phone number exists
     if (phoneNumber) {
         document.getElementById("selectedNumber").textContent = phoneNumber;
         document.getElementById("numberDisplay").style.display = "flex";
@@ -540,10 +550,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById("numberDisplay").style.display = "none";
     }
 
-    // Search input event listener
-    document.getElementById('searchInput').addEventListener('input', async (e) => {
-        const searchTerm = e.target.value.trim();
+    // Debounced search function
+    const debouncedSearch = debounce(async (searchTerm) => {
         await searchPlansFromBackend(searchTerm);
+    }, 300); // 300ms delay
+
+    // Search input event listener with debouncing
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const searchTerm = e.target.value.trim();
+        debouncedSearch(searchTerm);
     });
 
     // Buy now buttons
@@ -585,7 +600,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let value = e.target.value.replace(/[^0-9]/g, '');
         e.target.value = value.slice(0, 10);
 
-        const errorMessage = document.getElementById('modal WErrorMessage');
+        const errorMessage = document.getElementById('modalErrorMessage');
         if (value.length === 0) {
             errorMessage.textContent = 'Phone number is required';
             errorMessage.style.display = 'block';
