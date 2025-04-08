@@ -51,7 +51,7 @@ public class User {
     private String status = "active";
 
     @Column(columnDefinition = "TEXT")
-    private String address; // Optional, no strict validation
+    private String address;
 
     @Column(nullable = false, unique = true, length = 50)
     @NotBlank(message = "Username cannot be blank")
@@ -79,7 +79,6 @@ public class User {
     @JsonIgnore
     private List<Invoice> invoices;
 
-    // Getters and Setters
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
     public String getFirstName() { return firstName; }

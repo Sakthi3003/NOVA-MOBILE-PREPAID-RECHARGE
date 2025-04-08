@@ -123,7 +123,7 @@ public class UserService {
         return username;
     }
 
-    private User getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     logger.warn("User not found with username: {}", username);
@@ -131,7 +131,7 @@ public class UserService {
                 });
     }
 
-    private Map<String, Object> processUserPlans(List<Recharge> recharges) {
+    public Map<String, Object> processUserPlans(List<Recharge> recharges) {
         LocalDate today = LocalDate.now();
         logger.debug("Processing plans with current date: {}", today);
         
@@ -148,7 +148,7 @@ public class UserService {
         return response;
     }
 
-    private void updateExpiredPlans(List<Recharge> recharges, LocalDate today) {
+    public void updateExpiredPlans(List<Recharge> recharges, LocalDate today) {
         recharges.forEach(recharge -> {
             if ("Active".equalsIgnoreCase(recharge.getStatus()) && today.isAfter(recharge.getEndDate())) {
                 recharge.setStatus("Expired");
@@ -168,14 +168,14 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    private List<Map<String, Object>> getPlansByStatus(List<Recharge> recharges, String status) {
+    public List<Map<String, Object>> getPlansByStatus(List<Recharge> recharges, String status) {
         return recharges.stream()
                 .filter(r -> status.equalsIgnoreCase(r.getStatus()))
                 .map(this::mapRechargeToPlanData)
                 .collect(Collectors.toList());
     }
 
-    private Map<String, Object> mapRechargeToPlanData(Recharge recharge) {
+    public Map<String, Object> mapRechargeToPlanData(Recharge recharge) {
         Map<String, Object> planData = new HashMap<>();
         try {
             planData.put("id", recharge.getRechargeId());
@@ -216,7 +216,7 @@ public class UserService {
         return userDetails;
     }
 
-    private boolean isPhoneNumber(String subject) {
+    public boolean isPhoneNumber(String subject) {
         boolean result = subject.matches("\\+?\\d+");
         logger.debug("Checking if {} is phone number: {}", subject, result);
         return result;
@@ -328,7 +328,7 @@ public class UserService {
         }
     }
 
-    private Sort parseSortParameter(String sort) {
+    public Sort parseSortParameter(String sort) {
         String[] sortParams = sort.split(",");
         if (sortParams.length != 2) {
             logger.warn("Invalid sort parameter format: {}", sort);
@@ -353,7 +353,7 @@ public class UserService {
         return Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
     }
 
-    private UserDTO convertToUserDTO(User user) {
+    public UserDTO convertToUserDTO(User user) {
         UserDTO dto = new UserDTO();
         try {
             dto.setUserId(user.getUserId());

@@ -20,7 +20,6 @@ function debounce(func, wait) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Authentication Check
     function checkAuth() {
         const accessToken = sessionStorage.getItem('accessToken');
         if (!accessToken) {
@@ -28,11 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Run auth check on load
     checkAuth();
 
-    // Display Username and Role from sessionStorage
-    const userDetails = JSON.parse(sessionStorage.getItem('userDetails')) || {};
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails') || '{}');
     const username = userDetails.username || 'Admin';
     const role = sessionStorage.getItem('role') || '';
     const userNameElement = document.getElementById('userName');
@@ -43,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     userRoleElement.textContent = role;
     avatarElement.textContent = username.charAt(0).toUpperCase();
 
-    // Sidebar Toggle
     const sidebar = document.getElementById('sidebar');
     const content = document.getElementById('content');
     const toggleBtn = document.getElementById('toggleSidebar');
@@ -80,17 +76,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Setup other event listeners
     setupEventListeners();
     fetchSubscribers();
     checkRechargeStatus();
 
-    // Prevent back button access
     window.addEventListener('popstate', () => {
         checkAuth();
     });
 
-    // Push initial state to history
     history.pushState(null, null, window.location.href);
 });
 
@@ -100,7 +93,6 @@ function setupEventListeners() {
     const userProfile = document.getElementById('userProfile');
     const subscriberSearchInput = document.getElementById('subscriberSearchInput');
 
-    // Set active class based on current page
     const currentPagePath = window.location.pathname.split('/').pop();
     const navLinks = document.querySelectorAll('.nav-link');
     
@@ -123,7 +115,6 @@ function setupEventListeners() {
         }
     });
 
-    // Navigation click handler
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
             if (this.classList.contains('logout-btn')) {
@@ -146,14 +137,12 @@ function setupEventListeners() {
         });
     });
 
-    // Search Functionality
     subscriberSearchInput.addEventListener('input', debounce(() => {
         searchQuery = subscriberSearchInput.value.trim();
         currentPage = 0;
         fetchSubscribers();
     }, 500));
 
-    // Filter Buttons
     const subscriberFilterButtons = document.querySelectorAll('.subscriber-filter-btn');
     subscriberFilterButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -168,21 +157,18 @@ function setupEventListeners() {
         });
     });
 
-    // Sorting
     document.getElementById('subscriber-sort').addEventListener('change', () => {
         sort = document.getElementById('subscriber-sort').value;
         currentPage = 0;
         fetchSubscribers();
     });
 
-    // Page Size
     document.getElementById('page-size').addEventListener('change', () => {
         pageSize = parseInt(document.getElementById('page-size').value);
         currentPage = 0;
         fetchSubscribers();
     });
 
-    // Pagination
     document.getElementById('pagination').addEventListener('click', (e) => {
         e.preventDefault();
         const target = e.target.closest('.page-link');
@@ -199,7 +185,6 @@ function setupEventListeners() {
         showToast('Loading page ' + (currentPage + 1));
     });
 
-    // Logout Functionality
     const logoutBtn = document.getElementById('logoutBtn');
     const loadingOverlay = document.getElementById('loadingOverlay');
 
@@ -210,18 +195,24 @@ function setupEventListeners() {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}` }
         })
+        .then(response => {
+            if (!response.ok) throw new Error('Logout failed');
+            return response.text(); // Use text() for non-JSON responses
+        })
         .then(() => {
             sessionStorage.clear();
             setTimeout(() => {
-                window.location.href = '../index.html';
+                window.location.href = './login.html';
             }, 1500);
         })
-        .catch(error => {
-            console.error('Logout Error:', error);
+        .catch(() => {
             sessionStorage.clear();
             setTimeout(() => {
-                window.location.href = '../index.html';
+                window.location.href = './login.html';
             }, 1500);
+        })
+        .finally(() => {
+            loadingOverlay.style.display = 'none';
         });
     });
 }
@@ -237,7 +228,8 @@ async function refreshAccessToken() {
         });
 
         if (!response.ok) {
-            throw new Error('Token refresh failed');
+            const errorText = await response.text(); // Get raw response
+            throw new Error(errorText || 'Token refresh failed');
         }
 
         const data = await response.json();
@@ -249,6 +241,7 @@ async function refreshAccessToken() {
 
         return token;
     } catch (error) {
+        showErrorMessage(error.message || 'Token refresh failed. Please log in again.');
         handleLogout();
         return null;
     }
@@ -270,28 +263,39 @@ async function apiRequest(url, options = {}) {
             headers
         });
 
-        if (response.status === 401) {
-            const newToken = await refreshAccessToken();
-            if (newToken) {
-                headers['Authorization'] = `Bearer ${newToken}`;
-                return fetch(url, {
-                    ...options,
-                    headers
-                });
+        if (!response.ok) {
+            const errorText = await response.text(); // Capture raw error response
+            if (response.status === 401) {
+                const newToken = await refreshAccessToken();
+                if (newToken) {
+                    headers['Authorization'] = `Bearer ${newToken}`;
+                    return fetch(url, {
+                        ...options,
+                        headers
+                    });
+                }
+                return null;
+            } else if (response.status === 403) {
+                showErrorMessage('Permission denied. Please contact administrator.');
+                setTimeout(() => {
+                    handleLogout();
+                }, 2000);
+                return null;
+            } else {
+                throw new Error(errorText || 'Request failed with status ' + response.status);
             }
-            return null;
-        } else if (response.status === 403) {
-            showErrorMessage('Permission Denied. You do not have permission to access this resource. Redirecting to login...');
-            setTimeout(() => {
-                handleLogout();
-            }, 2000);
-            return null;
         }
 
-        return response;
+        // Try to parse JSON, fall back to text if parsing fails
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json();
+        } else {
+            return response.text();
+        }
     } catch (error) {
-        console.error('API Request Error:', error);
-        throw error;
+        showErrorMessage(error.message || 'An unexpected error occurred. Please try again later.');
+        return null;
     }
 }
 
@@ -340,36 +344,27 @@ async function checkRechargeStatus() {
             body: JSON.stringify({})
         });
 
-        if (!response || !response.ok) {
-            const errorData = await response?.json();
-            throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
+        if (!response) {
+            throw new Error('No response from server');
         }
 
-        const result = await response.json();
+        let result;
+        if (typeof response === 'string') {
+            throw new Error(response || 'Failed to check recharge status');
+        } else {
+            result = response;
+        }
+
         if (result.status === 'SUCCESS') {
             if (result.data && result.data.updated) {
                 showToast('User statuses updated based on recharge activity', 'success');
                 fetchSubscribers();
             }
         } else {
-            throw new Error(result.message || 'Failed to check recharge status');
+            throw new Error(result.message || 'Operation failed');
         }
     } catch (error) {
-        console.error('Error checking recharge status:', error);
-        let errorMsg = 'Failed to check recharge status. Please try again.';
-        if (error.message.includes('401')) {
-            showErrorMessage('Session expired. Redirecting to login...');
-            setTimeout(() => {
-                handleLogout();
-            }, 2000);
-        } else if (error.message.includes('403')) {
-            showErrorMessage('Permission denied. Redirecting to login...');
-            setTimeout(() => {
-                handleLogout();
-            }, 2000);
-        } else {
-            showErrorMessage(errorMsg);
-        }
+        showErrorMessage(error.message || 'Failed to check recharge status. Please try again later.');
     } finally {
         loadingOverlay.style.display = 'none';
     }
@@ -392,33 +387,24 @@ async function fetchSubscribers() {
             method: 'GET'
         });
 
-        if (!response || !response.ok) {
-            const errorData = await response?.json();
-            throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
+        if (!response) {
+            throw new Error('No response from server');
         }
 
-        const apiResponse = await response.json();
+        let apiResponse;
+        if (typeof response === 'string') {
+            throw new Error(response || 'Failed to load subscribers');
+        } else {
+            apiResponse = response;
+        }
+
         const pageData = apiResponse.data || apiResponse;
         const subscribers = pageData.content || [];
 
         renderSubscribersTable(subscribers);
         updatePagination(pageData);
     } catch (error) {
-        console.error('Error loading subscribers:', error);
-        let errorMsg = 'Failed to load subscribers. Please try again.';
-        if (error.message.includes('401')) {
-            showErrorMessage('Session expired. Redirecting to login...');
-            setTimeout(() => {
-                handleLogout();
-            }, 2000);
-        } else if (error.message.includes('403')) {
-            showErrorMessage('Permission denied. Redirecting to login...');
-            setTimeout(() => {
-                handleLogout();
-            }, 2000);
-        } else {
-            showErrorMessage(errorMsg);
-        }
+        showErrorMessage(error.message || 'Unable to load subscribers. Please try again later.');
         renderSubscribersTable([]);
     } finally {
         loadingOverlay.style.display = 'none';
@@ -485,12 +471,17 @@ async function handleSubscriberActivate() {
             method: 'POST'
         });
 
-        if (!response || !response.ok) {
-            const errorData = await response?.json();
-            throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
+        if (!response) {
+            throw new Error('No response from server');
         }
 
-        const result = await response.json();
+        let result;
+        if (typeof response === 'string') {
+            throw new Error(response || 'Failed to activate user');
+        } else {
+            result = response;
+        }
+
         if (result.status === 'SUCCESS') {
             statusCell.className = 'status-badge status-active';
             statusCell.textContent = 'Active';
@@ -509,11 +500,10 @@ async function handleSubscriberActivate() {
             fetchSubscribers();
             showToast('User activated successfully', 'success');
         } else {
-            throw new Error(result.message || 'Failed to activate user');
+            throw new Error(result.message || 'Operation failed');
         }
     } catch (error) {
-        console.error('Error activating user:', error);
-        showErrorMessage(error.message || 'Failed to activate user');
+        showErrorMessage(error.message || 'Unable to activate user. Please try again later.');
     } finally {
         loadingOverlay.style.display = 'none';
     }
@@ -531,12 +521,17 @@ async function handleSubscriberDeactivate() {
             method: 'POST'
         });
 
-        if (!response || !response.ok) {
-            const errorData = await response?.json();
-            throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
+        if (!response) {
+            throw new Error('No response from server');
         }
 
-        const result = await response.json();
+        let result;
+        if (typeof response === 'string') {
+            throw new Error(response || 'Failed to deactivate user');
+        } else {
+            result = response;
+        }
+
         if (result.status === 'SUCCESS') {
             statusCell.className = 'status-badge status-inactive';
             statusCell.textContent = 'Inactive';
@@ -551,11 +546,10 @@ async function handleSubscriberDeactivate() {
             fetchSubscribers();
             showToast('User deactivated successfully', 'danger');
         } else {
-            throw new Error(result.message || 'Failed to deactivate user');
+            throw new Error(result.message || 'Operation failed');
         }
     } catch (error) {
-        console.error('Error deactivating user:', error);
-        showErrorMessage(error.message || 'Failed to deactivate user');
+        showErrorMessage(error.message || 'Unable to deactivate user. Please try again later.');
     } finally {
         loadingOverlay.style.display = 'none';
     }
@@ -573,12 +567,17 @@ async function handleSubscriberSuspend() {
             method: 'POST'
         });
 
-        if (!response || !response.ok) {
-            const errorData = await response?.json();
-            throw new Error(errorData?.message || `HTTP error! Status: ${response.status}`);
+        if (!response) {
+            throw new Error('No response from server');
         }
 
-        const result = await response.json();
+        let result;
+        if (typeof response === 'string') {
+            throw new Error(response || 'Failed to suspend user');
+        } else {
+            result = response;
+        }
+
         if (result.status === 'SUCCESS') {
             statusCell.className = 'status-badge status-suspended';
             statusCell.textContent = 'Suspended';
@@ -595,11 +594,10 @@ async function handleSubscriberSuspend() {
             fetchSubscribers();
             showToast('User suspended successfully', 'warning');
         } else {
-            throw new Error(result.message || 'Failed to suspend user');
+            throw new Error(result.message || 'Operation failed');
         }
     } catch (error) {
-        console.error('Error suspending user:', error);
-        showErrorMessage(error.message || 'Failed to suspend user');
+        showErrorMessage(error.message || 'Unable to suspend user. Please try again later.');
     } finally {
         loadingOverlay.style.display = 'none';
     }
@@ -664,11 +662,6 @@ function updatePagination(pageData) {
     document.getElementById('pagination-info').textContent = `Showing ${start} to ${end} of ${totalEntries} entries`;
 }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * Checks if the current window is a mobile device or not
- * @return {boolean} True if the window is a mobile device, false otherwise
- */
-/*******  ff387eb0-7dba-42b7-8b96-b87641e13146  *******/function isMobile() {
-    return window.innerWidth <= 992;
+function isMobile() {
+    return window.innerWidth <= 992; 
 }

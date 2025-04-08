@@ -50,66 +50,55 @@ public class AuthService {
     public Map<String, Object> login(AuthRequest authRequest) {
         Map<String, Object> response = new HashMap<>();
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-            );
-        } catch (BadCredentialsException e) {
-            logger.warn("Invalid credentials for username: {}", authRequest.getUsername());
-            throw new InvalidCredentialsException("Invalid username or password");
-        } catch (Exception e) {
-            logger.error("Authentication failed for username: {}: {}", authRequest.getUsername(), e.getMessage(), e);
-            throw new RuntimeException("Authentication failed: " + e.getMessage(), e);
+        // Authenticate user - let BadCredentialsException propagate
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+        );
+
+        // Load user details
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+        User user = userRepository.findByUsername(authRequest.getUsername())
+            .orElseThrow(() -> {
+                logger.warn("Admin not found with username: {}", authRequest.getUsername());
+                return new UserNotFoundException("Admin not found with username: " + authRequest.getUsername());
+            });
+
+        // Extract and validate roles
+        List<String> roles = user.getRoles().stream()
+            .map(Role::getRoleName)
+            .filter(role -> role.equals("ADMIN") || role.equals("USER"))
+            .collect(Collectors.toList());
+
+        if (roles.isEmpty()) {
+            logger.warn("No valid roles for user: {}", authRequest.getUsername());
+            throw new InvalidRoleException("No valid roles (ADMIN or USER) assigned to user: " + authRequest.getUsername());
         }
 
-        try {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-            User user = userRepository.findByUsername(authRequest.getUsername())
-                    .orElseThrow(() -> {
-                        logger.warn("Admin not found with username: {}", authRequest.getUsername());
-                        return new UserNotFoundException("Admin not found with username: " + authRequest.getUsername());
-                    });
+        // Generate tokens
+        String accessToken = jwtUtil.generateToken(userDetails.getUsername(), roles);
+        String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), roles);
+        String responseRole = "ADMIN"; // Consider dynamically setting this based on roles
 
-            List<String> roles = user.getRoles().stream()
-                    .map(Role::getRoleName)
-                    .filter(role -> role.equals("ADMIN") || role.equals("USER"))
-                    .collect(Collectors.toList());
+        // Build response
+        response.put("status", "Success");
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken);
+        response.put("role", responseRole);
+        response.put("user_id", user.getUserId());
+        response.put("userDetails", new HashMap<String, Object>() {{
+            put("activation_date", user.getActivationDate().toString());
+            put("address", user.getAddress());
+            put("email", user.getEmail());
+            put("first_name", user.getFirstName());
+            put("last_name", user.getLastName());
+            put("phone_number", formatPhoneNumber(user.getPhoneNumber()));
+            put("status", user.getStatus());
+            put("username", user.getUsername());
+        }});
 
-            if (roles.isEmpty()) {
-                logger.warn("No valid roles for user: {}", authRequest.getUsername());
-                throw new InvalidRoleException("No valid roles (ADMIN or USER) assigned to user: " + authRequest.getUsername());
-            }
-
-            String accessToken = jwtUtil.generateToken(userDetails.getUsername(), roles);
-            String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), roles);
-            String responseRole = "ADMIN";
-
-            response.put("status", "Success");
-            response.put("accessToken", accessToken);
-            response.put("refreshToken", refreshToken);
-            response.put("role", responseRole);
-            response.put("user_id", user.getUserId());
-            response.put("userDetails", new HashMap<String, Object>() {{
-                put("activation_date", user.getActivationDate().toString());
-                put("address", user.getAddress());
-                put("email", user.getEmail());
-                put("first_name", user.getFirstName());
-                put("last_name", user.getLastName());
-                put("phone_number", formatPhoneNumber(user.getPhoneNumber()));
-                put("status", user.getStatus());
-                put("username", user.getUsername());
-            }});
-
-            return response;
-
-        } catch (UserNotFoundException | InvalidRoleException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Failed to process login for username: {}: {}", authRequest.getUsername(), e.getMessage(), e);
-            throw new RuntimeException("Failed to process login: " + e.getMessage(), e);
-        }
+        logger.info("Login successful for username: {}", authRequest.getUsername());
+        return response;
     }
-
     public Map<String, Object> requestOtp(OtpRequest otp) {
         Map<String, Object> response = new HashMap<>();
 

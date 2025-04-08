@@ -1,6 +1,6 @@
 $(document).ready(function() {
     window.onload = function() {
-        location.reload(true); // true parameter forces reload from server, not cache
+        location.reload(true);
     };  
 
     $("#adminLoginForm").validate({
@@ -28,81 +28,11 @@ $(document).ready(function() {
         }
     });
 
-    $("#requestResetForm").validate({
-        rules: { email: { required: true, email: true } },
-        messages: {
-            email: {
-                required: "Please enter your email",
-                email: "Please enter a valid email address"
-            }
-        },
-        errorPlacement: function(error, element) {
-            element.closest('.form-group').find('.error-message').html(error).show();
-            element.addClass('error');
-        },
-        success: function(label, element) {
-            $(element).removeClass('error');
-            $(element).closest('.form-group').find('.error-message').hide();
-        }
-    });
-
-    $("#resetPasswordForm").validate({
-        rules: {
-            newPassword: {
-                required: true,
-                minlength: 8,
-                pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
-            },
-            confirmNewPassword: { required: true, equalTo: "#newPassword" }
-        },
-        messages: {
-            newPassword: {
-                required: "Please enter a new password",
-                minlength: "Password must be at least 8 characters long",
-                pattern: "Password must contain uppercase, number, and special character"
-            },
-            confirmNewPassword: {
-                required: "Please confirm your new password",
-                equalTo: "Passwords do not match"
-            }
-        },
-        errorPlacement: function(error, element) {
-            element.closest('.form-group').find('.error-message').html(error).show();
-            element.addClass('error');
-        },
-        success: function(label, element) {
-            $(element).removeClass('error');
-            $(element).closest('.form-group').find('.error-message').hide();
-        }
-    });
-
-    $("#newPassword").on("input", function() {
-        const password = $(this).val();
-        $("#length").toggleClass("valid", password.length >= 8).toggleClass("invalid", password.length < 8);
-        $("#uppercase").toggleClass("valid", /[A-Z]/.test(password)).toggleClass("invalid", !/[A-Z]/.test(password));
-        $("#number").toggleClass("valid", /\d/.test(password)).toggleClass("invalid", !/\d/.test(password));
-        $("#special").toggleClass("valid", /[!@#$%^&*]/.test(password)).toggleClass("invalid", !/[!@#$%^&*]/.test(password));
-    });
-
     // Password toggle functionality
     $("#togglePassword").click(function() {
         const passwordField = $("#password");
         const type = passwordField.attr("type") === "password" ? "text" : "password";
         passwordField.attr("type", type);
-        $(this).toggleClass("fa-eye fa-eye-slash");
-    });
-
-    $("#toggleNewPassword").click(function() {
-        const newPasswordField = $("#newPassword");
-        const type = newPasswordField.attr("type") === "password" ? "text" : "password";
-        newPasswordField.attr("type", type);
-        $(this).toggleClass("fa-eye fa-eye-slash");
-    });
-
-    $("#toggleConfirmPassword").click(function() {
-        const confirmPasswordField = $("#confirmNewPassword");
-        const type = confirmPasswordField.attr("type") === "password" ? "text" : "password";
-        confirmPasswordField.attr("type", type);
         $(this).toggleClass("fa-eye fa-eye-slash");
     });
 });

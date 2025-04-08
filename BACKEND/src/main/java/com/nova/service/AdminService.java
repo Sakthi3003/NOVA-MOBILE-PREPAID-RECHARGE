@@ -47,8 +47,7 @@ public class AdminService {
             throw new IllegalArgumentException("Invalid or expired token");
         }
 
-        User user = userService.getUserByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userService.getUserByUsername(username);
 
         boolean isAdmin = user.getRoles().stream().anyMatch(role -> role.getRoleName().equals("ADMIN"));
         if (!isAdmin) {
