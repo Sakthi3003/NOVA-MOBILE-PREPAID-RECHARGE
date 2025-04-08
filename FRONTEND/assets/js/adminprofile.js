@@ -178,14 +178,18 @@ async function saveAccountChanges(event) {
     const email = document.getElementById('email-input').value.trim();
     const password = document.getElementById('password-input').value.trim();
     const updatedProfile = {};
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails')) || {};
 
-    // Client-side validation
+    // Compare with existing values from sessionStorage
     if (email && document.getElementById('email-edit').style.display !== 'none') {
         if (!/\S+@\S+\.\S+/.test(email)) {
             document.getElementById('email-error').textContent = 'Invalid email format';
             return;
         }
-        updatedProfile.email = email;
+        // Only include email if it’s different from the current value
+        if (email !== userDetails.email) {
+            updatedProfile.email = email;
+        }
     }
 
     if (password && document.getElementById('password-edit').style.display !== 'none') {
@@ -193,9 +197,11 @@ async function saveAccountChanges(event) {
             document.getElementById('password-error').textContent = 'Password must be at least 8 characters';
             return;
         }
-        updatedProfile.password = password;
+        // Only include password if it’s non-empty (assuming no current password is shown)
+        updatedProfile.password = password; // No direct comparison since password isn’t stored in sessionStorage
     }
 
+    // Check if there are any actual changes
     if (Object.keys(updatedProfile).length === 0) {
         Swal.fire({
             icon: 'info',
@@ -204,6 +210,15 @@ async function saveAccountChanges(event) {
             timer: 1500,
             showConfirmButton: false
         });
+        // Reset UI to display mode
+        document.getElementById('email-display').style.display = 'flex';
+        document.getElementById('email-edit').style.display = 'none';
+        document.getElementById('password-display').style.display = 'flex';
+        document.getElementById('password-edit').style.display = 'none';
+        document.getElementById('account-form').classList.add('hidden');
+        document.getElementById('email-error').textContent = '';
+        document.getElementById('password-error').textContent = '';
+        document.getElementById('password-input').value = '';
         return;
     }
 
