@@ -9,7 +9,7 @@ public class UserDTO {
     private String phoneNumber;
     private String email;
     private Date activationDate;
-    private String lastRechargeDate; // Derived from Recharge.startDate
+    private String lastRechargeDate;
     private String status;
     private String address;
     private String username;

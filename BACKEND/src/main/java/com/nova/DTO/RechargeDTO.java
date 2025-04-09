@@ -11,7 +11,7 @@ public class RechargeDTO {
     private LocalDate endDate;
     private String status;
     private Long transactionId;
-    private Long daysToExpire; // New field
+    private Long daysToExpire;
     private UserDTO user;
     private PlanDTO plan;
 

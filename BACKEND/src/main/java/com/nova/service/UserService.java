@@ -97,6 +97,7 @@ public class UserService {
         });
     }
 
+    @Transactional
     public Map<String, Object> getUserPlans() {
         try {
             logger.info("Fetching plans for authenticated user");
@@ -134,7 +135,7 @@ public class UserService {
     public Map<String, Object> processUserPlans(List<Recharge> recharges) {
         LocalDate today = LocalDate.now();
         logger.debug("Processing plans with current date: {}", today);
-        
+        activatePendingPlans(recharges, today);
         updateExpiredPlans(recharges, today);
         Map<String, Object> response = new HashMap<>();
         response.put("activePlans", getActivePlans(recharges, today));
@@ -146,6 +147,19 @@ public class UserService {
             ((List<?>) response.get("pendingPlans")).size(),
             ((List<?>) response.get("expiredPlans")).size());
         return response;
+    }
+    
+    @Transactional
+    public void activatePendingPlans(List<Recharge> recharges, LocalDate today) {
+        recharges.forEach(recharge -> {
+            if ("Pending".equalsIgnoreCase(recharge.getStatus()) && 
+                (today.isEqual(recharge.getStartDate()) || today.isAfter(recharge.getStartDate()))) {
+                recharge.setStatus("Active");
+                rechargeRepository.save(recharge);
+                logger.info("Activated recharge {} (startDate: {})", 
+                    recharge.getRechargeId(), recharge.getStartDate());
+            }
+        });
     }
 
     public void updateExpiredPlans(List<Recharge> recharges, LocalDate today) {

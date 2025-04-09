@@ -10,6 +10,4 @@ public class RechargeStatusResponse {
 
     public boolean isUpdated() { return updated; }
     public void setUpdated(boolean updated) { this.updated = updated; }
-    
-    
 }
